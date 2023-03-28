@@ -1,4 +1,4 @@
-export class CreateDoctroDto {
+export class CreateDoctorDto {
     firstName: string;
   
     lastName: string;
