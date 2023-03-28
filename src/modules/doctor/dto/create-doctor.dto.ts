@@ -1,11 +1,11 @@
-export class CreateDoctorDto {
-    firstName: string;
-  
-    lastName: string;
-  
-    email: string;
-  
-    password: string;
+export default class CreateDoctorDto {
+  firstName: string;
 
-    role: string;
+  lastName: string;
+
+  email: string;
+
+  password: string;
+
+  role: string;
 }
