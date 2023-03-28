@@ -10,6 +10,10 @@ export class DoctorService {
     private doctorRepository: Repository<Doctor>,
   ) {}
 
+  createDoctor(doctor: Doctor): Promise<Doctor> {
+    return this.doctorRepository.save(doctor);
+  }
+
   findAll(): Promise<Doctor[]> {
     return this.doctorRepository.find();
   }
