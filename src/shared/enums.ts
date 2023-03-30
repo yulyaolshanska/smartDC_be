@@ -1,9 +1,9 @@
 export enum Role {
-    Local = 'Local',
-    Remote = 'Remote'
+  Local = 'Local',
+  Remote = 'Remote',
 }
 
 export enum Gender {
-    Male = 'Male',
-    Female = 'Female'
+  Male = 'Male',
+  Female = 'Female',
 }

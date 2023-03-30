@@ -1,13 +1,14 @@
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import AppModule from './app.module';
 
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
 
   const config = new DocumentBuilder()
-    .setTitle('')
+    .setTitle('Web Wizards api')
     .setDescription('')
     .setVersion('1.0')
     .addTag('app')
@@ -15,6 +16,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  await app.listen(process.env.PORT || 3000);
+  await app.listen(app.get(ConfigService).get('PORT'));
 }
 bootstrap();
