@@ -1,40 +1,38 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpStatus,
-  Param,
-  Post,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import DoctorService from './doctor.service';
+import CreateDoctorDto from './dto/create-doctor.dto';
 import Doctor from './entity/doctor.entity';
 
 @Controller('doctor')
 export default class DoctorController {
   constructor(private readonly doctorService: DoctorService) {}
 
+  @ApiOperation({ summary: 'Doctor creation' })
+  @ApiResponse({ status: 201, type: Doctor })
   @Post()
-  async createBook(@Res() response, @Body() doctor: Doctor) {
-    const newDoctor = await this.doctorService.createDoctor(doctor);
-    return response.status(HttpStatus.CREATED).json({
-      newDoctor,
-    });
+  createDoctor(@Body() doctorDto: CreateDoctorDto) {
+    return this.doctorService.createDoctor(doctorDto);
   }
 
+  @ApiOperation({ summary: 'Getting all doctors' })
+  @ApiResponse({ status: 200, type: [Doctor] })
   @Get()
-  async fetchAll(@Res() response) {
-    const doctors = await this.doctorService.findAll();
-    return response.status(HttpStatus.OK).json({
-      doctors,
-    });
+  getAll() {
+    return this.doctorService.getAllDoctors();
   }
 
+  @ApiOperation({ summary: 'Getting doctor by id' })
+  @ApiResponse({ status: 200, type: Doctor })
   @Get('/:id')
-  async findById(@Res() response, @Param('id') id) {
-    const doctor = await this.doctorService.findOne(id);
-    return response.status(HttpStatus.OK).json({
-      doctor,
-    });
+  getOne(@Param('id') id: number) {
+    return this.doctorService.getDoctorByID(id);
+  }
+
+  @ApiOperation({ summary: 'Delete doctor by id' })
+  @ApiResponse({ status: 200, type: [Doctor] })
+  @Delete('/:id')
+  deleteOne(@Param('id') id: number) {
+    return this.doctorService.deleteDoctorById(id);
   }
 }
