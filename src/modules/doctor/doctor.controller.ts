@@ -11,28 +11,28 @@ export default class DoctorController {
   @ApiOperation({ summary: 'Doctor creation' })
   @ApiResponse({ status: 201, type: Doctor })
   @Post()
-  createDoctor(@Body() doctorDto: CreateDoctorDto) {
+  createDoctor(@Body() doctorDto: CreateDoctorDto): Promise<Doctor> {
     return this.doctorService.createDoctor(doctorDto);
   }
 
   @ApiOperation({ summary: 'Getting all doctors' })
   @ApiResponse({ status: 200, type: [Doctor] })
   @Get()
-  getAll() {
+  getAll(): Promise<Doctor[]> {
     return this.doctorService.getAllDoctors();
   }
 
   @ApiOperation({ summary: 'Getting doctor by id' })
   @ApiResponse({ status: 200, type: Doctor })
   @Get('/:id')
-  getOne(@Param('id') id: number) {
+  getOne(@Param('id') id: number): Promise<Doctor> {
     return this.doctorService.getDoctorByID(id);
   }
 
   @ApiOperation({ summary: 'Delete doctor by id' })
   @ApiResponse({ status: 200, type: [Doctor] })
   @Delete('/:id')
-  deleteOne(@Param('id') id: number) {
+  deleteOne(@Param('id') id: number): Promise<string> {
     return this.doctorService.deleteDoctorById(id);
   }
 }
