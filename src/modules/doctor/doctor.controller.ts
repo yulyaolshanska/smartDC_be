@@ -32,7 +32,7 @@ export default class DoctorController {
   @ApiOperation({ summary: 'Delete doctor by id' })
   @ApiResponse({ status: 200, type: [Doctor] })
   @Delete('/:id')
-  deleteOne(@Param('id') id: number): Promise<string> {
+  deleteOne(@Param('id') id: number): Promise<void> {
     return this.doctorService.deleteDoctorById(id);
   }
 }
