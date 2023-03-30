@@ -11,10 +11,10 @@ export default class DoctorService {
     private doctorRepository: Repository<Doctor>,
   ) {}
 
-  async createDoctor(doctorDto: CreateDoctorDto): Promise<CreateDoctorDto> {
+  async createDoctor(doctorDto: CreateDoctorDto): Promise<Doctor> {
     try {
       const doctor = await this.doctorRepository.create(doctorDto);
-      await this.doctorRepository.save(doctor);
+      this.doctorRepository.save(doctor);
       return doctor;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
