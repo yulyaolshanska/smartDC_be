@@ -1,11 +1,5 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { NO_ROWS_AFFECTED } from 'src/shared/consts';
 import { Repository } from 'typeorm';
 import CreateDoctorDto from './dto/create-doctor.dto';
 import Doctor from './entity/doctor.entity';
@@ -17,61 +11,67 @@ export default class DoctorService {
     private doctorRepository: Repository<Doctor>,
   ) {}
 
-  async createDoctor(createDoctorDto: CreateDoctorDto): Promise<Doctor> {
+  async createDoctor(
+    createDoctorDto: CreateDoctorDto,
+    link: string,
+  ): Promise<Doctor> {
     try {
-      const doctor = this.doctorRepository.create(createDoctorDto);
-
-      await this.doctorRepository
-        .createQueryBuilder()
-        .insert()
-        .into(Doctor)
-        .values(doctor)
-        .execute();
-
-      return doctor;
+      const newDoctor = this.doctorRepository.create({ ...createDoctorDto });
+      newDoctor.activation_link = link;
+      await this.doctorRepository.save(newDoctor);
+      return newDoctor;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async getAllDoctors(): Promise<Doctor[]> {
-    try {
-      return await this.doctorRepository.createQueryBuilder('doctor').getMany();
-    } catch (err) {
-      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+  async getDoctorByEmail(email: string): Promise<Doctor> {
+    const user = await this.doctorRepository.findOne({
+      where: {
+        email,
+      },
+    });
+    return user;
   }
 
-  async getDoctorByID(id: number): Promise<Doctor | null> {
-    try {
-      const doctor = await this.doctorRepository
-        .createQueryBuilder('doctor')
-        .where('doctor.id = :id', { id })
-        .getOne();
+  //   async  getAllDoctors(): Promise<Doctor[]> {
+  //     try {
+  //       return await this.doctorRepository.createQueryBuilder('doctor').getMany();
+  //     } catch (err) {
+  //       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+  //     }
+  //   }
 
-      if (!doctor) {
-        throw new NotFoundException(`Doctor with id ${id} not found`);
-      }
+  //   async getDoctorByID(id: number): Promise<Doctor | null> {
+  //     try {
+  //       const doctor = await this.doctorRepository
+  //         .createQueryBuilder('doctor')
+  //         .where('doctor.id = :id', { id })
+  //         .getOne();
 
-      return doctor;
-    } catch (err) {
-      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
+  //       if (!doctor) {
+  //         throw new NotFoundException(`Doctor with id ${id} not found`);
+  //       }
 
-  async deleteDoctorById(id: number): Promise<void> {
-    try {
-      const result = await this.doctorRepository
-        .createQueryBuilder('doctor')
-        .delete()
-        .where('doctor.id = :id', { id })
-        .execute();
+  //       return doctor;
+  //     } catch (err) {
+  //       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+  //     }
+  //   }
 
-      if (result.affected === NO_ROWS_AFFECTED) {
-        throw new NotFoundException(`Doctor with id ${id} not found`);
-      }
-    } catch (err) {
-      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
+  //   async deleteDoctorById(id: number): Promise<void> {
+  //     try {
+  //       const result = await this.doctorRepository
+  //         .createQueryBuilder('doctor')
+  //         .delete()
+  //         .where('doctor.id = :id', { id })
+  //         .execute();
+
+  //       if (result.affected === NO_ROWS_AFFECTED) {
+  //         throw new NotFoundException(`Doctor with id ${id} not found`);
+  //       }
+  //     } catch (err) {
+  //       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+  //     }
+  //   }
 }

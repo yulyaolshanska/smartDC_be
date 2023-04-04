@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { Role } from 'src/shared/enums';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsPhoneNumber,
+  IsString,
+  Length,
+  Matches,
+} from 'class-validator';
+import { NAME_MIN_LENGTH, PASSWORD_REGEX } from '../../../shared/consts';
 
 export default class CreateDoctorDto {
   @ApiProperty({
@@ -9,6 +16,7 @@ export default class CreateDoctorDto {
   })
   @IsString()
   @IsNotEmpty()
+  @Length(NAME_MIN_LENGTH)
   firstName: string;
 
   @ApiProperty({
@@ -17,7 +25,16 @@ export default class CreateDoctorDto {
   })
   @IsString()
   @IsNotEmpty()
+  @Length(NAME_MIN_LENGTH)
   lastName: string;
+
+  @ApiProperty({
+    description: "Doctor's phone ",
+    example: '+380992598283',
+  })
+  @IsPhoneNumber(undefined, { message: 'Phone number must be valid' })
+  @IsNotEmpty()
+  phone: string;
 
   @ApiProperty({
     description: "Doctor's email",
@@ -33,13 +50,33 @@ export default class CreateDoctorDto {
   })
   @IsString()
   @IsNotEmpty()
+  @Matches(PASSWORD_REGEX, {
+    message:
+      'Password should contain 10 characters, at least one uppercase and one lowercase letter',
+  })
   password: string;
 
-  @ApiProperty({
-    description: "Doctor's role",
-    example: 'Local',
-  })
-  @IsEnum(Role)
-  @IsNotEmpty()
-  role: Role;
+  // @ApiProperty({
+  //   description: "Verification passed",
+  //   example: 'true',
+  // })
+  // @IsString()
+  // @IsNotEmpty()
+  // is_verified: boolean;
+
+  // @ApiProperty({
+  //   description: 'Link to activate account',
+  //   example: '????',
+  // })
+  // @IsString()
+  // @IsNotEmpty()
+  // activation_link: string;
+
+  //   @ApiProperty({
+  //     description: "Doctor's role",
+  //     example: 'Local',
+  //   })
+  //   @IsEnum(Role)
+  //   @IsNotEmpty()
+  //   role: Role;
 }
