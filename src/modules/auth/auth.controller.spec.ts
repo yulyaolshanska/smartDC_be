@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import CreateDoctorDto from 'modules/doctor/dto/create-doctor.dto';
 import AuthController from './auth.controller';
 import AuthService from './auth.service';
+import { HttpException } from '@nestjs/common/exceptions';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -15,6 +16,7 @@ describe('AuthController', () => {
           provide: AuthService,
           useValue: {
             registration: jest.fn(() => ({ token: 'test_token' })),
+            activation: jest.fn(() => {}),
           },
         },
       ],
@@ -38,6 +40,16 @@ describe('AuthController', () => {
 
       expect(authService.registration).toHaveBeenCalledWith(userData);
       expect(result).toEqual({ token: 'test_token' });
+    });
+  });
+  describe('activation', () => {
+    it('should call authService.activation() with the provided activation link', async () => {
+      const activationLink = 'some-activation-link';
+      const activationSpy = jest.spyOn(authService, 'activation');
+
+      await controller.activation(activationLink);
+
+      expect(activationSpy).toHaveBeenCalledWith(activationLink);
     });
   });
 });

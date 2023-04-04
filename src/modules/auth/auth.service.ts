@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt/dist';
 import * as bcrypt from 'bcryptjs';
 import * as nodemailer from 'nodemailer';
 import * as uuid from 'uuid';
-import { Repository } from 'typeorm';
+import { Repository, getRepository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
@@ -38,11 +38,6 @@ export default class AuthService {
     });
   }
 
-  // async login(doctorDto: CreateDoctorDto) {
-  //   const doctor = await this.validateUser(doctorDto);
-  //   return this.generateToken(doctor);
-  // }
-
   async registration(doctorDto: CreateDoctorDto): Promise<{ token: string }> {
     const candidate = await this.doctorService.getDoctorByEmail(
       doctorDto.email,
@@ -50,22 +45,23 @@ export default class AuthService {
     if (candidate) {
       throw new HttpException(
         'User with this email already exists',
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.CONFLICT,
       );
     }
     const hashPassword = await bcrypt.hash(doctorDto.password, HASH_NUMBER);
-    const activationLink = `${this.configService.get(
-      'API_URL',
-    )}/auth/activation/${uuid.v4()}`;
+    const activationLink = uuid.v4();
     const doctor = await this.doctorService.createDoctor(
       {
         ...doctorDto,
         password: hashPassword,
       },
-      activationLink,
+      `${this.configService.get('API_URL')}/auth/activation/${activationLink}`,
     );
 
-    await this.sendActivationMail(doctorDto.email, activationLink);
+    await this.sendActivationMail(
+      doctorDto.email,
+      `${this.configService.get('API_URL')}/auth/activation/${activationLink}`,
+    );
     return this.generateToken(doctor);
   }
 
@@ -83,23 +79,9 @@ export default class AuthService {
     }
   }
 
-  // private async validateUser(doctorDto: CreateDoctorDto) {
-  //   try {
-  //     const doctor = await this.doctorService.getDoctorByEmail(doctorDto.email);
-  //     const passwordEquals = await bcrypt.compare(
-  //       doctorDto.password,
-  //       doctor.password,
-  //     );
-  //     if (doctor && passwordEquals) {
-  //       return doctor;
-  //     }
-  //   } catch (error) {
-  //     throw new UnauthorizedException({ message: 'Wrong email or password' });
-  //   }
-  // }
-
   private async sendActivationMail(to: string, link: string): Promise<void> {
     try {
+      console.log(link);
       await this.transporter.sendMail({
         from: this.configService.get('SMTP_USER'),
         to,
@@ -120,27 +102,53 @@ export default class AuthService {
   }
 
   async activation(link: string): Promise<void> {
+    const activationLink = `${this.configService.get(
+      'API_URL',
+    )}/auth/activation/${link}`;
     try {
-      const doctor = await this.doctorRepository.findOne({
-        where: {
-          activation_link: `${this.configService.get(
-            'API_URL',
-          )}/auth/activation/${link}`,
-        },
-      });
+      const doctor = await this.doctorRepository
+        .createQueryBuilder()
+        .update(Doctor)
+        .set({ is_verified: true })
+        .where('doctor.activation_link = :activation_link', {
+          activation_link: activationLink,
+        })
+        .execute();
+
       if (!doctor) {
         throw new HttpException(
           'Wrong activation link',
           HttpStatus.BAD_REQUEST,
         );
       }
-      doctor.is_verified = true;
-      await this.doctorRepository.save(doctor);
     } catch (error) {
+      console.log(error);
       throw new HttpException(
-        'Not possible to activate account',
+        'Wrong activation link',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 }
+
+//login i used to test registration
+
+// async login(doctorDto: CreateDoctorDto) {
+//   const doctor = await this.validateUser(doctorDto);
+//   return this.generateToken(doctor);
+// }\
+
+// private async validateUser(doctorDto: CreateDoctorDto) {
+//   try {
+//     const doctor = await this.doctorService.getDoctorByEmail(doctorDto.email);
+//     const passwordEquals = await bcrypt.compare(
+//       doctorDto.password,
+//       doctor.password,
+//     );
+//     if (doctor && passwordEquals) {
+//       return doctor;
+//     }
+//   } catch (error) {
+//     throw new UnauthorizedException({ message: 'Wrong email or password' });
+//   }
+// }

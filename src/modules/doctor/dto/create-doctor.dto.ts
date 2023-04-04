@@ -55,28 +55,4 @@ export default class CreateDoctorDto {
       'Password should contain 10 characters, at least one uppercase and one lowercase letter',
   })
   password: string;
-
-  // @ApiProperty({
-  //   description: "Verification passed",
-  //   example: 'true',
-  // })
-  // @IsString()
-  // @IsNotEmpty()
-  // is_verified: boolean;
-
-  // @ApiProperty({
-  //   description: 'Link to activate account',
-  //   example: '????',
-  // })
-  // @IsString()
-  // @IsNotEmpty()
-  // activation_link: string;
-
-  //   @ApiProperty({
-  //     description: "Doctor's role",
-  //     example: 'Local',
-  //   })
-  //   @IsEnum(Role)
-  //   @IsNotEmpty()
-  //   role: Role;
 }
