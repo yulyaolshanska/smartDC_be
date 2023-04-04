@@ -36,11 +36,16 @@ export default class DoctorService {
   }
 
   async getDoctorByEmail(email: string): Promise<Doctor> {
-    const user = await this.doctorRepository.findOne({
-      where: {
-        email,
-      },
-    });
+    const user = await this.doctorRepository
+      .createQueryBuilder('doctor')
+      .where('doctor.email = :email', { email })
+      .getOne();
+    if (user) {
+      throw new HttpException(
+        'User with this email already exists',
+        HttpStatus.CONFLICT,
+      );
+    }
     return user;
   }
 

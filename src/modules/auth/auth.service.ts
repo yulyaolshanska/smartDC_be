@@ -39,21 +39,13 @@ export default class AuthService {
   }
 
   async registration(doctorDto: CreateDoctorDto): Promise<{ token: string }> {
-    const candidate = await this.doctorService.getDoctorByEmail(
-      doctorDto.email,
-    );
-    if (candidate) {
-      throw new HttpException(
-        'User with this email already exists',
-        HttpStatus.CONFLICT,
-      );
-    }
-    const hashPassword = await bcrypt.hash(doctorDto.password, HASH_NUMBER);
+    await this.doctorService.getDoctorByEmail(doctorDto.email);
+    const hash = await this.hashPassword(doctorDto);
     const activationLink = uuid.v4();
     const doctor = await this.doctorService.createDoctor(
       {
         ...doctorDto,
-        password: hashPassword,
+        password: hash,
       },
       `${this.configService.get('API_URL')}/auth/activation/${activationLink}`,
     );
@@ -63,6 +55,14 @@ export default class AuthService {
       `${this.configService.get('API_URL')}/auth/activation/${activationLink}`,
     );
     return this.generateToken(doctor);
+  }
+
+  private async hashPassword(doctorDto: CreateDoctorDto) {
+    try {
+      return await bcrypt.hash(doctorDto.password, HASH_NUMBER);
+    } catch (error) {
+      throw new Error('Failed to hash the password');
+    }
   }
 
   private async generateToken(doctor: Doctor): Promise<{ token: string }> {
