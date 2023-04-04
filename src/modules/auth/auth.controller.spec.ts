@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import CreateDoctorDto from 'modules/doctor/dto/create-doctor.dto';
+import { HttpException } from '@nestjs/common/exceptions';
 import AuthController from './auth.controller';
 import AuthService from './auth.service';
-import { HttpException } from '@nestjs/common/exceptions';
 
 describe('AuthController', () => {
   let controller: AuthController;

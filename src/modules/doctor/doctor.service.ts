@@ -4,9 +4,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { NO_ROWS_AFFECTED } from '../../shared/consts';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { NO_ROWS_AFFECTED } from '../../shared/consts';
 import CreateDoctorDto from './dto/create-doctor.dto';
 import Doctor from './entity/doctor.entity';
 

@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt/dist';
 import * as bcrypt from 'bcryptjs';
 import * as nodemailer from 'nodemailer';
 import * as uuid from 'uuid';
-import { Repository, getRepository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
@@ -81,7 +81,6 @@ export default class AuthService {
 
   private async sendActivationMail(to: string, link: string): Promise<void> {
     try {
-      console.log(link);
       await this.transporter.sendMail({
         from: this.configService.get('SMTP_USER'),
         to,
@@ -122,7 +121,6 @@ export default class AuthService {
         );
       }
     } catch (error) {
-      console.log(error);
       throw new HttpException(
         'Wrong activation link',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -131,7 +129,7 @@ export default class AuthService {
   }
 }
 
-//login i used to test registration
+// login i used to test registration
 
 // async login(doctorDto: CreateDoctorDto) {
 //   const doctor = await this.validateUser(doctorDto);
