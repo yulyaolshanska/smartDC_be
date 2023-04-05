@@ -1,6 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsPhoneNumber,
+  IsString,
+  Length,
+  Matches,
+} from 'class-validator';
 import { Role } from 'src/shared/enums';
+import { NAME_MIN_LENGTH, PASSWORD_REGEX } from '../../../shared/consts';
 
 export default class CreateDoctorDto {
   @ApiProperty({
@@ -9,7 +18,8 @@ export default class CreateDoctorDto {
   })
   @IsString()
   @IsNotEmpty()
-  firstName: string;
+  @Length(NAME_MIN_LENGTH)
+  first_name: string;
 
   @ApiProperty({
     description: 'Doctor last name',
@@ -17,7 +27,16 @@ export default class CreateDoctorDto {
   })
   @IsString()
   @IsNotEmpty()
-  lastName: string;
+  @Length(NAME_MIN_LENGTH)
+  last_name: string;
+
+  @ApiProperty({
+    description: "Doctor's phone ",
+    example: '+380992598283',
+  })
+  @IsPhoneNumber(undefined, { message: 'Phone number must be valid' })
+  @IsNotEmpty()
+  phone: string;
 
   @ApiProperty({
     description: "Doctor's email",
@@ -29,10 +48,14 @@ export default class CreateDoctorDto {
 
   @ApiProperty({
     description: "Doctor's password",
-    example: 'R5bd7BBe',
+    example: '11111111Qq',
   })
   @IsString()
   @IsNotEmpty()
+  @Matches(PASSWORD_REGEX, {
+    message:
+      'Password should contain 10 characters, at least one uppercase and one lowercase letter',
+  })
   password: string;
 
   @ApiProperty({

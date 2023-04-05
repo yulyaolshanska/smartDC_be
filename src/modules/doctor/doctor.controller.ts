@@ -1,18 +1,21 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Post, Get, Delete, Param } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import DoctorService from './doctor.service';
 import CreateDoctorDto from './dto/create-doctor.dto';
 import Doctor from './entity/doctor.entity';
 
-@Controller('doctor')
+@Controller('create_doctor')
 export default class DoctorController {
   constructor(private readonly doctorService: DoctorService) {}
 
   @ApiOperation({ summary: 'Doctor creation' })
   @ApiResponse({ status: 201, type: Doctor })
   @Post()
-  createDoctor(@Body() doctorDto: CreateDoctorDto): Promise<Doctor> {
-    return this.doctorService.createDoctor(doctorDto);
+  createDoctor(
+    @Body() doctorDto: CreateDoctorDto,
+    link: string,
+  ): Promise<Doctor> {
+    return this.doctorService.createDoctor(doctorDto, link);
   }
 
   @ApiOperation({ summary: 'Getting all doctors' })
