@@ -41,6 +41,9 @@ export default class DoctorService {
       .where('doctor.email = :email', { email })
       .getOne();
 
+    if (!user) {
+      throw new NotFoundException(`Doctor with email ${email} not found`);
+    }
     return user;
   }
 
