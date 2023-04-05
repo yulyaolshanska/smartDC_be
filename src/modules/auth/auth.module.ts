@@ -15,6 +15,7 @@ import Doctor from '../doctor/entity/doctor.entity';
     DoctorModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
+
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('PRIVATE_KEY', 'WEBWIZARDS'),
         signOptions: {

@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+
 import { JwtService } from '@nestjs/jwt/dist';
 import * as bcrypt from 'bcryptjs';
 import * as nodemailer from 'nodemailer';
@@ -40,7 +41,7 @@ export default class AuthService {
 
   async registration(doctorDto: CreateDoctorDto): Promise<{ token: string }> {
     await this.doctorService.getDoctorByEmail(doctorDto.email);
-    const hash = await this.hashPassword(doctorDto);
+    const hash = await AuthService.hashPassword(doctorDto);
     const activationLink = uuid.v4();
     const doctor = await this.doctorService.createDoctor(
       {
@@ -57,7 +58,9 @@ export default class AuthService {
     return this.generateToken(doctor);
   }
 
-  private async hashPassword(doctorDto: CreateDoctorDto) {
+  private static async hashPassword(
+    doctorDto: CreateDoctorDto,
+  ): Promise<string> {
     try {
       return await bcrypt.hash(doctorDto.password, HASH_NUMBER);
     } catch (error) {

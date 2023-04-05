@@ -1,5 +1,15 @@
-import { Controller, Body, Post, Redirect, Param, Get } from '@nestjs/common';
+import {
+  Controller,
+  Body,
+  Post,
+  Redirect,
+  Param,
+  Get,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+
 import CreateDoctorDto from '../doctor/dto/create-doctor.dto';
 import AuthService from './auth.service';
 import Doctor from '../doctor/entity/doctor.entity';
