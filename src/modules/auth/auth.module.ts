@@ -6,10 +6,14 @@ import AuthController from './auth.controller';
 import AuthService from './auth.service';
 import DoctorModule from '../doctor/doctor.module';
 import Doctor from '../doctor/entity/doctor.entity';
+import GoogleStrategy from './utils/google.strategy';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [
+    { provide: 'AUTH_SERVICE', useClass: AuthService },
+    GoogleStrategy,
+  ],
   imports: [
     TypeOrmModule.forFeature([Doctor]),
     DoctorModule,

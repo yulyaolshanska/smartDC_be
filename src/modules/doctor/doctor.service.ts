@@ -26,9 +26,8 @@ export default class DoctorService {
         .createQueryBuilder()
         .insert()
         .into(Doctor)
-        .values({ ...createDoctorDto, activation_link: link })
+        .values({ ...createDoctorDto, activationLink: link })
         .execute();
-
       return newDoctor.generatedMaps[0] as Doctor;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);

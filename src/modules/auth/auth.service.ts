@@ -111,7 +111,7 @@ export default class AuthService {
       const doctor = await this.doctorRepository
         .createQueryBuilder()
         .update(Doctor)
-        .set({ is_verified: true })
+        .set({ isVerified: true })
         .where('doctor.activation_link = :activation_link', {
           activation_link: activationLink,
         })
@@ -129,6 +129,30 @@ export default class AuthService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  async validateDoctorFromGoogle(details: DoctorFromGoogle): Promise<Doctor> {
+    console.log(details);
+    const doctor = await this.doctorRepository
+      .createQueryBuilder()
+      .select('doctor')
+      .from(Doctor, 'doctor')
+      .where('doctor.email = :email', { email: details.email })
+      .getOne();
+    if (!doctor) {
+      await this.doctorRepository
+        .createQueryBuilder()
+        .insert()
+        .into(Doctor)
+        .values({
+          firstName: details.firstName,
+          lastName: details.lastName,
+          email: details.email,
+        })
+        .execute();
+      console.log('Creating a user...');
+    }
+    return doctor;
   }
 }
 

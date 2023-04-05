@@ -30,8 +30,8 @@ describe('AuthController', () => {
   describe('registration', () => {
     it('should return a token', async () => {
       const userData: CreateDoctorDto = {
-        firstName: 'John',
-        lastName: 'Doe',
+        first_name: 'John',
+        last_name: 'Doe',
         phone: '+380992598283',
         email: 'test@example.com',
         password: 'password',
@@ -40,7 +40,7 @@ describe('AuthController', () => {
         city: 'Kharkiv',
         dateOfBirth: '20.01.2000',
         country: 'Ukraine',
-        timeZone: 'Berlin/Germany GTM+3',
+        time_zone: 'Berlin/Germany GTM+3',
         address: 'some adress',
         role: Role.Local,
       };

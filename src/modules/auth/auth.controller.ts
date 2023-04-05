@@ -7,17 +7,21 @@ import {
   Get,
   Req,
   UseGuards,
+  Inject,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 import CreateDoctorDto from '../doctor/dto/create-doctor.dto';
 import AuthService from './auth.service';
 import Doctor from '../doctor/entity/doctor.entity';
+import GoogleAuthGuard from './utils/Guards';
 
 @ApiTags('Authorization')
 @Controller('auth')
 class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    @Inject('AUTH_SERVICE') private readonly authService: AuthService,
+  ) {}
 
   // @ApiOperation({ summary: 'Doctor login' })
   // @ApiResponse({ status: 201, type: Doctor })
@@ -33,6 +37,18 @@ class AuthController {
     @Body() doctorDto: CreateDoctorDto,
   ): Promise<{ token: string }> {
     return this.authService.registration(doctorDto);
+  }
+
+  @Get('/google/login')
+  @UseGuards(GoogleAuthGuard)
+  static handleLogin(): { msg: string } {
+    return { msg: 'google auth' };
+  }
+
+  @Get('/google/redirect')
+  @UseGuards(GoogleAuthGuard)
+  static handleRedirect(): { msg: string } {
+    return { msg: 'redirect ok' };
   }
 
   @ApiOperation({ summary: 'Account activation' })
