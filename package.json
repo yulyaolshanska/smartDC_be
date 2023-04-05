@@ -94,11 +94,6 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
-    "moduleNameMapper": {
-      "moduleNameMapper": {
-        "@shared/(.*)": "<rootDir>/shared/$1"
-      }
-    },
     "modulePaths": [
       "<rootDir>/src/shared"
     ]

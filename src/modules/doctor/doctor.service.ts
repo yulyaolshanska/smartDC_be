@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { NO_ROWS_AFFECTED } from '../../shared/consts';
+import { NO_ROWS_AFFECTED } from 'src/shared/consts';
 import CreateDoctorDto from './dto/create-doctor.dto';
 import Doctor from './entity/doctor.entity';
 
