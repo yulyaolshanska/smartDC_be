@@ -3,7 +3,7 @@ import CreateDoctorDto from 'modules/doctor/dto/create-doctor.dto';
 import { HttpException } from '@nestjs/common/exceptions';
 import AuthController from './auth.controller';
 import AuthService from './auth.service';
-import { Gender } from "../../shared/enums";
+import { Gender, Role } from '../../shared/enums';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -42,6 +42,7 @@ describe('AuthController', () => {
         country: 'Ukraine',
         timeZone: 'Berlin/Germany GTM+3',
         address: 'some adress',
+        role: Role.Local,
       };
 
       const result = await controller.registration(userData);
