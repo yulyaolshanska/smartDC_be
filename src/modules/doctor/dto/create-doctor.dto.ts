@@ -19,7 +19,7 @@ export default class CreateDoctorDto {
   @IsString()
   @IsNotEmpty()
   @Length(NAME_MIN_LENGTH)
-  first_name: string;
+  firstName: string;
 
   @ApiProperty({
     description: 'Doctor last name',
@@ -28,7 +28,7 @@ export default class CreateDoctorDto {
   @IsString()
   @IsNotEmpty()
   @Length(NAME_MIN_LENGTH)
-  last_name: string;
+  lastName: string;
 
   @ApiProperty({
     description: "Doctor's phone ",

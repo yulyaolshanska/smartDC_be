@@ -11,14 +11,14 @@ export default class Doctor {
     unique: false,
     default: null,
   })
-  first_name: string;
+  firstName: string;
 
   @ApiProperty({ example: 'Doe' })
   @Column({
     unique: false,
     default: null,
   })
-  last_name: string;
+  lastName: string;
 
   @ApiProperty({ example: '+390992598283' })
   @Column({
@@ -48,14 +48,14 @@ export default class Doctor {
     default: null,
   })
   @Column()
-  activation_link: string;
+  activationLink: string;
 
   @ApiProperty({ example: '????' })
   @Column({
     default: false,
   })
   @Column()
-  is_verified: boolean;
+  isVerified: boolean;
 
   @ApiProperty({ example: 'Local' })
   @Column({
