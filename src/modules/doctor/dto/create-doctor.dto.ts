@@ -8,6 +8,7 @@ import {
   Matches,
   IsEnum,
   IsISO31661Alpha2,
+  IsNumber,
 } from 'class-validator';
 import {
   NAME_MIN_LENGTH,
@@ -70,7 +71,7 @@ export default class CreateDoctorDto {
     description: "Doctor's specialization",
     example: 'Germany',
   })
-  @IsString()
+  @IsNumber()
   specialization: number;
 
   @ApiProperty({
