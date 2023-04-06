@@ -20,7 +20,7 @@ module.exports = {
   },
   ignorePatterns: ['.eslintrc.js'],
   rules: {
-    '@typescript-eslint/ class-methods-use-this': 'off',
+    '@typescript-eslint/class-methods-use-this': 'off',
     '@typescript-eslint/naming-convention': 'off',
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'error',

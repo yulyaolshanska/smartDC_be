@@ -21,12 +21,11 @@ import { GoogleDoctorResult } from './utils/types';
 export default class AuthService {
   private transporter: nodemailer.Transporter<SMTPTransport.SentMessageInfo>;
 
-  private readonly client_id =
-    '922767752665-vnleaigg45gddmdb90rkbvq6r4ce9c6k.apps.googleusercontent.com';
+  private readonly client_id = this.configService.get('GOOGLE_CLIENT_ID');
 
-  private readonly client_secret = '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';
+  private readonly client_secret = this.configService.get('GOOGLE_SECRET');
 
-  private readonly redirect_uri = 'http://localhost:5000/auth/google/redirect';
+  private readonly redirect_uri = this.configService.get('GOOGLE_REDIRECT_URL');
 
   constructor(
     @InjectRepository(Doctor)
