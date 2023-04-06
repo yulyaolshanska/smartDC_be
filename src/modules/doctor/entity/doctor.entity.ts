@@ -112,4 +112,11 @@ export default class Doctor {
   })
   @Column()
   timeZone: string;
+
+  @ApiProperty({ example: ' Male' })
+  @Column({
+    default: null,
+  })
+  @Column()
+  gender: string;
 }
