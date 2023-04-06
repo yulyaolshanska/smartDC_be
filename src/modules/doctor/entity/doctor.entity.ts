@@ -20,6 +20,14 @@ export default class Doctor {
   })
   lastName: string;
 
+  @ApiProperty({ example: '+390992598283' })
+  @Column({
+    unique: true,
+    default: null,
+  })
+  @Column()
+  phone: string;
+
   @ApiProperty({ example: 'john_doe@gmail.com' })
   @Column({
     unique: true,
@@ -28,12 +36,26 @@ export default class Doctor {
   @Column()
   email: string;
 
-  @ApiProperty({ example: 'R5bd7BBe' })
+  @ApiProperty({ example: '11111111Qq' })
   @Column({
     default: null,
   })
   @Column()
   password: string;
+
+  @ApiProperty({ example: '????' })
+  @Column({
+    default: null,
+  })
+  @Column()
+  activationLink: string;
+
+  @ApiProperty({ example: '????' })
+  @Column({
+    default: false,
+  })
+  @Column()
+  isVerified: boolean;
 
   @ApiProperty({ example: 'Local' })
   @Column({
