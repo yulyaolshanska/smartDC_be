@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Gender, Role } from '@shared/enums';
 import {
   IsEmail,
   IsNotEmpty,
@@ -17,8 +18,7 @@ import {
   ADDRESS_REGEX,
   DATE_REGEX,
   TIME_ZONE_REGEX,
-} from '../../../shared/consts';
-import { Role, Gender } from '../../../shared/enums';
+} from 'shared/consts';
 
 export default class CreateDoctorDto {
   @ApiProperty({
@@ -57,7 +57,7 @@ export default class CreateDoctorDto {
 
   @ApiProperty({
     description: "Doctor's password",
-    example: 'R5bd7BBe',
+    example: '11111111Qq',
   })
   @IsString()
   @IsNotEmpty()

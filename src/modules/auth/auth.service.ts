@@ -10,9 +10,10 @@ import { ConfigService } from '@nestjs/config';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import UpdateGoogleDoctorDto from 'modules/doctor/dto/update-google-doctor-dto';
 import { Request, Response, CookieOptions } from 'express';
+import LoginDoctorDto from '../doctor/dto/login-doctor.dto';
 
-import CreateDoctorDto from '../doctor/dto/create-doctor.dto';
-import DoctorService from '../doctor/doctor.service';
+import { CreateDoctorDto } from '../doctor/dto/create-doctor.dto';
+import { DoctorService } from '../doctor/doctor.service';
 import Doctor from '../doctor/entity/doctor.entity';
 import { HASH_NUMBER, SEVEN } from '../../shared/consts';
 import { GoogleDoctorResult } from './utils/types';
@@ -58,7 +59,7 @@ export default class AuthService {
   };
 
   async registration(doctorDto: CreateDoctorDto): Promise<{ token: string }> {
-    await this.doctorService.getDoctorByEmail(doctorDto.email);
+    await this.doctorService.getDoctorByEmailForRegister(doctorDto.email);
     const hash = await AuthService.hashPassword(doctorDto);
     const activationLink = uuid.v4();
     const doctor = await this.doctorService.createDoctor(
@@ -261,5 +262,35 @@ export default class AuthService {
       .set({ ...updateGoogleDoctorDto, isVerified: true })
       .where('doctor.email = :email', { email: decodedToken.email })
       .execute();
+  }
+
+  private async validateUser(doctorDto: LoginDoctorDto): Promise<Doctor> {
+    try {
+      const doctor = await this.doctorService.getDoctorByEmailForLogin(doctorDto.email);
+      const passwordEquals = await bcrypt.compare(
+        doctorDto.password,
+        doctor.password,
+      );
+      if (!doctor) {
+        throw new HttpException(
+          `Wrong email!`,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+      if (!passwordEquals) {
+        throw new HttpException(
+          `Wrong password`,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+      return doctor;
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async login(doctorDto: LoginDoctorDto): Promise<{ token: string }> {
+    const doctor = await this.validateUser(doctorDto);
+    return this.generateToken(doctor);
   }
 }

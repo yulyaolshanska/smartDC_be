@@ -36,7 +36,7 @@ export default class Doctor {
   @Column()
   email: string;
 
-  @ApiProperty({ example: 'R5bd7BBe' })
+  @ApiProperty({ example: '11111111Qq' })
   @Column({
     default: null,
   })

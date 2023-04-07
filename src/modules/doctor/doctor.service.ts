@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { NO_ROWS_AFFECTED } from '../../shared/consts';
+import { NO_ROWS_AFFECTED } from 'shared/consts';
 import CreateDoctorDto from './dto/create-doctor.dto';
 import Doctor from './entity/doctor.entity';
 
@@ -28,13 +28,30 @@ export default class DoctorService {
         .into(Doctor)
         .values({ ...createDoctorDto, activationLink: link })
         .execute();
+
       return newDoctor.generatedMaps[0] as Doctor;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async getDoctorByEmail(email: string): Promise<Doctor> {
+  async getDoctorByEmailForLogin(email: string): Promise<Doctor> {
+    try {
+      const user = await this.doctorRepository
+        .createQueryBuilder('doctor')
+        .where('doctor.email = :email', { email })
+        .getOne();
+
+      if (!user) {
+        throw new NotFoundException(`Doctor with email ${email} not found`);
+      }
+      return user;
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async getDoctorByEmailForRegister(email: string): Promise<Doctor> {
     const user = await this.doctorRepository
       .createQueryBuilder('doctor')
       .where('doctor.email = :email', { email })
