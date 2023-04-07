@@ -266,7 +266,9 @@ export default class AuthService {
 
   private async validateUser(doctorDto: LoginDoctorDto): Promise<Doctor> {
     try {
-      const doctor = await this.doctorService.getDoctorByEmailForLogin(doctorDto.email);
+      const doctor = await this.doctorService.getDoctorByEmailForLogin(
+        doctorDto.email,
+      );
       const passwordEquals = await bcrypt.compare(
         doctorDto.password,
         doctor.password,

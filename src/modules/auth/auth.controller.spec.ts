@@ -28,7 +28,7 @@ describe('AuthController', () => {
     authService = moduleRef.get<AuthService>(AuthService);
   });
 
-    describe('registration', () => {
+  describe('registration', () => {
     it('should return a token', async () => {
       const userData: CreateDoctorDto = {
         firstName: 'John',
@@ -52,7 +52,7 @@ describe('AuthController', () => {
       expect(result).toEqual({ token: 'test_token' });
     });
   });
-  
+
   describe('activation', () => {
     it('should call authService.activation() with the provided activation link', async () => {
       const activationLink = 'some-activation-link';

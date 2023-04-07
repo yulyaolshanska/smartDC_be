@@ -1,4 +1,7 @@
-import { Controller, Body, Post ,
+import {
+  Controller,
+  Body,
+  Post,
   Redirect,
   Param,
   Get,
