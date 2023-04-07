@@ -1,4 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import CreateDoctorDto from 'modules/doctor/dto/create-doctor.dto';
+import { Gender, Role } from '@shared/enums';
 import AuthController from './auth.controller';
 import AuthService from './auth.service';
 import LoginDoctorDto from '../doctor/dto/login-doctor.dto';
@@ -29,17 +31,17 @@ describe('AuthController', () => {
     describe('registration', () => {
     it('should return a token', async () => {
       const userData: CreateDoctorDto = {
-        first_name: 'John',
-        last_name: 'Doe',
+        firstName: 'John',
+        lastName: 'Doe',
         phone: '+380992598283',
         email: 'test@example.com',
         password: 'password',
-        specialization: 1,
+        specialityId: 1,
         gender: Gender.Male,
         city: 'Kharkiv',
-        dateOfBirth: '20.01.2000',
+        birthDate: '20.01.2000',
         country: 'Ukraine',
-        time_zone: 'Berlin/Germany GTM+3',
+        timeZone: 'Berlin/Germany GTM+3',
         address: 'some adress',
         role: Role.Local,
       };

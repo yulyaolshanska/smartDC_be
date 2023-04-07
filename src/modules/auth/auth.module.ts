@@ -3,9 +3,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import AuthController from './auth.controller';
-import { AuthService } from './auth.service';
+import AuthService from './auth.service';
 import DoctorModule from '../doctor/doctor.module';
-import { Doctor } from '../doctor/entity/doctor.entity';
+import Doctor from '../doctor/entity/doctor.entity';
 
 @Module({
   controllers: [AuthController],

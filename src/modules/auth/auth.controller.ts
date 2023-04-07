@@ -11,11 +11,11 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 
 import UpdateGoogleDoctorDto from 'modules/doctor/dto/update-google-doctor-dto';
-import { Doctor } from '../doctor/entity/doctor.entity';
-import { AuthService } from './auth.service';
+import Doctor from '../doctor/entity/doctor.entity';
+import AuthService from './auth.service';
 import LoginDoctorDto from '../doctor/dto/login-doctor.dto';
 
-import { CreateDoctorDto } from '../doctor/dto/create-doctor.dto';
+import CreateDoctorDto from '../doctor/dto/create-doctor.dto';
 import JwtAuthGuard from './utils/Guards';
 
 @ApiTags('Authorization')

@@ -12,8 +12,8 @@ import UpdateGoogleDoctorDto from 'modules/doctor/dto/update-google-doctor-dto';
 import { Request, Response, CookieOptions } from 'express';
 import LoginDoctorDto from '../doctor/dto/login-doctor.dto';
 
-import { CreateDoctorDto } from '../doctor/dto/create-doctor.dto';
-import { DoctorService } from '../doctor/doctor.service';
+import CreateDoctorDto from '../doctor/dto/create-doctor.dto';
+import DoctorService from '../doctor/doctor.service';
 import Doctor from '../doctor/entity/doctor.entity';
 import { HASH_NUMBER, SEVEN } from '../../shared/consts';
 import { GoogleDoctorResult } from './utils/types';
