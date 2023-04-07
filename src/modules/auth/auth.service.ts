@@ -131,7 +131,7 @@ export default class AuthService {
         .createQueryBuilder()
         .update(Doctor)
         .set({ isVerified: true })
-        .where('doctor.activation_link = :activation_link', {
+        .where('doctor.activationLink = :activation_link', {
           activation_link: activationLink,
         })
         .execute();
