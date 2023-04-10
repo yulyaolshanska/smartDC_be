@@ -105,4 +105,23 @@ export default class DoctorService {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  async updateDoctor(id: number, doctorDto: Partial<CreateDoctorDto>): Promise<Doctor> {
+    try {
+      const doctor = await this.doctorRepository
+      .createQueryBuilder('doctor')
+      .where('doctor.id = :id', { id })
+      .getOne();
+  
+      if (!doctor) {
+        throw new NotFoundException(`Doctor with ID ${id} not found`);
+      }
+
+      Object.assign(doctor, doctorDto);
+
+      return await this.doctorRepository.save(doctor);
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }
