@@ -54,17 +54,23 @@ export default class AuthService {
   private readonly accessTokenCookieOptions: CookieOptions = {
     maxAge: this.configService.get('ACCESS_TOKEN_MAX_AGE'),
     httpOnly: true,
-    domain: 'localhost',
+    domain: this.configService.get('ACCESS_TOKEN_DOMAIN'),
     path: '/',
     sameSite: 'lax',
     secure: false,
   };
 
   async registration(doctorDto: CreateDoctorDto): Promise<{ token: string }> {
-    await this.doctorService.getDoctorByEmailForRegister(doctorDto.email);
+    const doctor = await this.doctorService.getDoctorByEmail(doctorDto.email);
+    if (doctor) {
+      throw new HttpException(
+        'User with this email already exists',
+        HttpStatus.CONFLICT,
+      );
+    }
     const hash = await AuthService.hashPassword(doctorDto);
     const activationLink = uuid.v4();
-    const doctor = await this.doctorService.createDoctor(
+    const newDoctor = await this.doctorService.createDoctor(
       {
         ...doctorDto,
         password: hash,
@@ -76,7 +82,7 @@ export default class AuthService {
       doctorDto.email,
       `${this.configService.get('API_URL')}/auth/activation/${activationLink}`,
     );
-    return this.generateToken(doctor);
+    return this.generateToken(newDoctor);
   }
 
   private static async hashPassword(
@@ -99,27 +105,6 @@ export default class AuthService {
       throw new HttpException(
         'Unpossible to generate token',
         HttpStatus.BAD_REQUEST,
-      );
-    }
-  }
-
-  private async sendActivationMail(to: string, link: string): Promise<void> {
-    try {
-      await this.transporter.sendMail({
-        from: this.configService.get('SMTP_USER'),
-        to,
-        subject: `Account activation${this.configService.get('API_URL')}`,
-        html: `
-                <div>
-                <h1>"For activation press the link"</h1>
-                <a href="${link}">${link}</a>
-                </div>
-          `,
-      });
-    } catch (error) {
-      throw new HttpException(
-        'Can not send email',
-        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -168,7 +153,7 @@ export default class AuthService {
     );
 
     res.cookie('accessToken', accessToken, this.accessTokenCookieOptions);
-    res.redirect('http://localhost:4200/');
+    res.redirect(this.configService.get('CLIENT_URL'));
   }
 
   private async getGoogleOauthTokens(code: {
@@ -268,9 +253,7 @@ export default class AuthService {
 
   private async validateUser(doctorDto: LoginDoctorDto): Promise<Doctor> {
     try {
-      const doctor = await this.doctorService.getDoctorByEmailForLogin(
-        doctorDto.email,
-      );
+      const doctor = await this.doctorService.getDoctorByEmail(doctorDto.email);
       const passwordEquals = await bcrypt.compare(
         doctorDto.password,
         doctor.password,

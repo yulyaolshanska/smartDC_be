@@ -65,6 +65,15 @@ export default class DoctorService {
     return user;
   }
 
+  async getDoctorByEmail(email: string): Promise<Doctor> {
+    const user = await this.doctorRepository
+      .createQueryBuilder('doctor')
+      .where('doctor.email = :email', { email })
+      .getOne();
+    if (!user) return null;
+    else return user;
+  }
+
   async getAllDoctors(): Promise<Doctor[]> {
     try {
       return await this.doctorRepository.createQueryBuilder('doctor').getMany();

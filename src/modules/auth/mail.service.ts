@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable , HttpException, HttpStatus } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { ConfigService } from '@nestjs/config';
-import { HttpException, HttpStatus } from '@nestjs/common';
+
 import { InjectRepository } from '@nestjs/typeorm';
 import Doctor from 'modules/doctor/entity/doctor.entity';
 import { Repository } from 'typeorm';
