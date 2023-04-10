@@ -17,6 +17,7 @@ import DoctorService from '../doctor/doctor.service';
 import Doctor from '../doctor/entity/doctor.entity';
 import { HASH_NUMBER, SEVEN } from '../../shared/consts';
 import { GoogleDoctorResult } from './utils/types';
+import MailService from './mail.service';
 
 @Injectable()
 export default class AuthService {
@@ -32,6 +33,7 @@ export default class AuthService {
     @InjectRepository(Doctor)
     private doctorRepository: Repository<Doctor>,
     private doctorService: DoctorService,
+    private mailService: MailService,
     private jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {
@@ -70,7 +72,7 @@ export default class AuthService {
       `${this.configService.get('API_URL')}/auth/activation/${activationLink}`,
     );
 
-    await this.sendActivationMail(
+    await this.mailService.sendActivationMail(
       doctorDto.email,
       `${this.configService.get('API_URL')}/auth/activation/${activationLink}`,
     );
@@ -247,7 +249,7 @@ export default class AuthService {
     }
   }
 
-  // can be used to update doctor profile, can be possobly renamed and used in the future
+  // can be used to update doctor profile, can be possobly renamed and used in the future TODO
   updateGoogleDoctorHandler(
     updateGoogleDoctorDto: UpdateGoogleDoctorDto,
     token: string,
