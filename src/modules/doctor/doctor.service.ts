@@ -71,7 +71,7 @@ export default class DoctorService {
       .where('doctor.email = :email', { email })
       .getOne();
     if (!user) return null;
-    else return user;
+    return user;
   }
 
   async getAllDoctors(): Promise<Doctor[]> {
