@@ -1,5 +1,14 @@
-import { Controller, Get, Delete, Param, Patch, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Delete,
+  Param,
+  Patch,
+  Body,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import JwtPatchGuard from 'modules/auth/utils/PatchGuard';
 import DoctorService from './doctor.service';
 import Doctor from './entity/doctor.entity';
 import CreateDoctorDto from './dto/create-doctor.dto';
@@ -30,7 +39,11 @@ export default class DoctorController {
   }
 
   @Patch('/:id')
-  updateOne(@Param('id') id: number, @Body() doctorDto: Partial<CreateDoctorDto>): Promise<Doctor> {
+  @UseGuards(JwtPatchGuard)
+  updateOne(
+    @Param('id') id: number,
+    @Body() doctorDto: Partial<CreateDoctorDto>,
+  ): Promise<Doctor> {
     return this.doctorService.updateDoctor(id, doctorDto);
   }
 }

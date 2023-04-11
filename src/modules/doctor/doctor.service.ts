@@ -106,13 +106,16 @@ export default class DoctorService {
     }
   }
 
-  async updateDoctor(id: number, doctorDto: Partial<CreateDoctorDto>): Promise<Doctor> {
+  async updateDoctor(
+    id: number,
+    doctorDto: Partial<CreateDoctorDto>,
+  ): Promise<Doctor> {
     try {
       const doctor = await this.doctorRepository
-      .createQueryBuilder('doctor')
-      .where('doctor.id = :id', { id })
-      .getOne();
-  
+        .createQueryBuilder('doctor')
+        .where('doctor.id = :id', { id })
+        .getOne();
+
       if (!doctor) {
         throw new NotFoundException(`Doctor with ID ${id} not found`);
       }
