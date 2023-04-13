@@ -279,7 +279,11 @@ export default class AuthService {
   }
 
   async login(doctorDto: LoginDoctorDto): Promise<{ token: string }> {
-    const doctor = await this.validateUser(doctorDto);
-    return this.generateToken(doctor);
+    try {
+      const doctor = await this.validateUser(doctorDto);
+      return await this.generateToken(doctor);
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }
