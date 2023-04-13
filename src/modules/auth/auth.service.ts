@@ -319,7 +319,7 @@ export default class AuthService {
 
   private static async hashPasswordForResetPassword(password: string): Promise<string> {
     try {
-      return bcrypt.hash(password, await bcrypt.genSalt());
+      return await bcrypt.hash(password, await bcrypt.genSalt());
     } catch (error) {
       throw new Error('Failed to hash the password');
     }
