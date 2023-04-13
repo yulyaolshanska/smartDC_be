@@ -97,7 +97,7 @@ export default class Doctor {
     default: null,
   })
   @Column()
-  specialityId: number;
+  specialization: number;
 
   @ApiProperty({ example: ' ????' })
   @Column({

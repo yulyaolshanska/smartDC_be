@@ -69,10 +69,10 @@ export default class CreateDoctorDto {
 
   @ApiProperty({
     description: "Doctor's specialization",
-    example: 'Germany',
+    example: 0,
   })
   @IsNumber()
-  specialityId: number;
+  specialization: number;
 
   @ApiProperty({
     description: "Doctor's gender",
@@ -83,7 +83,7 @@ export default class CreateDoctorDto {
 
   @ApiProperty({
     description: "Doctor's birthday",
-    example: '10/20/1980',
+    example: '1980-10-20',
   })
   @Matches(DATE_REGEX, {
     message: 'Invalid date type',
