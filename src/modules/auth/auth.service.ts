@@ -15,7 +15,7 @@ import LoginDoctorDto from '../doctor/dto/login-doctor.dto';
 import CreateDoctorDto from '../doctor/dto/create-doctor.dto';
 import DoctorService from '../doctor/doctor.service';
 import Doctor from '../doctor/entity/doctor.entity';
-import { HASH_NUMBER, SEVEN } from '../../shared/consts';
+import { GOOGLE_URL, HASH_NUMBER, SEVEN } from '../../shared/consts';
 import { GoogleDoctorResult } from './utils/types';
 
 @Injectable()
@@ -166,7 +166,7 @@ export default class AuthService {
     );
 
     res.cookie('accessToken', accessToken, this.accessTokenCookieOptions);
-    res.redirect('http://localhost:4200/');
+    res.redirect(this.configService.get('CLIENT_URL'));
   }
 
   private async getGoogleOauthTokens(code: {
@@ -203,7 +203,7 @@ export default class AuthService {
   }): Promise<GoogleDoctorResult> {
     try {
       const res = await axios.get(
-        `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`,
+        `${GOOGLE_URL}=${access_token}`,
         {
           headers: {
             Authorization: `Bearer ${id_token}`,
