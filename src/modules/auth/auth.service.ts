@@ -10,12 +10,17 @@ import { ConfigService } from '@nestjs/config';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import UpdateGoogleDoctorDto from 'modules/doctor/dto/update-google-doctor-dto';
 import { Request, Response, CookieOptions } from 'express';
+import {
+  GOOGLE_TOCKEN_PATH,
+  GOOGLE_URL,
+  HASH_NUMBER,
+  SEVEN,
+} from '@shared/consts';
 import LoginDoctorDto from '../doctor/dto/login-doctor.dto';
 
 import CreateDoctorDto from '../doctor/dto/create-doctor.dto';
 import DoctorService from '../doctor/doctor.service';
 import Doctor from '../doctor/entity/doctor.entity';
-import { GOOGLE_URL, HASH_NUMBER, SEVEN } from '../../shared/consts';
 import { GoogleDoctorResult } from './utils/types';
 import MailService from './mail.service';
 
@@ -159,7 +164,7 @@ export default class AuthService {
   private async getGoogleOauthTokens(code: {
     code: string;
   }): Promise<Record<string, string>> {
-    const url = 'https://oauth2.googleapis.com/token';
+    const url = GOOGLE_TOCKEN_PATH;
     const values = {
       ...code,
       client_id: this.client_id,
@@ -189,14 +194,11 @@ export default class AuthService {
     access_token,
   }): Promise<GoogleDoctorResult> {
     try {
-      const res = await axios.get(
-        `${GOOGLE_URL}=${access_token}`,
-        {
-          headers: {
-            Authorization: `Bearer ${id_token}`,
-          },
+      const res = await axios.get(`${GOOGLE_URL}=${access_token}`, {
+        headers: {
+          Authorization: `Bearer ${id_token}`,
         },
-      );
+      });
       return res.data;
     } catch (error) {
       throw new Error(error);
