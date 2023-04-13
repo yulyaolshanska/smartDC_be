@@ -23,7 +23,7 @@ export default class UpdateGoogleDoctorDto {
   })
   @IsPhoneNumber(undefined, { message: 'Phone number must be valid' })
   @IsNotEmpty()
-  phone: string;
+  phoneNumber: string;
 
   @ApiProperty({
     description: "Doctor's specialization",

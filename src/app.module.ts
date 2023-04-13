@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
 import AuthModule from './modules/auth/auth.module';
-
 import DoctorModule from './modules/doctor/doctor.module';
 import Doctor from './modules/doctor/entity/doctor.entity';
 

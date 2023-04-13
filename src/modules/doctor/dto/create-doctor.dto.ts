@@ -45,7 +45,7 @@ export default class CreateDoctorDto {
   })
   @IsPhoneNumber(undefined, { message: 'Phone number must be valid' })
   @IsNotEmpty()
-  phone: string;
+  phoneNumber: string;
 
   @ApiProperty({
     description: "Doctor's email",

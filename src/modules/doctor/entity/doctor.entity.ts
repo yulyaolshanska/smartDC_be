@@ -26,7 +26,7 @@ export default class Doctor {
     default: null,
   })
   @Column()
-  phone: string;
+  phoneNumber: string;
 
   @ApiProperty({ example: 'john_doe@gmail.com' })
   @Column({
@@ -36,7 +36,7 @@ export default class Doctor {
   @Column()
   email: string;
 
-  @ApiProperty({ example: '11111111Qq' })
+  @ApiProperty({ example: 'Derikloshad' })
   @Column({
     default: null,
   })
@@ -50,7 +50,7 @@ export default class Doctor {
   @Column()
   activationLink: string;
 
-  @ApiProperty({ example: '0' })
+  @ApiProperty({ example: true })
   @Column({
     default: false,
   })
@@ -71,7 +71,7 @@ export default class Doctor {
   @Column()
   address: string;
 
-  @ApiProperty({ example: '20/01/2000' })
+  @ApiProperty({ example: '20-01-2000' })
   @Column({
     default: null,
   })
@@ -102,6 +102,7 @@ export default class Doctor {
   @ApiProperty({ example: ' ????' })
   @Column({
     default: null,
+    nullable: true,
   })
   @Column()
   photoUrl: string;

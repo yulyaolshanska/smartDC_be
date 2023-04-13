@@ -17,6 +17,7 @@ import DoctorService from '../doctor/doctor.service';
 import Doctor from '../doctor/entity/doctor.entity';
 import { GOOGLE_URL, HASH_NUMBER, SEVEN } from '../../shared/consts';
 import { GoogleDoctorResult } from './utils/types';
+import MailService from './mail.service';
 
 @Injectable()
 export default class AuthService {
@@ -32,6 +33,7 @@ export default class AuthService {
     @InjectRepository(Doctor)
     private doctorRepository: Repository<Doctor>,
     private doctorService: DoctorService,
+    private mailService: MailService,
     private jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {
@@ -52,17 +54,23 @@ export default class AuthService {
   private readonly accessTokenCookieOptions: CookieOptions = {
     maxAge: this.configService.get('ACCESS_TOKEN_MAX_AGE'),
     httpOnly: true,
-    domain: 'localhost',
+    domain: this.configService.get('ACCESS_TOKEN_DOMAIN'),
     path: '/',
     sameSite: 'lax',
     secure: false,
   };
 
   async registration(doctorDto: CreateDoctorDto): Promise<{ token: string }> {
-    await this.doctorService.getDoctorByEmailForRegister(doctorDto.email);
+    const doctor = await this.doctorService.getDoctorByEmail(doctorDto.email);
+    if (doctor) {
+      throw new HttpException(
+        'User with this email already exists',
+        HttpStatus.CONFLICT,
+      );
+    }
     const hash = await AuthService.hashPassword(doctorDto);
     const activationLink = uuid.v4();
-    const doctor = await this.doctorService.createDoctor(
+    const newDoctor = await this.doctorService.createDoctor(
       {
         ...doctorDto,
         password: hash,
@@ -70,11 +78,11 @@ export default class AuthService {
       `${this.configService.get('API_URL')}/auth/activation/${activationLink}`,
     );
 
-    await this.sendActivationMail(
+    await this.mailService.sendActivationMail(
       doctorDto.email,
       `${this.configService.get('API_URL')}/auth/activation/${activationLink}`,
     );
-    return this.generateToken(doctor);
+    return this.generateToken(newDoctor);
   }
 
   private static async hashPassword(
@@ -97,27 +105,6 @@ export default class AuthService {
       throw new HttpException(
         'Unpossible to generate token',
         HttpStatus.BAD_REQUEST,
-      );
-    }
-  }
-
-  private async sendActivationMail(to: string, link: string): Promise<void> {
-    try {
-      await this.transporter.sendMail({
-        from: this.configService.get('SMTP_USER'),
-        to,
-        subject: `Account activation${this.configService.get('API_URL')}`,
-        html: `
-                <div>
-                <h1>"For activation press the link"</h1>
-                <a href="${link}">${link}</a>
-                </div>
-          `,
-      });
-    } catch (error) {
-      throw new HttpException(
-        'Can not send email',
-        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -247,7 +234,7 @@ export default class AuthService {
     }
   }
 
-  // can be used to update doctor profile, can be possobly renamed and used in the future
+  // can be used to update doctor profile, can be possobly renamed and used in the future TODO
   updateGoogleDoctorHandler(
     updateGoogleDoctorDto: UpdateGoogleDoctorDto,
     token: string,
@@ -266,9 +253,7 @@ export default class AuthService {
 
   private async validateUser(doctorDto: LoginDoctorDto): Promise<Doctor> {
     try {
-      const doctor = await this.doctorService.getDoctorByEmailForLogin(
-        doctorDto.email,
-      );
+      const doctor = await this.doctorService.getDoctorByEmail(doctorDto.email);
       const passwordEquals = await bcrypt.compare(
         doctorDto.password,
         doctor.password,
