@@ -50,7 +50,7 @@ export default class Doctor {
   @Column()
   activationLink: string;
 
-  @ApiProperty({ example: true })
+  @ApiProperty({ example: false })
   @Column({
     default: false,
   })
