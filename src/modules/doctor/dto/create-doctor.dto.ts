@@ -83,7 +83,7 @@ export default class CreateDoctorDto {
 
   @ApiProperty({
     description: "Doctor's birthday",
-    example: '10/20/1980',
+    example: '10-20-1980',
   })
   @Matches(DATE_REGEX, {
     message: 'Invalid date type',
