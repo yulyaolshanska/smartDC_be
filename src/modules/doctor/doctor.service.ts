@@ -52,17 +52,18 @@ export default class DoctorService {
   }
 
   async getDoctorByEmailForRegister(email: string): Promise<Doctor> {
-    const user = await this.doctorRepository
-      .createQueryBuilder('doctor')
-      .where('doctor.email = :email', { email })
-      .getOne();
-    if (user) {
-      throw new HttpException(
-        'User with this email already exists',
-        HttpStatus.CONFLICT,
-      );
+    try {
+      const user = await this.doctorRepository
+        .createQueryBuilder('doctor')
+        .where('doctor.email = :email', { email })
+        .getOne();
+      if (user) {
+        throw new Error('User with this email already exists');
+      }
+      return user;
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.CONFLICT);
     }
-    return user;
   }
 
   async getDoctorByEmail(email: string): Promise<Doctor> {

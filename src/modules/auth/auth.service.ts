@@ -62,7 +62,9 @@ export default class AuthService {
   };
 
   async registration(doctorDto: CreateDoctorDto): Promise<{ token: string }> {
-    const doctor = await this.doctorService.getDoctorByEmail(doctorDto.email);
+    const doctor = await this.doctorService.getDoctorByEmailForRegister(
+      doctorDto.email,
+    );
     if (doctor) {
       throw new HttpException(
         'User with this email already exists',
@@ -280,7 +282,7 @@ export default class AuthService {
   }
 
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<void> {
-    const doctor = await this.doctorService.getDoctorByEmail(
+    const doctor = await this.doctorService.getDoctorByEmailForLogin(
       forgotPasswordDto.email,
     );
 
