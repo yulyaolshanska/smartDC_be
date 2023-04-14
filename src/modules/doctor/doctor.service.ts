@@ -66,12 +66,18 @@ export default class DoctorService {
   }
 
   async getDoctorByEmail(email: string): Promise<Doctor> {
-    const user = await this.doctorRepository
-      .createQueryBuilder('doctor')
-      .where('doctor.email = :email', { email })
-      .getOne();
-    if (!user) return null;
-    return user;
+    try {
+      const user = await this.doctorRepository
+        .createQueryBuilder('doctor')
+        .where('doctor.email = :email', { email })
+        .getOne();
+      if (!user) {
+        throw new NotFoundException(`Doctor with email ${email} not found`);
+      }
+      return user;
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async getAllDoctors(): Promise<Doctor[]> {

@@ -1,4 +1,4 @@
-import {HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { JwtService } from '@nestjs/jwt/dist';
 import * as bcrypt from 'bcryptjs';
@@ -11,15 +11,14 @@ import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import UpdateGoogleDoctorDto from 'modules/doctor/dto/update-google-doctor-dto';
 import { Request, Response, CookieOptions } from 'express';
 import LoginDoctorDto from '../doctor/dto/login-doctor.dto';
-
 import CreateDoctorDto from '../doctor/dto/create-doctor.dto';
 import DoctorService from '../doctor/doctor.service';
 import Doctor from '../doctor/entity/doctor.entity';
-import { HASH_NUMBER, SEVEN } from '../../shared/consts';
+import { GOOGLE_URL, HASH_NUMBER, OAUTH_URL, SEVEN } from '@shared/consts';
 import { GoogleDoctorResult } from './utils/types';
 import MailService from './mail.service';
-import ForgotPasswordDto from "../doctor/dto/forgot-password.dto";
-import ResetPasswordDto from "../doctor/dto/change-password.dto";
+import ForgotPasswordDto from '../doctor/dto/forgot-password.dto';
+import ResetPasswordDto from '../doctor/dto/change-password.dto';
 
 @Injectable()
 export default class AuthService {
@@ -161,7 +160,7 @@ export default class AuthService {
   private async getGoogleOauthTokens(code: {
     code: string;
   }): Promise<Record<string, string>> {
-    const url = 'https://oauth2.googleapis.com/token';
+    const url = OAUTH_URL;
     const values = {
       ...code,
       client_id: this.client_id,
@@ -191,14 +190,11 @@ export default class AuthService {
     access_token,
   }): Promise<GoogleDoctorResult> {
     try {
-      const res = await axios.get(
-        `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`,
-        {
-          headers: {
-            Authorization: `Bearer ${id_token}`,
-          },
+      const res = await axios.get(`${GOOGLE_URL}=${access_token}`, {
+        headers: {
+          Authorization: `Bearer ${id_token}`,
         },
-      );
+      });
       return res.data;
     } catch (error) {
       throw new Error(error);
@@ -283,13 +279,16 @@ export default class AuthService {
     return this.generateToken(doctor);
   }
 
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<void> {
+    const doctor = await this.doctorService.getDoctorByEmail(
+      forgotPasswordDto.email,
+    );
 
-  async forgotPassword(forgotPasswordDto: ForgotPasswordDto) : Promise<void>{
-    const doctor = await this.doctorService.getDoctorByEmailForLogin(forgotPasswordDto.email);
+    const { token } = await this.generateToken(doctor);
 
-    const {token} = await this.generateToken(doctor);
-
-    const forgotLink = `${this.configService.get('CLIENT_URL',)}/reset-pass/${token}`;
+    const forgotLink = `${this.configService.get(
+      'CLIENT_URL',
+    )}/reset-pass/${token}`;
 
     try {
       await this.transporter.sendMail({
@@ -310,14 +309,16 @@ export default class AuthService {
 
   async updatePasswordByEmail(email: string, password: string): Promise<void> {
     const doctor = await this.doctorRepository
-        .createQueryBuilder()
-        .update(Doctor)
-        .set({ password })
-        .where('email = :email', { email })
-        .execute();
+      .createQueryBuilder()
+      .update(Doctor)
+      .set({ password })
+      .where('email = :email', { email })
+      .execute();
   }
 
-  private static async hashPasswordForResetPassword(password: string): Promise<string> {
+  private static async hashPasswordForResetPassword(
+    password: string,
+  ): Promise<string> {
     try {
       return await bcrypt.hash(password, await bcrypt.genSalt());
     } catch (error) {
@@ -331,9 +332,13 @@ export default class AuthService {
       const result = 'password updated';
 
       const verifiedDoctor = await this.jwtService.verify(token);
-      const newPassword = await AuthService.hashPasswordForResetPassword(password);
+      const newPassword = await AuthService.hashPasswordForResetPassword(
+        password,
+      );
 
-      const doctor = await this.doctorService.getDoctorByEmailForLogin(verifiedDoctor.email);
+      const doctor = await this.doctorService.getDoctorByEmailForLogin(
+        verifiedDoctor.email,
+      );
 
       doctor.password = newPassword;
       await this.updatePasswordByEmail(doctor.email, doctor.password);
