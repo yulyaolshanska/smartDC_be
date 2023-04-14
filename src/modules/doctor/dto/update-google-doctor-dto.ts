@@ -1,44 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Gender, Role } from '@shared/enums';
 import {
-  IsEmail,
   IsNotEmpty,
   IsPhoneNumber,
   IsString,
-  Length,
   Matches,
   IsEnum,
   IsISO31661Alpha2,
   IsNumber,
 } from 'class-validator';
 import {
-  NAME_MIN_LENGTH,
-  PASSWORD_REGEX,
   CITY_REGEX,
   ADDRESS_REGEX,
   DATE_REGEX,
   TIME_ZONE_REGEX,
-} from 'shared/consts';
+} from '../../../shared/consts';
+import { Role, Gender } from '../../../shared/enums';
 
-export default class CreateDoctorDto {
-  @ApiProperty({
-    description: 'Doctor first name',
-    example: 'John',
-  })
-  @IsString()
-  @IsNotEmpty()
-  @Length(NAME_MIN_LENGTH)
-  firstName: string;
-
-  @ApiProperty({
-    description: 'Doctor last name',
-    example: 'Doe',
-  })
-  @IsString()
-  @IsNotEmpty()
-  @Length(NAME_MIN_LENGTH)
-  lastName: string;
-
+export default class UpdateGoogleDoctorDto {
   @ApiProperty({
     description: "Doctor's phone ",
     example: '+380992598283',
@@ -46,26 +24,6 @@ export default class CreateDoctorDto {
   @IsPhoneNumber(undefined, { message: 'Phone number must be valid' })
   @IsNotEmpty()
   phoneNumber: string;
-
-  @ApiProperty({
-    description: "Doctor's email",
-    example: 'john_doe@gmail.com',
-  })
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
-
-  @ApiProperty({
-    description: "Doctor's password",
-    example: '11111111Qq',
-  })
-  @IsString()
-  @IsNotEmpty()
-  @Matches(PASSWORD_REGEX, {
-    message:
-      'Password should contain 10 characters, at least one uppercase and one lowercase letter',
-  })
-  password: string;
 
   @ApiProperty({
     description: "Doctor's specialization",
@@ -83,7 +41,7 @@ export default class CreateDoctorDto {
 
   @ApiProperty({
     description: "Doctor's birthday",
-    example: '10-20-1980',
+    example: '10/20/1980',
   })
   @Matches(DATE_REGEX, {
     message: 'Invalid date type',

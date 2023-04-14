@@ -26,7 +26,7 @@ export default class Doctor {
     default: null,
   })
   @Column()
-  phone: string;
+  phoneNumber: string;
 
   @ApiProperty({ example: 'john_doe@gmail.com' })
   @Column({
@@ -36,7 +36,7 @@ export default class Doctor {
   @Column()
   email: string;
 
-  @ApiProperty({ example: '11111111Qq' })
+  @ApiProperty({ example: 'Derikloshad' })
   @Column({
     default: null,
   })
@@ -50,7 +50,7 @@ export default class Doctor {
   @Column()
   activationLink: string;
 
-  @ApiProperty({ example: '????' })
+  @ApiProperty({ example: false })
   @Column({
     default: false,
   })
@@ -63,4 +63,61 @@ export default class Doctor {
   })
   @Column()
   role: string;
+
+  @ApiProperty({ example: 'some adress' })
+  @Column({
+    default: null,
+  })
+  @Column()
+  address: string;
+
+  @ApiProperty({ example: '20-01-2000' })
+  @Column({
+    default: null,
+  })
+  @Column()
+  birthDate: string;
+
+  @ApiProperty({ example: 'Kiev' })
+  @Column({
+    default: null,
+  })
+  @Column()
+  city: string;
+
+  @ApiProperty({ example: ' DE' })
+  @Column({
+    default: null,
+  })
+  @Column()
+  country: string;
+
+  @ApiProperty({ example: ' 1' })
+  @Column({
+    default: null,
+  })
+  @Column()
+  specialityId: number;
+
+  @ApiProperty({ example: ' ????' })
+  @Column({
+    default: null,
+    nullable: true,
+  })
+  @Column()
+  photoUrl: string;
+
+  @ApiProperty({ example: ' ????' })
+  @Column({
+    default: null,
+  })
+  @Column()
+  timeZone: string;
+
+  @ApiProperty({ example: ' Male' })
+  @Column({
+    default: null,
+  })
+  @Column()
+  gender: string;
 }

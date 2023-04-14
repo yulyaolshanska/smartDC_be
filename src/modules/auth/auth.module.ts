@@ -4,12 +4,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import AuthController from './auth.controller';
 import AuthService from './auth.service';
+import MailService from './mail.service';
 import DoctorModule from '../doctor/doctor.module';
 import Doctor from '../doctor/entity/doctor.entity';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [{ provide: 'AUTH_SERVICE', useClass: AuthService }, MailService],
   imports: [
     TypeOrmModule.forFeature([Doctor]),
     DoctorModule,
