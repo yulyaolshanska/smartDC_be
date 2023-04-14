@@ -13,8 +13,8 @@ import {
   ADDRESS_REGEX,
   DATE_REGEX,
   TIME_ZONE_REGEX,
-} from '../../../shared/consts';
-import { Role, Gender } from '../../../shared/enums';
+} from '@shared/consts';
+import { Role, Gender } from '@shared/enums';
 
 export default class UpdateGoogleDoctorDto {
   @ApiProperty({

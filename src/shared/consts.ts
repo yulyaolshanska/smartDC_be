@@ -10,3 +10,7 @@ export const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 export const TIME_ZONE_REGEX = /\(\w{3}[+-]\d{1,2}\)\s\w+\/\w+/;
 
 export const SEVEN = 7;
+
+export const GOOGLE_URL =
+  'https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token';
+export const GOOGLE_TOCKEN_PATH = 'https://oauth2.googleapis.com/token';
