@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import JwtPatchGuard from 'modules/auth/utils/PatchGuard';
 import PatientService from './patient.service';
@@ -24,5 +32,16 @@ export default class PatientController {
   @UseGuards(JwtPatchGuard)
   postPatient(@Body() patientDto: CreatePatientDto): Promise<Patient> {
     return this.patientService.createPatient(patientDto);
+  }
+
+  @ApiOperation({ summary: 'Patient update' })
+  @ApiResponse({ status: 200, type: Patient })
+  @Patch('/:id')
+  @UseGuards(JwtPatchGuard)
+  updateOne(
+    @Param('id') id: number,
+    @Body() patientDto: Partial<CreatePatientDto>,
+  ): Promise<Patient> {
+    return this.patientService.updatePatient(id, patientDto);
   }
 }

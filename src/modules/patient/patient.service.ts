@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import Patient from './entity/patient.entity';
@@ -31,6 +36,28 @@ export default class PatientService {
         .execute();
 
       return newPatient.generatedMaps[0] as Patient;
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async updatePatient(
+    id: number,
+    patientDto: Partial<CreatePatientDto>,
+  ): Promise<Patient> {
+    try {
+      const patient = await this.patientRepository
+        .createQueryBuilder('patient')
+        .where('patient.id = :id', { id })
+        .getOne();
+
+      if (!patient) {
+        throw new NotFoundException(`patient with ID ${id} not found`);
+      }
+
+      Object.assign(patient, patientDto);
+
+      return await this.patientRepository.save(patient);
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
