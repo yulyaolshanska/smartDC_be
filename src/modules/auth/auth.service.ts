@@ -11,6 +11,7 @@ import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import UpdateGoogleDoctorDto from 'modules/doctor/dto/update-google-doctor-dto';
 import { Request, Response, CookieOptions } from 'express';
 import { GOOGLE_URL, HASH_NUMBER, OAUTH_URL, SEVEN } from '@shared/consts';
+import base64url from 'base64url';
 import LoginDoctorDto from '../doctor/dto/login-doctor.dto';
 import CreateDoctorDto from '../doctor/dto/create-doctor.dto';
 import DoctorService from '../doctor/doctor.service';
@@ -19,7 +20,6 @@ import { GoogleDoctorResult } from './utils/types';
 import MailService from './mail.service';
 import ForgotPasswordDto from '../doctor/dto/forgot-password.dto';
 import ResetPasswordDto from '../doctor/dto/change-password.dto';
-import base64url from 'base64url';
 
 @Injectable()
 export default class AuthService {
