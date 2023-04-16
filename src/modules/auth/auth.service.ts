@@ -10,8 +10,13 @@ import { ConfigService } from '@nestjs/config';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import UpdateGoogleDoctorDto from 'modules/doctor/dto/update-google-doctor-dto';
 import { Request, Response, CookieOptions } from 'express';
-import { GOOGLE_URL, HASH_NUMBER, OAUTH_URL, SEVEN } from '@shared/consts';
 import base64url from 'base64url';
+import {
+  GOOGLE_TOCKEN_PATH,
+  GOOGLE_URL,
+  HASH_NUMBER,
+  SEVEN,
+} from '@shared/consts';
 import LoginDoctorDto from '../doctor/dto/login-doctor.dto';
 import CreateDoctorDto from '../doctor/dto/create-doctor.dto';
 import DoctorService from '../doctor/doctor.service';
@@ -163,7 +168,7 @@ export default class AuthService {
   private async getGoogleOauthTokens(code: {
     code: string;
   }): Promise<Record<string, string>> {
-    const url = OAUTH_URL;
+    const url = GOOGLE_TOCKEN_PATH;
     const values = {
       ...code,
       client_id: this.client_id,
@@ -278,8 +283,12 @@ export default class AuthService {
   }
 
   async login(doctorDto: LoginDoctorDto): Promise<{ token: string }> {
-    const doctor = await this.validateUser(doctorDto);
-    return this.generateToken(doctor);
+    try {
+      const doctor = await this.validateUser(doctorDto);
+      return await this.generateToken(doctor);
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<void> {

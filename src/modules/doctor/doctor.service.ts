@@ -72,9 +72,7 @@ export default class DoctorService {
         .createQueryBuilder('doctor')
         .where('doctor.email = :email', { email })
         .getOne();
-      if (!user) {
-        throw new NotFoundException(`Doctor with email ${email} not found`);
-      }
+      if (!user) return null;
       return user;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -117,6 +115,28 @@ export default class DoctorService {
       if (result.affected === NO_ROWS_AFFECTED) {
         throw new NotFoundException(`Doctor with id ${id} not found`);
       }
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async updateDoctor(
+    id: number,
+    doctorDto: Partial<CreateDoctorDto>,
+  ): Promise<Doctor> {
+    try {
+      const doctor = await this.doctorRepository
+        .createQueryBuilder('doctor')
+        .where('doctor.id = :id', { id })
+        .getOne();
+
+      if (!doctor) {
+        throw new NotFoundException(`Doctor with ID ${id} not found`);
+      }
+
+      Object.assign(doctor, doctorDto);
+
+      return await this.doctorRepository.save(doctor);
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
