@@ -19,6 +19,7 @@ import { GoogleDoctorResult } from './utils/types';
 import MailService from './mail.service';
 import ForgotPasswordDto from '../doctor/dto/forgot-password.dto';
 import ResetPasswordDto from '../doctor/dto/change-password.dto';
+import base64url from 'base64url';
 
 @Injectable()
 export default class AuthService {
@@ -288,9 +289,11 @@ export default class AuthService {
 
     const { token } = await this.generateToken(doctor);
 
+    const encodedToken = base64url.encode(token);
+
     const forgotLink = `${this.configService.get(
       'CLIENT_URL',
-    )}/reset-pass/${token}`;
+    )}/reset-pass/${encodedToken}`;
 
     try {
       await this.transporter.sendMail({
@@ -333,7 +336,9 @@ export default class AuthService {
       const { password, token } = payload;
       const result = 'password updated';
 
-      const verifiedDoctor = await this.jwtService.verify(token);
+      const decodedToken = base64url.decode(token);
+
+      const verifiedDoctor = await this.jwtService.verify(decodedToken);
       const newPassword = await AuthService.hashPasswordForResetPassword(
         password,
       );
