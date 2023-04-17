@@ -26,13 +26,13 @@ export default class PatientService {
     }
   }
 
-  async createPatient(createPatientDto: CreatePatientDto): Promise<Patient> {
+  async createPatient(patient: CreatePatientDto): Promise<Patient> {
     try {
       const newPatient = await this.patientRepository
         .createQueryBuilder()
         .insert()
         .into(Patient)
-        .values({ ...createPatientDto })
+        .values({ ...patient })
         .execute();
 
       return newPatient.generatedMaps[0] as Patient;
@@ -43,21 +43,21 @@ export default class PatientService {
 
   async updatePatient(
     id: number,
-    patientDto: Partial<CreatePatientDto>,
+    patient: Partial<CreatePatientDto>,
   ): Promise<Patient> {
     try {
-      const patient = await this.patientRepository
+      const updatedPatient = await this.patientRepository
         .createQueryBuilder('patient')
         .where('patient.id = :id', { id })
         .getOne();
 
-      if (!patient) {
+      if (!updatedPatient) {
         throw new NotFoundException(`patient with ID ${id} not found`);
       }
 
-      Object.assign(patient, patientDto);
+      Object.assign(updatedPatient, patient);
 
-      return await this.patientRepository.save(patient);
+      return await this.patientRepository.save(updatedPatient);
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
