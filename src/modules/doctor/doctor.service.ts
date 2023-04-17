@@ -35,37 +35,6 @@ export default class DoctorService {
     }
   }
 
-  async getDoctorByEmailForLogin(email: string): Promise<Doctor> {
-    try {
-      const user = await this.doctorRepository
-        .createQueryBuilder('doctor')
-        .where('doctor.email = :email', { email })
-        .getOne();
-
-      if (!user) {
-        throw new NotFoundException(`Doctor with email ${email} not found`);
-      }
-      return user;
-    } catch (err) {
-      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  async getDoctorByEmailForRegister(email: string): Promise<Doctor> {
-    try {
-      const user = await this.doctorRepository
-        .createQueryBuilder('doctor')
-        .where('doctor.email = :email', { email })
-        .getOne();
-      if (user) {
-        throw new Error('User with this email already exists');
-      }
-      return user;
-    } catch (err) {
-      throw new HttpException(`${err}`, HttpStatus.CONFLICT);
-    }
-  }
-
   async getDoctorByEmail(email: string): Promise<Doctor> {
     try {
       const user = await this.doctorRepository
