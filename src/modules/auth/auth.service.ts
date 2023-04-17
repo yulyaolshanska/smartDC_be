@@ -68,7 +68,7 @@ export default class AuthService {
   };
 
   async registration(doctorDto: CreateDoctorDto): Promise<{ token: string }> {
-    const doctor = await this.doctorService.getDoctorByEmailForRegister(
+    const doctor = await this.doctorService.getDoctorByEmail(
       doctorDto.email,
     );
     if (doctor) {
@@ -292,7 +292,7 @@ export default class AuthService {
   }
 
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<void> {
-    const doctor = await this.doctorService.getDoctorByEmailForLogin(
+    const doctor = await this.doctorService.getDoctorByEmail(
       forgotPasswordDto.email,
     );
 
@@ -352,7 +352,7 @@ export default class AuthService {
         password,
       );
 
-      const doctor = await this.doctorService.getDoctorByEmailForLogin(
+      const doctor = await this.doctorService.getDoctorByEmail(
         verifiedDoctor.email,
       );
 
