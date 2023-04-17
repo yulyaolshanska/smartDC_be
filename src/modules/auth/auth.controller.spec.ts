@@ -33,10 +33,10 @@ describe('AuthController', () => {
       const userData: CreateDoctorDto = {
         firstName: 'John',
         lastName: 'Doe',
-        phone: '+380992598283',
+        phoneNumber: '+380992598283',
         email: 'test@example.com',
         password: 'password',
-        specialityId: 1,
+        specialization: 1,
         gender: Gender.Male,
         city: 'Kharkiv',
         birthDate: '20.01.2000',
