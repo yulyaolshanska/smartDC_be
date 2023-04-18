@@ -59,8 +59,8 @@ export default class DoctorController {
     @UploadedFile() file: Express.Multer.File,
     @Param('id') id: number,
   ): Promise<Doctor> {
-    const filePath = `uploads/${id}/${file.originalname}`;
-    await fs.move(file.path, filePath);
+    const filePath = `uploads/${id}/avatar.jpg`;
+    await fs.move(file.path, filePath, { overwrite: true });
 
     const doctor = await this.doctorService.updateDoctorPhotoUrl(id, filePath);
     return doctor;
