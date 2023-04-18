@@ -6,9 +6,14 @@ import {
   Patch,
   Body,
   UseGuards,
+  Post,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import JwtPatchGuard from 'modules/auth/utils/PatchGuard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import * as fs from 'fs-extra';
 import DoctorService from './doctor.service';
 import Doctor from './entity/doctor.entity';
 import CreateDoctorDto from './dto/create-doctor.dto';
@@ -45,5 +50,19 @@ export default class DoctorController {
     @Body() doctorDto: Partial<CreateDoctorDto>,
   ): Promise<Doctor> {
     return this.doctorService.updateDoctor(id, doctorDto);
+  }
+
+  @UseGuards(JwtPatchGuard)
+  @Post('/:id/upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('id') id: number,
+  ): Promise<Doctor> {
+    const filePath = `uploads/${id}/${file.originalname}`;
+    await fs.move(file.path, filePath);
+
+    const doctor = await this.doctorService.updateDoctorPhotoUrl(id, filePath);
+    return doctor;
   }
 }

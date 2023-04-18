@@ -136,4 +136,10 @@ export default class CreateDoctorDto {
   @IsNotEmpty()
   @IsEnum(Role)
   role: string;
+
+  @ApiProperty({
+    description: "Doctor's photo",
+    example: '?????',
+  })
+  photoUrl: string;
 }
