@@ -3,10 +3,6 @@ import * as nodemailer from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { ConfigService } from '@nestjs/config';
 
-import { InjectRepository } from '@nestjs/typeorm';
-import Doctor from 'modules/doctor/entity/doctor.entity';
-import { Repository } from 'typeorm';
-
 @Injectable()
 export default class MailService {
   private transporter: nodemailer.Transporter<SMTPTransport.SentMessageInfo>;

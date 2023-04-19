@@ -43,15 +43,14 @@ export default class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  // private readonly accessTokenCookieOptions: CookieOptions = {
-  //   maxAge: this.configService.get('ACCESS_TOKEN_MAX_AGE'),
-  //   maxAge: 86400000,
-  //   httpOnly: true,
-  //   domain: this.configService.get('ACCESS_TOKEN_DOMAIN'),
-  //   path: '/',
-  //   sameSite: 'lax',
-  //   secure: false,
-  // };
+  private readonly accessTokenCookieOptions: CookieOptions = {
+    maxAge: this.configService.get('ACCESS_TOKEN_MAX_AGE'),
+    httpOnly: true,
+    domain: this.configService.get('ACCESS_TOKEN_DOMAIN'),
+    path: '/',
+    sameSite: 'lax',
+    secure: false,
+  };
 
   async registration(doctorDto: CreateDoctorDto): Promise<{ token: string }> {
     const doctor = await this.doctorService.getDoctorByEmail(doctorDto.email);
@@ -139,7 +138,6 @@ export default class AuthService {
     const googleDoctor = await this.getGoogleUser({ id_token, access_token });
 
     const doctor = await this.validateDoctorFromGoogle(googleDoctor);
-    console.log('handleOauthDoctor', doctor);
 
     const accessToken = this.jwtService.sign(
       { ...doctor },
@@ -174,7 +172,7 @@ export default class AuthService {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       });
-      console.log('resresresresres.data', res.data);
+
       return res.data;
     } catch (error) {
       throw new HttpException(
@@ -226,7 +224,6 @@ export default class AuthService {
       }
       return existingDoctor;
     } catch (error) {
-      console.log(error);
       throw new Error('Unpossible to validate the user');
     }
   }
@@ -236,16 +233,23 @@ export default class AuthService {
     updateGoogleDoctorDto: UpdateGoogleDoctorDto,
     token: string,
   ): void {
-    const decodedToken = this.jwtService.verify(
-      token.slice(SEVEN),
-      this.configService.get('PRIVATE_KEY'),
-    );
-    this.doctorRepository
-      .createQueryBuilder()
-      .update(Doctor)
-      .set({ ...updateGoogleDoctorDto, isVerified: true })
-      .where('doctor.email = :email', { email: decodedToken.email })
-      .execute();
+    try {
+      const decodedToken = this.jwtService.verify(
+        token.slice(SEVEN),
+        this.configService.get('PRIVATE_KEY'),
+      );
+      this.doctorRepository
+        .createQueryBuilder()
+        .update(Doctor)
+        .set({ ...updateGoogleDoctorDto, isVerified: true })
+        .where('doctor.email = :email', { email: decodedToken.email })
+        .execute();
+    } catch (error) {
+      throw new HttpException(
+        'Not possible to update google doctor',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   private async validateUser(doctorDto: LoginDoctorDto): Promise<Doctor> {
@@ -269,7 +273,6 @@ export default class AuthService {
       }
       return doctor;
     } catch (err) {
-      console.log(err);
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -284,14 +287,12 @@ export default class AuthService {
 
       return { token, userInfo };
     } catch (err) {
-      console.log(err);
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
   private stripPassword(doctor: Doctor): UserInfo {
     const { password, activationLink, ...userInfo } = doctor;
-    console.log('doctor', doctor);
 
     return userInfo;
   }
@@ -300,8 +301,8 @@ export default class AuthService {
     try {
       const token = req.headers.authorization.slice(SEVEN);
       const decodedToken = this.jwtService.decode(token);
-
-      const { id }: any = decodedToken;
+      // @ts-ignore
+      const { id } = decodedToken;
       const doctor = await this.doctorRepository
         .createQueryBuilder('doctor')
         .where('doctor.id = :id', { id })
@@ -309,7 +310,6 @@ export default class AuthService {
       const userInfo = this.stripPassword(doctor);
       return userInfo;
     } catch (error) {
-      console.log(error);
       throw new Error(error);
     }
   }
