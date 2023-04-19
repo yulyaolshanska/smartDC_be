@@ -129,7 +129,7 @@ export default class AuthService {
     }
   }
 
-  async handleOauthDoctor(req: Request, res: Response): Promise<Doctor> {
+  async handleOauthDoctor(req: Request, res: Response): Promise<void> {
     const code = req.query.code as string;
     const { id_token, access_token } = await this.getGoogleOauthTokens({
       code,
@@ -147,11 +147,15 @@ export default class AuthService {
     res.clearCookie('accessToken');
     res.cookie('accessToken', accessToken);
 
-    res.redirect(this.configService.get('SECOND_FORM_URL'));
+    const doctor2 = await this.doctorService.getDoctorByEmail(doctor.email);
+    console.log('dcotor1', doctor);
+    console.log('dcotor2', doctor2);
 
-    // res.redirect(this.configService.get('CLIENT_API'));
-
-    return doctor;
+    if (doctor2?.address) {
+      res.redirect(`${this.configService.get(`CLIENT_URL`)}/dashboard`);
+    } else {
+      res.redirect(this.configService.get('SECOND_FORM_URL'));
+    }
   }
 
   private async getGoogleOauthTokens(code: {
@@ -303,11 +307,9 @@ export default class AuthService {
       const decodedToken = this.jwtService.decode(token);
       // @ts-ignore
       const { id } = decodedToken;
-      const doctor = await this.doctorRepository
-        .createQueryBuilder('doctor')
-        .where('doctor.id = :id', { id })
-        .getOne();
+      const doctor = await this.doctorService.getDoctorByID(id);
       const userInfo = this.stripPassword(doctor);
+
       return userInfo;
     } catch (error) {
       throw new Error(error);
