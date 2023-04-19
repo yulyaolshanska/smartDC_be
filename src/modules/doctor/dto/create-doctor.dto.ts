@@ -72,7 +72,7 @@ export default class CreateDoctorDto {
     example: 'Germany',
   })
   @IsNumber()
-  specialityId: number;
+  specialization: number;
 
   @ApiProperty({
     description: "Doctor's gender",

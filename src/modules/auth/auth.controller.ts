@@ -20,6 +20,7 @@ import LoginDoctorDto from '../doctor/dto/login-doctor.dto';
 
 import CreateDoctorDto from '../doctor/dto/create-doctor.dto';
 import JwtAuthGuard from './utils/Guards';
+import { UserInfo } from './utils/types';
 
 @ApiTags('Authorization')
 @Controller('auth')
@@ -43,7 +44,7 @@ class AuthController {
   async handleRedirect(
     @Req() req: Request,
     @Res() res: Response,
-  ): Promise<void> {
+  ): Promise<Doctor> {
     return this.authService.handleOauthDoctor(req, res);
   }
 
@@ -72,6 +73,12 @@ class AuthController {
   @Post('/login')
   async login(@Body() doctorDto: LoginDoctorDto): Promise<{ token: string }> {
     return this.authService.login(doctorDto);
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  getMe(@Req() req: Request): Promise<UserInfo> {
+    return this.authService.getMe(req);
   }
 }
 export default AuthController;

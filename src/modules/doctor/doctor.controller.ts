@@ -13,7 +13,7 @@ import DoctorService from './doctor.service';
 import Doctor from './entity/doctor.entity';
 import CreateDoctorDto from './dto/create-doctor.dto';
 
-@Controller('create_doctor')
+@Controller('doctor')
 export default class DoctorController {
   constructor(private readonly doctorService: DoctorService) {}
 

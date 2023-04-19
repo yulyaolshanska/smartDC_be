@@ -16,3 +16,21 @@ export interface GoogleDoctorResult {
   picture: string;
   locale: string;
 }
+
+export interface UserInfo {
+  id: number;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  email: string;
+  isVerified: boolean;
+  role: string;
+  address: string;
+  birthDate: string;
+  city: string;
+  country: string;
+  specialityId: number;
+  photoUrl: string;
+  timeZone: string;
+  gender: string;
+}

@@ -21,7 +21,7 @@ import LoginDoctorDto from '../doctor/dto/login-doctor.dto';
 import CreateDoctorDto from '../doctor/dto/create-doctor.dto';
 import DoctorService from '../doctor/doctor.service';
 import Doctor from '../doctor/entity/doctor.entity';
-import { GoogleDoctorResult } from './utils/types';
+import { GoogleDoctorResult, UserInfo } from './utils/types';
 import MailService from './mail.service';
 
 @Injectable()
@@ -41,29 +41,17 @@ export default class AuthService {
     private mailService: MailService,
     private jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) {
-    this.transporter = nodemailer.createTransport({
-      host: this.configService.get('SMTP_HOST'),
-      port: this.configService.get('SMTP_PORT'),
-      secure: true,
-      auth: {
-        user: this.configService.get('SMTP_USER'),
-        pass: this.configService.get('SMTP_PASSWORD'),
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
-  }
+  ) {}
 
-  private readonly accessTokenCookieOptions: CookieOptions = {
-    maxAge: this.configService.get('ACCESS_TOKEN_MAX_AGE'),
-    httpOnly: true,
-    domain: this.configService.get('ACCESS_TOKEN_DOMAIN'),
-    path: '/',
-    sameSite: 'lax',
-    secure: false,
-  };
+  // private readonly accessTokenCookieOptions: CookieOptions = {
+  //   maxAge: this.configService.get('ACCESS_TOKEN_MAX_AGE'),
+  //   maxAge: 86400000,
+  //   httpOnly: true,
+  //   domain: this.configService.get('ACCESS_TOKEN_DOMAIN'),
+  //   path: '/',
+  //   sameSite: 'lax',
+  //   secure: false,
+  // };
 
   async registration(doctorDto: CreateDoctorDto): Promise<{ token: string }> {
     const doctor = await this.doctorService.getDoctorByEmail(doctorDto.email);
@@ -142,7 +130,7 @@ export default class AuthService {
     }
   }
 
-  async handleOauthDoctor(req: Request, res: Response): Promise<void> {
+  async handleOauthDoctor(req: Request, res: Response): Promise<Doctor> {
     const code = req.query.code as string;
     const { id_token, access_token } = await this.getGoogleOauthTokens({
       code,
@@ -151,14 +139,21 @@ export default class AuthService {
     const googleDoctor = await this.getGoogleUser({ id_token, access_token });
 
     const doctor = await this.validateDoctorFromGoogle(googleDoctor);
+    console.log('handleOauthDoctor', doctor);
 
     const accessToken = this.jwtService.sign(
       { ...doctor },
-      { expiresIn: '8h' },
+      { expiresIn: '24h' },
     );
 
-    res.cookie('accessToken', accessToken, this.accessTokenCookieOptions);
-    res.redirect(this.configService.get('CLIENT_URL'));
+    res.clearCookie('accessToken');
+    res.cookie('accessToken', accessToken);
+
+    res.redirect(this.configService.get('SECOND_FORM_URL'));
+
+    // res.redirect(this.configService.get('CLIENT_API'));
+
+    return doctor;
   }
 
   private async getGoogleOauthTokens(code: {
@@ -179,6 +174,7 @@ export default class AuthService {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       });
+      console.log('resresresresres.data', res.data);
       return res.data;
     } catch (error) {
       throw new HttpException(
@@ -196,9 +192,10 @@ export default class AuthService {
     try {
       const res = await axios.get(`${GOOGLE_URL}=${access_token}`, {
         headers: {
-          Authorization: `Bearer ${id_token}`,
+          authorization: `Bearer ${id_token}`,
         },
       });
+
       return res.data;
     } catch (error) {
       throw new Error(error);
@@ -209,14 +206,12 @@ export default class AuthService {
     details: GoogleDoctorResult,
   ): Promise<Doctor> {
     try {
-      const doctor = await this.doctorRepository
-        .createQueryBuilder()
-        .select('doctor')
-        .from(Doctor, 'doctor')
+      const existingDoctor = await this.doctorRepository
+        .createQueryBuilder('doctor')
         .where('doctor.email = :email', { email: details.email })
         .getOne();
-      if (!doctor) {
-        await this.doctorRepository
+      if (!existingDoctor) {
+        const newDoctor = await this.doctorRepository
           .createQueryBuilder()
           .insert()
           .into(Doctor)
@@ -224,14 +219,14 @@ export default class AuthService {
             firstName: details.given_name,
             lastName: details.family_name,
             email: details.email,
-            isVerified: true,
+            isVerified: false,
           })
           .execute();
-
-        this.validateDoctorFromGoogle(details);
+        return newDoctor.generatedMaps[0] as Doctor;
       }
-      return doctor;
+      return existingDoctor;
     } catch (error) {
+      console.log(error);
       throw new Error('Unpossible to validate the user');
     }
   }
@@ -274,16 +269,48 @@ export default class AuthService {
       }
       return doctor;
     } catch (err) {
+      console.log(err);
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async login(doctorDto: LoginDoctorDto): Promise<{ token: string }> {
+  async login(
+    doctorDto: LoginDoctorDto,
+  ): Promise<{ token: string; userInfo: UserInfo }> {
     try {
       const doctor = await this.validateUser(doctorDto);
-      return await this.generateToken(doctor);
+      const { token } = await this.generateToken(doctor);
+      const userInfo = this.stripPassword(doctor);
+
+      return { token, userInfo };
     } catch (err) {
+      console.log(err);
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  private stripPassword(doctor: Doctor): UserInfo {
+    const { password, activationLink, ...userInfo } = doctor;
+    console.log('doctor', doctor);
+
+    return userInfo;
+  }
+
+  async getMe(req: Request): Promise<UserInfo> {
+    try {
+      const token = req.headers.authorization.slice(SEVEN);
+      const decodedToken = this.jwtService.decode(token);
+
+      const { id }: any = decodedToken;
+      const doctor = await this.doctorRepository
+        .createQueryBuilder('doctor')
+        .where('doctor.id = :id', { id })
+        .getOne();
+      const userInfo = this.stripPassword(doctor);
+      return userInfo;
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
     }
   }
 }
