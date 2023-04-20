@@ -148,8 +148,6 @@ export default class AuthService {
     res.cookie('accessToken', accessToken);
 
     const doctor2 = await this.doctorService.getDoctorByEmail(doctor.email);
-    console.log('dcotor1', doctor);
-    console.log('dcotor2', doctor2);
 
     if (doctor2?.address) {
       res.redirect(`${this.configService.get(`CLIENT_URL`)}/dashboard`);
@@ -287,7 +285,7 @@ export default class AuthService {
     try {
       const doctor = await this.validateUser(doctorDto);
       const { token } = await this.generateToken(doctor);
-      const userInfo = this.stripPassword(doctor);
+      const userInfo = this.separateDoctorInfo(doctor);
 
       return { token, userInfo };
     } catch (err) {
@@ -295,7 +293,7 @@ export default class AuthService {
     }
   }
 
-  private stripPassword(doctor: Doctor): UserInfo {
+  private separateDoctorInfo(doctor: Doctor): UserInfo {
     const { password, activationLink, ...userInfo } = doctor;
 
     return userInfo;
@@ -305,10 +303,14 @@ export default class AuthService {
     try {
       const token = req.headers.authorization.slice(SEVEN);
       const decodedToken = this.jwtService.decode(token);
-      // @ts-ignore
+
+      if (typeof decodedToken === 'string') {
+        throw new Error('Invalid token');
+      }
+
       const { id } = decodedToken;
       const doctor = await this.doctorService.getDoctorByID(id);
-      const userInfo = this.stripPassword(doctor);
+      const userInfo = this.separateDoctorInfo(doctor);
 
       return userInfo;
     } catch (error) {
