@@ -42,7 +42,6 @@ export default class DoctorService {
         .where('doctor.email = :email', { email })
         .getOne();
       if (!user) return null;
-
       return user;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);

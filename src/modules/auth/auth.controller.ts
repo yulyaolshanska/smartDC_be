@@ -9,6 +9,7 @@ import {
   Inject,
   Res,
   UseGuards,
+  Patch,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Request, Response } from 'express';
@@ -20,6 +21,8 @@ import LoginDoctorDto from '../doctor/dto/login-doctor.dto';
 
 import CreateDoctorDto from '../doctor/dto/create-doctor.dto';
 import JwtAuthGuard from './utils/Guards';
+import ForgotPasswordDto from '../doctor/dto/forgot-password.dto';
+import ResetPasswordDto from '../doctor/dto/change-password.dto';
 import { UserInfo } from './utils/types';
 
 @ApiTags('Authorization')
@@ -73,6 +76,24 @@ class AuthController {
   @Post('/login')
   async login(@Body() doctorDto: LoginDoctorDto): Promise<{ token: string }> {
     return this.authService.login(doctorDto);
+  }
+
+  @ApiOperation({ summary: 'Forgot password' })
+  @ApiResponse({ status: 201, type: Doctor })
+  @Post('/forgotPassword')
+  async forgotPassword(
+    @Body() forgotPasswordDto: ForgotPasswordDto,
+  ): Promise<void> {
+    return this.authService.forgotPassword(forgotPasswordDto);
+  }
+
+  @ApiOperation({ summary: 'Reset password' })
+  @ApiResponse({ status: 200, type: Doctor })
+  @Patch('/resetPassword')
+  async resetPassword(
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ): Promise<string> {
+    return this.authService.resetPassword(resetPasswordDto);
   }
 
   @Get('me')

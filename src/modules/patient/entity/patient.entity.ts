@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export default class Doctor {
+export default class Patient {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -13,7 +13,7 @@ export default class Doctor {
   })
   firstName: string;
 
-  @ApiProperty({ example: 'Doe' })
+  @ApiProperty({ example: 'Nedoe' })
   @Column({
     unique: false,
     default: null,
@@ -28,7 +28,7 @@ export default class Doctor {
   @Column()
   phoneNumber: string;
 
-  @ApiProperty({ example: 'john_doe@gmail.com' })
+  @ApiProperty({ example: 'john_nedoe@gmail.com' })
   @Column({
     unique: true,
     default: null,
@@ -36,49 +36,21 @@ export default class Doctor {
   @Column()
   email: string;
 
-  @ApiProperty({ example: 'Derikloshad' })
-  @Column({
-    default: null,
-  })
-  @Column()
-  password: string;
-
-  @ApiProperty({ example: '????' })
-  @Column({
-    default: null,
-  })
-  @Column()
-  activationLink: string;
-
-  @ApiProperty({ example: false })
-  @Column({
-    default: false,
-  })
-  @Column()
-  isVerified: boolean;
-
-  @ApiProperty({ example: 'Local' })
-  @Column({
-    default: null,
-  })
-  @Column()
-  role: string;
-
-  @ApiProperty({ example: 'some adress' })
+  @ApiProperty({ example: 'Berger Str. 22' })
   @Column({
     default: null,
   })
   @Column()
   address: string;
 
-  @ApiProperty({ example: '20-01-2000' })
+  @ApiProperty({ example: '2000-10-10' })
   @Column({
     default: null,
   })
   @Column()
   birthDate: string;
 
-  @ApiProperty({ example: 'Kiev' })
+  @ApiProperty({ example: 'Berlin' })
   @Column({
     default: null,
   })
@@ -92,22 +64,7 @@ export default class Doctor {
   @Column()
   country: string;
 
-  @ApiProperty({ example: ' 1' })
-  @Column({
-    default: null,
-  })
-  @Column()
-  specialization: number;
-
-  @ApiProperty({ example: ' ????' })
-  @Column({
-    default: null,
-    nullable: true,
-  })
-  @Column()
-  photoUrl: string;
-
-  @ApiProperty({ example: ' ????' })
+  @ApiProperty({ example: '(GMT+2) Europe/Berlin' })
   @Column({
     default: null,
   })

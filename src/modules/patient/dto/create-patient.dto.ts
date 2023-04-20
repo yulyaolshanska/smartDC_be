@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Gender, Role } from '@shared/enums';
+import { Gender } from '@shared/enums';
 import {
   IsEmail,
   IsNotEmpty,
@@ -9,20 +9,18 @@ import {
   Matches,
   IsEnum,
   IsISO31661Alpha2,
-  IsNumber,
 } from 'class-validator';
 import {
   NAME_MIN_LENGTH,
-  PASSWORD_REGEX,
   CITY_REGEX,
   ADDRESS_REGEX,
   DATE_REGEX,
   TIME_ZONE_REGEX,
 } from 'shared/consts';
 
-export default class CreateDoctorDto {
+export default class CreatePatientDto {
   @ApiProperty({
-    description: 'Doctor first name',
+    description: 'Patient first name',
     example: 'John',
   })
   @IsString()
@@ -31,8 +29,8 @@ export default class CreateDoctorDto {
   firstName: string;
 
   @ApiProperty({
-    description: 'Doctor last name',
-    example: 'Doe',
+    description: 'Patient last name',
+    example: 'Nedoe',
   })
   @IsString()
   @IsNotEmpty()
@@ -40,7 +38,7 @@ export default class CreateDoctorDto {
   lastName: string;
 
   @ApiProperty({
-    description: "Doctor's phone ",
+    description: "Patient's phone ",
     example: '+380992598283',
   })
   @IsPhoneNumber(undefined, { message: 'Phone number must be valid' })
@@ -48,42 +46,23 @@ export default class CreateDoctorDto {
   phoneNumber: string;
 
   @ApiProperty({
-    description: "Doctor's email",
-    example: 'john_doe@gmail.com',
+    description: "Patient's email",
+    example: 'john_nedoe@gmail.com',
   })
   @IsEmail()
   @IsNotEmpty()
   email: string;
 
   @ApiProperty({
-    description: "Doctor's password",
-    example: '11111111Qq',
-  })
-  @IsString()
-  @IsNotEmpty()
-  @Matches(PASSWORD_REGEX, {
-    message:
-      'Password should contain 10 characters, at least one uppercase and one lowercase letter',
-  })
-  password: string;
-
-  @ApiProperty({
-    description: "Doctor's specialization",
-    example: 0,
-  })
-  @IsNumber()
-  specialization: number;
-
-  @ApiProperty({
-    description: "Doctor's gender",
+    description: "Patient's gender",
     example: 'Male',
   })
   @IsEnum(Gender)
   gender: Gender;
 
   @ApiProperty({
-    description: "Doctor's birthday",
-    example: '1980-10-20',
+    description: "Patient's birthday",
+    example: '2000-10-10',
   })
   @Matches(DATE_REGEX, {
     message: 'Invalid date type',
@@ -91,7 +70,7 @@ export default class CreateDoctorDto {
   birthDate: string;
 
   @ApiProperty({
-    description: "Doctor's country",
+    description: "Patient's country",
     example: 'DE',
   })
   @IsISO31661Alpha2()
@@ -99,8 +78,8 @@ export default class CreateDoctorDto {
   country: string;
 
   @ApiProperty({
-    description: "Doctor's city",
-    example: 'Frankfurt',
+    description: "Patient's city",
+    example: 'Berlin',
   })
   @Matches(CITY_REGEX, {
     message: 'Invalid city name',
@@ -109,7 +88,7 @@ export default class CreateDoctorDto {
   city: string;
 
   @ApiProperty({
-    description: "Doctor's address",
+    description: "Patient's address",
     example: 'Berger Str. 22',
   })
   @Matches(ADDRESS_REGEX, {
@@ -119,7 +98,7 @@ export default class CreateDoctorDto {
   address: string;
 
   @ApiProperty({
-    description: "Doctor's time zone",
+    description: "Patient's time zone",
     example: '(GMT+2) Europe/Berlin',
   })
   @Matches(TIME_ZONE_REGEX, {
@@ -129,11 +108,10 @@ export default class CreateDoctorDto {
   timeZone: string;
 
   @ApiProperty({
-    description: "Doctor's role",
-    example: 'Local',
+    description: "Patient's overview",
+    example: 'Some issue',
   })
   @IsString()
   @IsNotEmpty()
-  @IsEnum(Role)
-  role: string;
+  overview: string;
 }

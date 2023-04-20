@@ -10,6 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import UpdateGoogleDoctorDto from 'modules/doctor/dto/update-google-doctor-dto';
 import { Request, Response, CookieOptions } from 'express';
+import base64url from 'base64url';
 import {
   GOOGLE_TOCKEN_PATH,
   GOOGLE_URL,
@@ -17,12 +18,13 @@ import {
   SEVEN,
 } from '@shared/consts';
 import LoginDoctorDto from '../doctor/dto/login-doctor.dto';
-
 import CreateDoctorDto from '../doctor/dto/create-doctor.dto';
 import DoctorService from '../doctor/doctor.service';
 import Doctor from '../doctor/entity/doctor.entity';
 import { GoogleDoctorResult, UserInfo } from './utils/types';
 import MailService from './mail.service';
+import ForgotPasswordDto from '../doctor/dto/forgot-password.dto';
+import ResetPasswordDto from '../doctor/dto/change-password.dto';
 
 @Injectable()
 export default class AuthService {
@@ -315,6 +317,79 @@ export default class AuthService {
       return userInfo;
     } catch (error) {
       throw new Error(error);
+    }
+  }
+
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<void> {
+    const doctor = await this.doctorService.getDoctorByEmail(
+      forgotPasswordDto.email,
+    );
+
+    const { token } = await this.generateToken(doctor);
+
+    const encodedToken = base64url.encode(token);
+
+    const forgotLink = `${this.configService.get(
+      'CLIENT_URL',
+    )}/reset-pass/${encodedToken}`;
+
+    try {
+      await this.transporter.sendMail({
+        from: this.configService.get('SMTP_USER'),
+        to: doctor.email,
+        subject: `Account activation${this.configService.get('API_URL')}`,
+        html: `
+                <div>
+                <h1>Hello ${doctor.firstName}</h1>
+                <p>Please use this <a href="${forgotLink}">link</a> to reset your password.</p>
+                </div>
+          `,
+      });
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async updatePasswordByEmail(email: string, password: string): Promise<void> {
+    const doctor = await this.doctorRepository
+      .createQueryBuilder()
+      .update(Doctor)
+      .set({ password })
+      .where('email = :email', { email })
+      .execute();
+  }
+
+  private static async hashPasswordForResetPassword(
+    password: string,
+  ): Promise<string> {
+    try {
+      return await bcrypt.hash(password, await bcrypt.genSalt());
+    } catch (error) {
+      throw new Error('Failed to hash the password');
+    }
+  }
+
+  async resetPassword(payload: ResetPasswordDto): Promise<string> {
+    try {
+      const { password, token } = payload;
+      const result = 'password updated';
+
+      const decodedToken = base64url.decode(token);
+
+      const verifiedDoctor = await this.jwtService.verify(decodedToken);
+      const newPassword = await AuthService.hashPasswordForResetPassword(
+        password,
+      );
+
+      const doctor = await this.doctorService.getDoctorByEmail(
+        verifiedDoctor.email,
+      );
+
+      doctor.password = newPassword;
+      await this.updatePasswordByEmail(doctor.email, doctor.password);
+      return result;
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

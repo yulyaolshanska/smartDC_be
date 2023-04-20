@@ -2,9 +2,11 @@ import { Module, ValidationPipe } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
+import PatientModule from 'modules/patient/patient.module';
+import Patient from 'modules/patient/entity/patient.entity';
+import Doctor from 'modules/doctor/entity/doctor.entity';
 import AuthModule from './modules/auth/auth.module';
 import DoctorModule from './modules/doctor/doctor.module';
-import Doctor from './modules/doctor/entity/doctor.entity';
 
 @Module({
   imports: [
@@ -18,13 +20,14 @@ import Doctor from './modules/doctor/entity/doctor.entity';
         username: configService.get('DB_USER'),
         password: configService.get('DB_PASS'),
         database: configService.get('DB_NAME'),
-        entities: [Doctor],
+        entities: [Doctor, Patient],
         synchronize: false,
       }),
       inject: [ConfigService],
     }),
     DoctorModule,
     AuthModule,
+    PatientModule,
   ],
   providers: [
     {

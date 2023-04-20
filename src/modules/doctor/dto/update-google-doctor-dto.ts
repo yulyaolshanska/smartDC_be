@@ -27,10 +27,10 @@ export default class UpdateGoogleDoctorDto {
 
   @ApiProperty({
     description: "Doctor's specialization",
-    example: 'Germany',
+    example: 0,
   })
   @IsNumber()
-  specialityId: number;
+  specialization: number;
 
   @ApiProperty({
     description: "Doctor's gender",
