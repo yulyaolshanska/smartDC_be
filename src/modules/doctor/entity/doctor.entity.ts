@@ -24,8 +24,8 @@ export default class Doctor {
   @Column({
     unique: true,
     default: null,
+    nullable: true,
   })
-  @Column()
   phoneNumber: string;
 
   @ApiProperty({ example: 'john_doe@gmail.com' })
@@ -33,91 +33,85 @@ export default class Doctor {
     unique: true,
     default: null,
   })
-  @Column()
   email: string;
 
   @ApiProperty({ example: 'Derikloshad' })
   @Column({
-    default: null,
+    nullable: true,
   })
-  @Column()
   password: string;
 
   @ApiProperty({ example: '????' })
   @Column({
     default: null,
+    nullable: true,
   })
-  @Column()
   activationLink: string;
 
   @ApiProperty({ example: false })
   @Column({
     default: false,
+    nullable: true,
   })
-  @Column()
   isVerified: boolean;
 
   @ApiProperty({ example: 'Local' })
   @Column({
     default: null,
+    nullable: true,
   })
-  @Column()
   role: string;
 
   @ApiProperty({ example: 'some adress' })
-  @Column({
-    default: null,
-  })
-  @Column()
+  @Column({ default: null, nullable: true })
   address: string;
 
   @ApiProperty({ example: '20-01-2000' })
   @Column({
+    nullable: true,
     default: null,
   })
-  @Column()
   birthDate: string;
 
   @ApiProperty({ example: 'Kiev' })
   @Column({
+    nullable: true,
     default: null,
   })
-  @Column()
   city: string;
 
   @ApiProperty({ example: ' DE' })
   @Column({
+    nullable: true,
     default: null,
   })
-  @Column()
   country: string;
 
   @ApiProperty({ example: ' 1' })
   @Column({
+    nullable: true,
     default: null,
   })
-  @Column()
   specialization: number;
 
   @ApiProperty({ example: ' ????' })
   @Column({
-    default: null,
     nullable: true,
+    default: null,
   })
-  @Column()
   photoUrl: string;
 
   @ApiProperty({ example: ' ????' })
   @Column({
+    nullable: true,
     default: null,
   })
-  @Column()
   timeZone: string;
 
   @ApiProperty({ example: ' Male' })
   @Column({
+    nullable: true,
     default: null,
   })
-  @Column()
   gender: string;
 }

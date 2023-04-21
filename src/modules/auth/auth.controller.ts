@@ -24,6 +24,7 @@ import JwtAuthGuard from './utils/Guards';
 import ForgotPasswordDto from '../doctor/dto/forgot-password.dto';
 import ResetPasswordDto from '../doctor/dto/change-password.dto';
 import { UserInfo } from './utils/types';
+import CheckDoctorEmailDto from 'modules/doctor/dto/check-email.dto';
 
 @ApiTags('Authorization')
 @Controller('auth')
@@ -100,6 +101,13 @@ class AuthController {
   @UseGuards(JwtAuthGuard)
   getMe(@Req() req: Request): Promise<UserInfo> {
     return this.authService.getMe(req);
+  }
+
+  @ApiOperation({ summary: 'Check doctor email' })
+  @ApiResponse({ status: 201, type: Doctor })
+  @Post('/checkEmail')
+  async checkEmail(@Body() doctorDto: CheckDoctorEmailDto): Promise<void> {
+    return this.authService.checkEmail(doctorDto);
   }
 }
 export default AuthController;

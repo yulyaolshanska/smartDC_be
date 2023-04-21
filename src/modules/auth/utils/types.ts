@@ -29,7 +29,7 @@ export interface UserInfo {
   birthDate: string;
   city: string;
   country: string;
-  specialityId: number;
+  specialization: number;
   photoUrl: string;
   timeZone: string;
   gender: string;

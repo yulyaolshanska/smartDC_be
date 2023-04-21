@@ -25,6 +25,7 @@ import { GoogleDoctorResult, UserInfo } from './utils/types';
 import MailService from './mail.service';
 import ForgotPasswordDto from '../doctor/dto/forgot-password.dto';
 import ResetPasswordDto from '../doctor/dto/change-password.dto';
+import CheckDoctorEmailDto from 'modules/doctor/dto/check-email.dto';
 
 @Injectable()
 export default class AuthService {
@@ -149,9 +150,11 @@ export default class AuthService {
     res.clearCookie('accessToken');
     res.cookie('accessToken', accessToken);
 
-    const doctor2 = await this.doctorService.getDoctorByEmail(doctor.email);
+    const existingDoctor = await this.doctorService.getDoctorByEmail(
+      doctor.email,
+    );
 
-    if (doctor2?.address) {
+    if (existingDoctor?.address) {
       res.redirect(`${this.configService.get(`CLIENT_URL`)}/dashboard`);
     } else {
       res.redirect(this.configService.get('SECOND_FORM_URL'));
@@ -228,6 +231,7 @@ export default class AuthService {
       }
       return existingDoctor;
     } catch (error) {
+      console.log(error);
       throw new Error('Unpossible to validate the user');
     }
   }
@@ -390,6 +394,23 @@ export default class AuthService {
       return result;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+  async checkEmail(doctorDto: CheckDoctorEmailDto): Promise<void> {
+    try {
+      const doctor = await this.doctorService.getDoctorByEmail(doctorDto.email);
+      if (doctor) {
+        throw new HttpException(
+          'User with this email already exists',
+          HttpStatus.CONFLICT,
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        'Error while checking email',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }
