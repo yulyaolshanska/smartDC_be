@@ -17,6 +17,7 @@ import {
   HASH_NUMBER,
   SEVEN,
 } from '@shared/consts';
+import CheckDoctorEmailDto from 'modules/doctor/dto/check-email.dto';
 import LoginDoctorDto from '../doctor/dto/login-doctor.dto';
 import CreateDoctorDto from '../doctor/dto/create-doctor.dto';
 import DoctorService from '../doctor/doctor.service';
@@ -25,7 +26,6 @@ import { GoogleDoctorResult, UserInfo } from './utils/types';
 import MailService from './mail.service';
 import ForgotPasswordDto from '../doctor/dto/forgot-password.dto';
 import ResetPasswordDto from '../doctor/dto/change-password.dto';
-import CheckDoctorEmailDto from 'modules/doctor/dto/check-email.dto';
 
 @Injectable()
 export default class AuthService {
@@ -231,7 +231,6 @@ export default class AuthService {
       }
       return existingDoctor;
     } catch (error) {
-      console.log(error);
       throw new Error('Unpossible to validate the user');
     }
   }
@@ -396,6 +395,7 @@ export default class AuthService {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
   async checkEmail(doctorDto: CheckDoctorEmailDto): Promise<void> {
     try {
       const doctor = await this.doctorService.getDoctorByEmail(doctorDto.email);
@@ -406,7 +406,6 @@ export default class AuthService {
         );
       }
     } catch (error) {
-      console.log(error);
       throw new HttpException(
         'Error while checking email',
         HttpStatus.INTERNAL_SERVER_ERROR,

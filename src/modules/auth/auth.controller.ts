@@ -15,6 +15,7 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 
 import UpdateGoogleDoctorDto from 'modules/doctor/dto/update-google-doctor-dto';
+import CheckDoctorEmailDto from 'modules/doctor/dto/check-email.dto';
 import Doctor from '../doctor/entity/doctor.entity';
 import AuthService from './auth.service';
 import LoginDoctorDto from '../doctor/dto/login-doctor.dto';
@@ -24,7 +25,6 @@ import JwtAuthGuard from './utils/Guards';
 import ForgotPasswordDto from '../doctor/dto/forgot-password.dto';
 import ResetPasswordDto from '../doctor/dto/change-password.dto';
 import { UserInfo } from './utils/types';
-import CheckDoctorEmailDto from 'modules/doctor/dto/check-email.dto';
 
 @ApiTags('Authorization')
 @Controller('auth')
