@@ -54,15 +54,18 @@ export default class DoctorController {
     @Param('id') doctorId: number,
     @Body() availabilities: Omit<Availability, 'doctorId'>[],
   ): Promise<Availability[]> {
-    return this.doctorService.addAvailability(doctorId, availabilities);
+    return this.doctorService.updateDoctorAvailability(
+      doctorId,
+      availabilities,
+    );
   }
 
-  // @UseGuards(JwtPatchGuard)
-  // @Delete('/:id/availability/:uuid')
-  // deleteAvailability(
-  //   @Param('id') doctorId: number,
-  //   @Param('uuid') uuid: string,
-  // ): Promise<void> {
-  //   return this.doctorService.deleteAvailability(doctorId, uuid);
-  // }
+  @UseGuards(JwtPatchGuard)
+  @Delete('/:id/availability/:uuid')
+  deleteAvailability(
+    @Param('id') doctorId: number,
+    @Param('uuid') uuid: string,
+  ): Promise<void> {
+    return this.doctorService.deleteDoctorAvailability(doctorId, uuid);
+  }
 }
