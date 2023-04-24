@@ -17,13 +17,13 @@ import { Request, Response } from 'express';
 import UpdateGoogleDoctorDto from 'modules/doctor/dto/update-google-doctor-dto';
 import CheckDoctorEmailDto from 'modules/doctor/dto/check-email.dto';
 import Doctor from 'modules/doctor/entity/doctor.entity';
-import AuthService from './auth.service';
 import LoginDoctorDto from 'modules/doctor/dto/login-doctor.dto';
 
 import CreateDoctorDto from 'modules/doctor/dto/create-doctor.dto';
-import JwtAuthGuard from './utils/Guards';
 import ForgotPasswordDto from 'modules/doctor/dto/forgot-password.dto';
 import ResetPasswordDto from 'modules/doctor/dto/change-password.dto';
+import AuthService from './auth.service';
+import JwtAuthGuard from './utils/Guards';
 import { UserInfo } from './utils/types';
 
 @ApiTags('Authorization')
