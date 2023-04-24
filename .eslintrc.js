@@ -20,6 +20,8 @@ module.exports = {
   },
   ignorePatterns: ['.eslintrc.js'],
   rules: {
+    '@typescript-eslint/ban-ts-comment': 'off',
+    'class-methods-use-this': 'off',
     '@typescript-eslint/class-methods-use-this': 'off',
     '@typescript-eslint/naming-convention': 'off',
     '@typescript-eslint/interface-name-prefix': 'off',

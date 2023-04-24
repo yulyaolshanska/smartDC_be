@@ -19,7 +19,7 @@ import Doctor from './entity/doctor.entity';
 import CreateDoctorDto from './dto/create-doctor.dto';
 
 @UseGuards(JwtPatchGuard)
-@Controller('create_doctor')
+@Controller('doctor')
 export default class DoctorController {
   constructor(private readonly doctorService: DoctorService) {}
 

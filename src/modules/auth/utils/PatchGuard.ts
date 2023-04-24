@@ -18,7 +18,8 @@ export default class JwtPatchGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
     const req = context.switchToHttp().getRequest();
     try {
-      const token = req.headers.authorization;
+      const authHeader = req.headers.authorization;
+      const token = authHeader.split(' ')[1];
 
       if (!token) {
         throw new UnauthorizedException({
