@@ -68,9 +68,7 @@ export default class AuthService {
   };
 
   async registration(doctorDto: CreateDoctorDto): Promise<{ token: string }> {
-    const doctor = await this.doctorService.getDoctorByEmail(
-      doctorDto.email,
-    );
+    const doctor = await this.doctorService.getDoctorByEmail(doctorDto.email);
     if (doctor) {
       throw new HttpException(
         'User with this email already exists',

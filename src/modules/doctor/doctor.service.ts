@@ -8,7 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NO_ROWS_AFFECTED } from 'shared/consts';
 import CreateDoctorDto from './dto/create-doctor.dto';
-import Doctor from './entity/doctor.entity';
+import Doctor, { Availability } from './entity/doctor.entity';
 
 @Injectable()
 export default class DoctorService {
@@ -110,4 +110,47 @@ export default class DoctorService {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  async addAvailability(doctorId: number, availabilities: Availability[]): Promise<Availability[]> {
+    try {
+      const doctor = await this.doctorRepository
+        .createQueryBuilder('doctor')
+        .where('doctor.id = :id', { id: doctorId })
+        .getOne();
+      
+      if (!doctor) {
+        throw new NotFoundException(`Doctor with id ${doctorId} not found`);
+      }
+
+      doctor.availabilities = availabilities;
+
+      await this.doctorRepository.save(doctor);
+
+      return availabilities;
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  // async deleteAvailability(doctorId: number, uuid: string): Promise<void> {
+  //   try {
+  //     const doctor = await this.doctorRepository
+  //       .createQueryBuilder('doctor')
+  //       .where('doctor.id = :id', { doctorId })
+  //       .getOne();
+  
+  //     if (!doctor) {
+  //       throw new NotFoundException(`Doctor with id ${doctorId} not found`);
+  //     }
+
+  //     await this.availabilityRepository
+  //       .createQueryBuilder()
+  //       .delete()
+  //       .where('uuid = :uuid', { uuid })
+  //       .andWhere('doctorId = :doctorId', { doctorId })
+  //       .execute();
+  //   } catch (err) {
+  //     throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+  //   }
+  // }
 }
