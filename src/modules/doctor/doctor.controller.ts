@@ -18,6 +18,7 @@ import DoctorService from './doctor.service';
 import Doctor from './entity/doctor.entity';
 import CreateDoctorDto from './dto/create-doctor.dto';
 
+@UseGuards(JwtPatchGuard)
 @Controller('create_doctor')
 export default class DoctorController {
   constructor(private readonly doctorService: DoctorService) {}
@@ -44,7 +45,6 @@ export default class DoctorController {
   }
 
   @Patch('/:id')
-  @UseGuards(JwtPatchGuard)
   updateOne(
     @Param('id') id: number,
     @Body() doctorDto: Partial<CreateDoctorDto>,
@@ -52,7 +52,6 @@ export default class DoctorController {
     return this.doctorService.updateDoctor(id, doctorDto);
   }
 
-  @UseGuards(JwtPatchGuard)
   @Post('/:id/upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
