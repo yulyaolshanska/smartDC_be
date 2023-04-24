@@ -113,6 +113,24 @@ export default class DoctorService {
     }
   }
 
+  async updateDoctorPhotoUrl(id: number, photoUrl: string): Promise<Doctor> {
+    try {
+      const doctor = await this.doctorRepository
+        .createQueryBuilder('doctor')
+        .where('doctor.id = :id', { id })
+        .getOne();
+
+      if (!doctor) {
+        throw new NotFoundException('Doctor not found');
+      }
+      doctor.photoUrl = photoUrl;
+
+      return await this.doctorRepository.save(doctor);
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   async updateDoctorAvailability(
     doctorId: number,
     availabilities: Availability[],
