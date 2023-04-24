@@ -9,6 +9,7 @@ import {
   Post,
   UseInterceptors,
   UploadedFile,
+  Put,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import JwtPatchGuard from 'modules/auth/utils/PatchGuard';
@@ -65,7 +66,6 @@ export default class DoctorController {
     return doctor;
   }
 
-  @UseGuards(JwtPatchGuard)
   @Put('/:id/availability')
   addAvailability(
     @Param('id') doctorId: number,
@@ -77,12 +77,14 @@ export default class DoctorController {
     );
   }
 
-  @UseGuards(JwtPatchGuard)
   @Delete('/:id/availability/:uuid')
   deleteAvailability(
     @Param('id') doctorId: number,
     @Param('uuid') availabilityUuid: string,
   ): Promise<void> {
-    return this.doctorService.deleteDoctorAvailability(doctorId, availabilityUuid);
+    return this.doctorService.deleteDoctorAvailability(
+      doctorId,
+      availabilityUuid,
+    );
   }
 }

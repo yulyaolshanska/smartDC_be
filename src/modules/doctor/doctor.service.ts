@@ -58,16 +58,11 @@ export default class DoctorService {
     }
   }
 
-  async getDoctorByID(id: number): Promise<Doctor | null> {
+  async getDoctorByID(doctorId: number): Promise<Doctor | null> {
     try {
-      const doctor = await this.doctorRepository
-        .createQueryBuilder('doctor')
-        .where('doctor.id = :id', { id })
-        .getOne();
-
-      if (!doctor) {
-        throw new NotFoundException(`Doctor with id ${id} not found`);
-      }
+      const doctor = await this.doctorRepository.findOneOrFail({
+        where: { id: doctorId },
+      });
 
       return doctor;
     } catch (err) {
@@ -92,18 +87,13 @@ export default class DoctorService {
   }
 
   async updateDoctor(
-    id: number,
+    doctorId: number,
     doctorDto: Partial<CreateDoctorDto>,
   ): Promise<Doctor> {
     try {
-      const doctor = await this.doctorRepository
-        .createQueryBuilder('doctor')
-        .where('doctor.id = :id', { id })
-        .getOne();
-
-      if (!doctor) {
-        throw new NotFoundException(`Doctor with ID ${id} not found`);
-      }
+      const doctor = await this.doctorRepository.findOneOrFail({
+        where: { id: doctorId },
+      });
 
       Object.assign(doctor, doctorDto);
 
@@ -113,16 +103,14 @@ export default class DoctorService {
     }
   }
 
-  async updateDoctorPhotoUrl(id: number, photoUrl: string): Promise<Doctor> {
+  async updateDoctorPhotoUrl(
+    doctorId: number,
+    photoUrl: string,
+  ): Promise<Doctor> {
     try {
-      const doctor = await this.doctorRepository
-        .createQueryBuilder('doctor')
-        .where('doctor.id = :id', { id })
-        .getOne();
-
-      if (!doctor) {
-        throw new NotFoundException('Doctor not found');
-      }
+      const doctor = await this.doctorRepository.findOneOrFail({
+        where: { id: doctorId },
+      });
       doctor.photoUrl = photoUrl;
 
       return await this.doctorRepository.save(doctor);
@@ -136,15 +124,9 @@ export default class DoctorService {
     availabilities: Availability[],
   ): Promise<Availability[]> {
     try {
-      const doctor = await this.doctorRepository
-        .createQueryBuilder('doctor')
-        .where('doctor.id = :id', { id: doctorId })
-        .getOne();
-
-      if (!doctor) {
-        throw new NotFoundException(`Doctor with id ${doctorId} not found`);
-      }
-
+      const doctor = await this.doctorRepository.findOneOrFail({
+        where: { id: doctorId },
+      });
       doctor.availabilities = availabilities;
 
       await this.doctorRepository.save(doctor);
@@ -160,21 +142,18 @@ export default class DoctorService {
     availabilityUuid: string,
   ): Promise<void> {
     try {
-      const doctor = await this.doctorRepository
-        .createQueryBuilder('doctor')
-        .where('doctor.id = :id', { id: doctorId })
-        .getOne();
-
-      if (!doctor) {
-        throw new NotFoundException(`Doctor with id ${doctorId} not found`);
-      }
+      const doctor = await this.doctorRepository.findOneOrFail({
+        where: { id: doctorId },
+      });
 
       const index = doctor.availabilities.findIndex(
         (availability) => availability.uuid === availabilityUuid,
       );
 
       if (index === BACKWARD) {
-        throw new NotFoundException(`Availability with uuid ${availabilityUuid} not found`);
+        throw new NotFoundException(
+          `Availability with uuid ${availabilityUuid} not found`,
+        );
       }
 
       doctor.availabilities.splice(index, FORWARD);
