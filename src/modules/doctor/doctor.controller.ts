@@ -64,8 +64,8 @@ export default class DoctorController {
   @Delete('/:id/availability/:uuid')
   deleteAvailability(
     @Param('id') doctorId: number,
-    @Param('uuid') uuid: string,
+    @Param('uuid') availabilityUuid: string,
   ): Promise<void> {
-    return this.doctorService.deleteDoctorAvailability(doctorId, uuid);
+    return this.doctorService.deleteDoctorAvailability(doctorId, availabilityUuid);
   }
 }

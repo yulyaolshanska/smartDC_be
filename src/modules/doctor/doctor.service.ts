@@ -139,7 +139,7 @@ export default class DoctorService {
 
   async deleteDoctorAvailability(
     doctorId: number,
-    uuid: string,
+    availabilityUuid: string,
   ): Promise<void> {
     try {
       const doctor = await this.doctorRepository
@@ -152,11 +152,11 @@ export default class DoctorService {
       }
 
       const index = doctor.availabilities.findIndex(
-        (availability) => availability.uuid === uuid,
+        (availability) => availability.uuid === availabilityUuid,
       );
 
       if (index === BACKWARD) {
-        throw new NotFoundException(`Availability with uuid ${uuid} not found`);
+        throw new NotFoundException(`Availability with uuid ${availabilityUuid} not found`);
       }
 
       doctor.availabilities.splice(index, FORWARD);
