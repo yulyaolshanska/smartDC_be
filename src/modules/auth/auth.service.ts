@@ -17,11 +17,12 @@ import {
   HASH_NUMBER,
   SEVEN,
 } from '@shared/consts';
+import CheckDoctorEmailDto from 'modules/doctor/dto/check-email.dto';
 import LoginDoctorDto from '../doctor/dto/login-doctor.dto';
 import CreateDoctorDto from '../doctor/dto/create-doctor.dto';
 import DoctorService from '../doctor/doctor.service';
 import Doctor from '../doctor/entity/doctor.entity';
-import { GoogleDoctorResult } from './utils/types';
+import { GoogleDoctorResult, UserInfo } from './utils/types';
 import MailService from './mail.service';
 import ForgotPasswordDto from '../doctor/dto/forgot-password.dto';
 import ResetPasswordDto from '../doctor/dto/change-password.dto';
@@ -43,20 +44,7 @@ export default class AuthService {
     private mailService: MailService,
     private jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) {
-    this.transporter = nodemailer.createTransport({
-      host: this.configService.get('SMTP_HOST'),
-      port: this.configService.get('SMTP_PORT'),
-      secure: true,
-      auth: {
-        user: this.configService.get('SMTP_USER'),
-        pass: this.configService.get('SMTP_PASSWORD'),
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
-  }
+  ) {}
 
   private readonly accessTokenCookieOptions: CookieOptions = {
     maxAge: this.configService.get('ACCESS_TOKEN_MAX_AGE'),
@@ -68,9 +56,7 @@ export default class AuthService {
   };
 
   async registration(doctorDto: CreateDoctorDto): Promise<{ token: string }> {
-    const doctor = await this.doctorService.getDoctorByEmail(
-      doctorDto.email,
-    );
+    const doctor = await this.doctorService.getDoctorByEmail(doctorDto.email);
     if (doctor) {
       throw new HttpException(
         'User with this email already exists',
@@ -158,11 +144,21 @@ export default class AuthService {
 
     const accessToken = this.jwtService.sign(
       { ...doctor },
-      { expiresIn: '8h' },
+      { expiresIn: '24h' },
     );
 
-    res.cookie('accessToken', accessToken, this.accessTokenCookieOptions);
-    res.redirect(this.configService.get('CLIENT_URL'));
+    res.clearCookie('accessToken');
+    res.cookie('accessToken', accessToken);
+
+    const existingDoctor = await this.doctorService.getDoctorByEmail(
+      doctor.email,
+    );
+
+    if (existingDoctor?.address) {
+      res.redirect(`${this.configService.get(`CLIENT_URL`)}/dashboard`);
+    } else {
+      res.redirect(this.configService.get('SECOND_FORM_URL'));
+    }
   }
 
   private async getGoogleOauthTokens(code: {
@@ -183,6 +179,7 @@ export default class AuthService {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       });
+
       return res.data;
     } catch (error) {
       throw new HttpException(
@@ -200,9 +197,10 @@ export default class AuthService {
     try {
       const res = await axios.get(`${GOOGLE_URL}=${access_token}`, {
         headers: {
-          Authorization: `Bearer ${id_token}`,
+          authorization: `Bearer ${id_token}`,
         },
       });
+
       return res.data;
     } catch (error) {
       throw new Error(error);
@@ -213,14 +211,12 @@ export default class AuthService {
     details: GoogleDoctorResult,
   ): Promise<Doctor> {
     try {
-      const doctor = await this.doctorRepository
-        .createQueryBuilder()
-        .select('doctor')
-        .from(Doctor, 'doctor')
+      const existingDoctor = await this.doctorRepository
+        .createQueryBuilder('doctor')
         .where('doctor.email = :email', { email: details.email })
         .getOne();
-      if (!doctor) {
-        await this.doctorRepository
+      if (!existingDoctor) {
+        const newDoctor = await this.doctorRepository
           .createQueryBuilder()
           .insert()
           .into(Doctor)
@@ -228,13 +224,12 @@ export default class AuthService {
             firstName: details.given_name,
             lastName: details.family_name,
             email: details.email,
-            isVerified: true,
+            isVerified: false,
           })
           .execute();
-
-        this.validateDoctorFromGoogle(details);
+        return newDoctor.generatedMaps[0] as Doctor;
       }
-      return doctor;
+      return existingDoctor;
     } catch (error) {
       throw new Error('Unpossible to validate the user');
     }
@@ -245,16 +240,23 @@ export default class AuthService {
     updateGoogleDoctorDto: UpdateGoogleDoctorDto,
     token: string,
   ): void {
-    const decodedToken = this.jwtService.verify(
-      token.slice(SEVEN),
-      this.configService.get('PRIVATE_KEY'),
-    );
-    this.doctorRepository
-      .createQueryBuilder()
-      .update(Doctor)
-      .set({ ...updateGoogleDoctorDto, isVerified: true })
-      .where('doctor.email = :email', { email: decodedToken.email })
-      .execute();
+    try {
+      const decodedToken = this.jwtService.verify(
+        token.slice(SEVEN),
+        this.configService.get('PRIVATE_KEY'),
+      );
+      this.doctorRepository
+        .createQueryBuilder()
+        .update(Doctor)
+        .set({ ...updateGoogleDoctorDto, isVerified: true })
+        .where('doctor.email = :email', { email: decodedToken.email })
+        .execute();
+    } catch (error) {
+      throw new HttpException(
+        'Not possible to update google doctor',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   private async validateUser(doctorDto: LoginDoctorDto): Promise<Doctor> {
@@ -282,12 +284,42 @@ export default class AuthService {
     }
   }
 
-  async login(doctorDto: LoginDoctorDto): Promise<{ token: string }> {
+  async login(
+    doctorDto: LoginDoctorDto,
+  ): Promise<{ token: string; userInfo: UserInfo }> {
     try {
       const doctor = await this.validateUser(doctorDto);
-      return await this.generateToken(doctor);
+      const { token } = await this.generateToken(doctor);
+      const userInfo = this.separateDoctorInfo(doctor);
+
+      return { token, userInfo };
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  private separateDoctorInfo(doctor: Doctor): UserInfo {
+    const { password, activationLink, ...userInfo } = doctor;
+
+    return userInfo;
+  }
+
+  async getMe(req: Request): Promise<UserInfo> {
+    try {
+      const token = req.headers.authorization.slice(SEVEN);
+      const decodedToken = this.jwtService.decode(token);
+
+      if (typeof decodedToken === 'string') {
+        throw new Error('Invalid token');
+      }
+
+      const { id } = decodedToken;
+      const doctor = await this.doctorService.getDoctorByID(id);
+      const userInfo = this.separateDoctorInfo(doctor);
+
+      return userInfo;
+    } catch (error) {
+      throw new Error(error);
     }
   }
 
@@ -361,6 +393,23 @@ export default class AuthService {
       return result;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async checkEmail(doctorDto: CheckDoctorEmailDto): Promise<void> {
+    try {
+      const doctor = await this.doctorService.getDoctorByEmail(doctorDto.email);
+      if (doctor) {
+        throw new HttpException(
+          'User with this email already exists',
+          HttpStatus.CONFLICT,
+        );
+      }
+    } catch (error) {
+      throw new HttpException(
+        'Error while checking email',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }
