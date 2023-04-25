@@ -6,9 +6,9 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { NO_ROWS_AFFECTED } from 'shared/consts';
+import { BACKWARD, FORWARD, NO_ROWS_AFFECTED } from 'shared/consts';
 import CreateDoctorDto from './dto/create-doctor.dto';
-import Doctor from './entity/doctor.entity';
+import Doctor, { Availability } from './entity/doctor.entity';
 
 @Injectable()
 export default class DoctorService {
@@ -41,7 +41,9 @@ export default class DoctorService {
         .createQueryBuilder('doctor')
         .where('doctor.email = :email', { email })
         .getOne();
+
       if (!user) return null;
+
       return user;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -56,16 +58,11 @@ export default class DoctorService {
     }
   }
 
-  async getDoctorByID(id: number): Promise<Doctor | null> {
+  async getDoctorByID(doctorId: number): Promise<Doctor | null> {
     try {
-      const doctor = await this.doctorRepository
-        .createQueryBuilder('doctor')
-        .where('doctor.id = :id', { id })
-        .getOne();
-
-      if (!doctor) {
-        throw new NotFoundException(`Doctor with id ${id} not found`);
-      }
+      const doctor = await this.doctorRepository.findOneOrFail({
+        where: { id: doctorId },
+      });
 
       return doctor;
     } catch (err) {
@@ -90,18 +87,13 @@ export default class DoctorService {
   }
 
   async updateDoctor(
-    id: number,
+    doctorId: number,
     doctorDto: Partial<CreateDoctorDto>,
   ): Promise<Doctor> {
     try {
-      const doctor = await this.doctorRepository
-        .createQueryBuilder('doctor')
-        .where('doctor.id = :id', { id })
-        .getOne();
-
-      if (!doctor) {
-        throw new NotFoundException(`Doctor with ID ${id} not found`);
-      }
+      const doctor = await this.doctorRepository.findOneOrFail({
+        where: { id: doctorId },
+      });
 
       Object.assign(doctor, doctorDto);
 
@@ -111,19 +103,62 @@ export default class DoctorService {
     }
   }
 
-  async updateDoctorPhotoUrl(id: number, photoUrl: string): Promise<Doctor> {
+  async updateDoctorPhotoUrl(
+    doctorId: number,
+    photoUrl: string,
+  ): Promise<Doctor> {
     try {
-      const doctor = await this.doctorRepository
-        .createQueryBuilder('doctor')
-        .where('doctor.id = :id', { id })
-        .getOne();
-
-      if (!doctor) {
-        throw new NotFoundException('Doctor not found');
-      }
+      const doctor = await this.doctorRepository.findOneOrFail({
+        where: { id: doctorId },
+      });
       doctor.photoUrl = photoUrl;
 
       return await this.doctorRepository.save(doctor);
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async updateDoctorAvailability(
+    doctorId: number,
+    availabilities: Availability[],
+  ): Promise<Availability[]> {
+    try {
+      const doctor = await this.doctorRepository.findOneOrFail({
+        where: { id: doctorId },
+      });
+      doctor.availabilities = availabilities;
+
+      await this.doctorRepository.save(doctor);
+
+      return availabilities;
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async deleteDoctorAvailability(
+    doctorId: number,
+    availabilityUuid: string,
+  ): Promise<void> {
+    try {
+      const doctor = await this.doctorRepository.findOneOrFail({
+        where: { id: doctorId },
+      });
+
+      const index = doctor.availabilities.findIndex(
+        (availability) => availability.uuid === availabilityUuid,
+      );
+
+      if (index === BACKWARD) {
+        throw new NotFoundException(
+          `Availability with uuid ${availabilityUuid} not found`,
+        );
+      }
+
+      doctor.availabilities.splice(index, FORWARD);
+
+      await this.doctorRepository.save(doctor);
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }

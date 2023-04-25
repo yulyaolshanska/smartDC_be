@@ -11,6 +11,9 @@ export const TIME_ZONE_REGEX = /\(\w{3}[+-]\d{1,2}\)\s\w+\/\w+/;
 
 export const SEVEN = 7;
 
+export const BACKWARD = -1;
+export const FORWARD = 1;
+
 export const GOOGLE_URL =
   'https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token';
 
