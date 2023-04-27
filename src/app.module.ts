@@ -21,7 +21,7 @@ import DoctorModule from './modules/doctor/doctor.module';
         password: configService.get('DB_PASS'),
         database: configService.get('DB_NAME'),
         entities: [Doctor, Patient],
-        synchronize: true,
+        synchronize: false,
       }),
       inject: [ConfigService],
     }),

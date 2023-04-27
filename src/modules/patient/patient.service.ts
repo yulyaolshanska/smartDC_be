@@ -51,4 +51,14 @@ export default class PatientService {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  async getPatientById(patientId: number): Promise<Patient> {
+    try {
+      return await this.patientRepository.findOneOrFail({
+        where: { id: patientId },
+      });
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }

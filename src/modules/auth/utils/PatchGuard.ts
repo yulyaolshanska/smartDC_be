@@ -31,7 +31,9 @@ export default class JwtPatchGuard implements CanActivate {
       req.user = user;
       return true;
     } catch (e) {
-      throw new HttpException(`${e}`, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new UnauthorizedException({
+        message: 'User isnt logged in',
+      });
     }
   }
 }

@@ -42,4 +42,11 @@ export default class PatientController {
   ): Promise<Patient> {
     return this.patientService.updatePatient(id, patientDto);
   }
+
+  @ApiOperation({ summary: 'Getting a patient by ID' })
+  @ApiResponse({ status: 200, type: Patient })
+  @Get('/:id')
+  getOne(@Param('id') id: number): Promise<Patient> {
+    return this.patientService.getPatientById(id);
+  }
 }
