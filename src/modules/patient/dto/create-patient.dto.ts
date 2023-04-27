@@ -112,6 +112,5 @@ export default class CreatePatientDto {
     example: 'Some issue',
   })
   @IsString()
-  @IsNotEmpty()
   overview: string;
 }

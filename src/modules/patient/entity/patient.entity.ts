@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { IsString } from 'class-validator';
 
 @Entity()
 export default class Patient {
@@ -77,4 +78,12 @@ export default class Patient {
   })
   @Column()
   gender: string;
+
+  @ApiProperty({
+    description: "Patient's overview",
+    example: 'Some issue',
+  })
+  @Column()
+  @IsString()
+  overview: string;
 }
