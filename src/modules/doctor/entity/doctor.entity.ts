@@ -1,9 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
+import Note from 'modules/notes/entity/note.entity';
 
 @Entity()
 export default class Doctor {
   @PrimaryGeneratedColumn()
+  @OneToMany(() => Note, (note) => note.doctorId)
   id: number;
 
   @ApiProperty({ example: 'John' })
@@ -114,4 +122,10 @@ export default class Doctor {
     default: null,
   })
   gender: string;
+
+  // @Column({
+  //   default: null,
+  // })
+  // @OneToMany(() => Note, (note) => note.doctorId)
+  // notes: Note[];
 }

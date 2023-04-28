@@ -224,7 +224,7 @@ export default class AuthService {
             firstName: details.given_name,
             lastName: details.family_name,
             email: details.email,
-            isVerified: false,
+            isVerified: true,
           })
           .execute();
         return newDoctor.generatedMaps[0] as Doctor;

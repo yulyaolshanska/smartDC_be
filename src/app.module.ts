@@ -5,8 +5,11 @@ import { APP_PIPE } from '@nestjs/core';
 import PatientModule from 'modules/patient/patient.module';
 import Patient from 'modules/patient/entity/patient.entity';
 import Doctor from 'modules/doctor/entity/doctor.entity';
-import AuthModule from './modules/auth/auth.module';
+import Note from 'modules/notes/entity/note.entity';
+import { NotesModule } from 'modules/notes/notes.module';
+import { File } from 'modules/notes/entity/file.entity';
 import DoctorModule from './modules/doctor/doctor.module';
+import AuthModule from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -20,7 +23,7 @@ import DoctorModule from './modules/doctor/doctor.module';
         username: configService.get('DB_USER'),
         password: configService.get('DB_PASS'),
         database: configService.get('DB_NAME'),
-        entities: [Doctor, Patient],
+        entities: [Doctor, Patient, Note, File],
         synchronize: true,
       }),
       inject: [ConfigService],
@@ -28,6 +31,7 @@ import DoctorModule from './modules/doctor/doctor.module';
     DoctorModule,
     AuthModule,
     PatientModule,
+    NotesModule,
   ],
   providers: [
     {

@@ -23,7 +23,7 @@ import CreateDoctorDto from 'modules/doctor/dto/create-doctor.dto';
 import ForgotPasswordDto from 'modules/doctor/dto/forgot-password.dto';
 import ResetPasswordDto from 'modules/doctor/dto/change-password.dto';
 import AuthService from './auth.service';
-import JwtAuthGuard from './utils/Guards';
+import JwtAuthGuard from './utils/jwt.guard';
 import { UserInfo } from './utils/types';
 
 @ApiTags('Authorization')
