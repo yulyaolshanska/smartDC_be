@@ -8,7 +8,7 @@ import {
 import Note from './note.entity';
 
 @Entity('file')
-export class File {
+export default class File {
   @PrimaryGeneratedColumn()
   id: number;
 

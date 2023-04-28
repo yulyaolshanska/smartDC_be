@@ -8,11 +8,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
-  OneToMany,
   OneToOne,
   JoinColumn,
 } from 'typeorm';
-import { File } from './file.entity';
+import File from './file.entity';
 
 @Entity()
 export default class Note {

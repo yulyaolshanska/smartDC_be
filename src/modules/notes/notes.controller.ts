@@ -22,19 +22,19 @@ import {
 } from '@nestjs/swagger';
 import { Query as ExpressQuery } from 'express-serve-static-core';
 import { Response } from 'express';
-import * as fs from 'fs';
 
 import JwtAuthGuard from 'modules/auth/utils/jwt.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import Note from './entity/note.entity';
 
-import { NotesService } from './notes.service';
+import NotesService from './notes.service';
 import CreateNoteDto from './dto/create-note.dto';
 import { fileStorage } from './storage';
 
+const MAX_FILE_SIZE_BYTES = 1024 * 1024 * 5; // eslint-disable-line no-magic-numbers
 @Controller('notes')
 @ApiTags('Notes')
-export class NotesController {
+export default class NotesController {
   constructor(private notesService: NotesService) {}
 
   // get all notes
@@ -42,7 +42,7 @@ export class NotesController {
   @ApiOperation({ summary: 'Getting All Notes' })
   @ApiResponse({ status: 200, type: [Note] })
   @Get('/all')
-  getAllNotes(@Query() query: ExpressQuery) {
+  getAllNotes(@Query() query: ExpressQuery): Promise<Note[]> {
     return this.notesService.findAll(query);
   }
 
@@ -78,12 +78,14 @@ export class NotesController {
     @Body() createNoteDto: CreateNoteDto,
     @UploadedFile(
       new ParseFilePipe({
-        validators: [new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 })],
+        validators: [
+          new MaxFileSizeValidator({ maxSize: MAX_FILE_SIZE_BYTES }),
+        ],
         fileIsRequired: false,
       }),
     )
     file?: Express.Multer.File,
-  ) {
+  ): Promise<void> {
     return this.notesService.create(createNoteDto, file);
   }
 
@@ -93,7 +95,7 @@ export class NotesController {
   async downloadFile(
     @Param('filename') filename: string,
     @Res() res: Response,
-  ) {
+  ): Promise<void> {
     return this.notesService.downloadFile(filename, res);
   }
 }

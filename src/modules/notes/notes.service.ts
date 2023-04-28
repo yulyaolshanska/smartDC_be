@@ -2,20 +2,23 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Query } from 'express-serve-static-core';
-import Note from './entity/note.entity';
-import CreateNoteDto from './dto/create-note.dto';
-import { File } from './entity/file.entity';
 import { Response } from 'express';
 import * as fs from 'fs';
+import Note from './entity/note.entity';
+import CreateNoteDto from './dto/create-note.dto';
+import File from './entity/file.entity';
 
 @Injectable()
-export class NotesService {
+export default class NotesService {
   constructor(
     @InjectRepository(Note) private notesRepository: Repository<Note>,
     @InjectRepository(File) private filesRepository: Repository<File>,
   ) {}
 
-  async create(createNoteDto: CreateNoteDto, file: Express.Multer.File) {
+  async create(
+    createNoteDto: CreateNoteDto,
+    file: Express.Multer.File,
+  ): Promise<void> {
     try {
       if (file) {
         const newNote = await this.notesRepository
@@ -42,11 +45,6 @@ export class NotesService {
         await this.notesRepository.update(newNote.generatedMaps[0].id, {
           file: newFile.generatedMaps[0].id,
         });
-
-        return {
-          note: newNote.generatedMaps[0] as Note,
-          file: newFile.generatedMaps[0] as File,
-        };
       } else {
         const newNote = await this.notesRepository
           .createQueryBuilder()
@@ -56,16 +54,13 @@ export class NotesService {
             ...createNoteDto,
           })
           .execute();
-        return {
-          note: newNote.generatedMaps[0] as Note,
-        };
       }
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async findAll(query: Query) {
+  async findAll(query: Query): Promise<Note[]> {
     try {
       const qb = this.notesRepository.createQueryBuilder('notes');
       const sortOrder = query.sortOrder === 'desc' ? 'DESC' : 'ASC';
@@ -90,7 +85,7 @@ export class NotesService {
     }
   }
 
-  async downloadFile(filename: string, res: Response) {
+  async downloadFile(filename: string, res: Response): Promise<void> {
     const filePath = `./uploads/${filename}`;
     const fileStream = fs.createReadStream(filePath);
 
