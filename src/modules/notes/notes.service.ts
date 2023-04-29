@@ -60,7 +60,7 @@ export default class NotesService {
     }
   }
 
-  async findAll(query: Query): Promise<any> {
+  async findAll(query: Query): Promise<{ notes: Note[]; count: number }> {
     try {
       const qb = this.notesRepository.createQueryBuilder('notes');
       const sortOrder = query.sortOrder === 'desc' ? 'DESC' : 'ASC';

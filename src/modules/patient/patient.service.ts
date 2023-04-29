@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import Patient from './entity/patient.entity';
@@ -42,22 +37,26 @@ export default class PatientService {
   }
 
   async updatePatient(
-    id: number,
+    patientId: number,
     patient: Partial<CreatePatientDto>,
   ): Promise<Patient> {
     try {
-      const updatedPatient = await this.patientRepository
-        .createQueryBuilder('patient')
-        .where('patient.id = :id', { id })
-        .getOne();
-
-      if (!updatedPatient) {
-        throw new NotFoundException(`patient with ID ${id} not found`);
-      }
-
+      const updatedPatient = await this.patientRepository.findOneOrFail({
+        where: { id: patientId },
+      });
       Object.assign(updatedPatient, patient);
 
       return await this.patientRepository.save(updatedPatient);
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async getPatientById(patientId: number): Promise<Patient> {
+    try {
+      return await this.patientRepository.findOneOrFail({
+        where: { id: patientId },
+      });
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
