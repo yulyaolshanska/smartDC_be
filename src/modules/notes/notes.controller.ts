@@ -42,7 +42,10 @@ export default class NotesController {
   @ApiOperation({ summary: 'Getting All Notes' })
   @ApiResponse({ status: 200, type: [Note] })
   @Get('/all')
-  getAllNotes(@Query() query: ExpressQuery): Promise<Note[]> {
+  @UseGuards(JwtAuthGuard)
+  getAllNotes(
+    @Query() query: ExpressQuery,
+  ): Promise<{ notes: Note[]; count: number }> {
     return this.notesService.findAll(query);
   }
 
@@ -92,6 +95,7 @@ export default class NotesController {
   // file download
 
   @Get('/file/:filename')
+  @UseGuards(JwtAuthGuard)
   async downloadFile(
     @Param('filename') filename: string,
     @Res() res: Response,
