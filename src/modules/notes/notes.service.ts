@@ -87,12 +87,16 @@ export default class NotesService {
   }
 
   async downloadFile(filename: string, res: Response): Promise<void> {
-    const filePath = `./uploads/${filename}`;
-    const fileStream = fs.createReadStream(filePath);
+    try {
+      const filePath = `./uploads/${filename}`;
+      const fileStream = fs.createReadStream(filePath);
 
-    res.setHeader('Content-Type', 'application/octet-stream');
-    res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+      res.setHeader('Content-Type', 'application/octet-stream');
+      res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
 
-    fileStream.pipe(res);
+      fileStream.pipe(res);
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }

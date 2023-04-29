@@ -94,7 +94,7 @@ export default class NotesController {
 
   // file download
   @ApiOperation({ summary: 'Download a file' })
-  @ApiResponse({ status: 200, type: File })
+  @ApiResponse({ status: 200, type: [Note] })
   @Get('/file/:filename')
   @UseGuards(JwtAuthGuard)
   async downloadFile(
