@@ -60,7 +60,7 @@ export default class NotesService {
     }
   }
 
-  async findAll(query: Query): Promise<Note[]> {
+  async findAll(query: Query): Promise<any> {
     try {
       const qb = this.notesRepository.createQueryBuilder('notes');
       const sortOrder = query.sortOrder === 'desc' ? 'DESC' : 'ASC';
@@ -68,7 +68,8 @@ export default class NotesService {
       if (query.sortBy === 'Date') sortBy = 'createdAt';
       if (query.sortBy === 'Doctor') sortBy = 'doctorId';
 
-      qb.select(['notes', 'doctor.firstName', 'doctor.lastName'])
+      const [notes, count] = await qb
+        .select(['notes', 'doctor.firstName', 'doctor.lastName'])
         .where('notes.note like :searchString', {
           searchString: `%${query.searchString}%`,
         })
@@ -76,10 +77,10 @@ export default class NotesService {
         .leftJoinAndSelect('notes.file', 'file')
         .orderBy(`notes.${sortBy}`, sortOrder)
         .skip(Number(query.skipAmount))
-        .take(Number(query.limit));
+        .take(Number(query.limit))
+        .getManyAndCount();
 
-      const notes = await qb.getMany();
-      return notes;
+      return { notes, count };
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }

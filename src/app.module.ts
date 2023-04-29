@@ -6,8 +6,8 @@ import PatientModule from 'modules/patient/patient.module';
 import Patient from 'modules/patient/entity/patient.entity';
 import Doctor from 'modules/doctor/entity/doctor.entity';
 import Note from 'modules/notes/entity/note.entity';
-import { NotesModule } from 'modules/notes/notes.module';
-import { File } from 'modules/notes/entity/file.entity';
+import NotesModule from 'modules/notes/notes.module';
+import File from 'modules/notes/entity/file.entity';
 import DoctorModule from './modules/doctor/doctor.module';
 import AuthModule from './modules/auth/auth.module';
 

@@ -30,12 +30,4 @@ export default class CreateNoteDto {
   @IsNotEmpty()
   @Length(NOTE_MIN_LENGTH)
   note: string;
-
-  // @ApiProperty({
-  //   description: 'File',
-  //   type: 'string',
-  //   format: 'binary',
-  //   required: false,
-  // })
-  // file?: Express.Multer.File;
 }

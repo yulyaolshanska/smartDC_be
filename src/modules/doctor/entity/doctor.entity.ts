@@ -116,10 +116,4 @@ export default class Doctor {
     default: null,
   })
   gender: string;
-
-  // @Column({
-  //   default: null,
-  // })
-  // @OneToMany(() => Note, (note) => note.doctorId)
-  // notes: Note[];
 }
