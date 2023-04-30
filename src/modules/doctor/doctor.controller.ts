@@ -12,6 +12,8 @@ import {
   Put,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import JwtPatchGuard from 'modules/auth/utils/PatchGuard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs-extra';
@@ -19,7 +21,7 @@ import DoctorService from './doctor.service';
 import Doctor, { Availability } from './entity/doctor.entity';
 import CreateDoctorDto from './dto/create-doctor.dto';
 
-@UseGuards(JwtPatchGuard)
+// @UseGuards(JwtPatchGuard)
 @Controller('doctor')
 export default class DoctorController {
   constructor(private readonly doctorService: DoctorService) {}
@@ -86,5 +88,9 @@ export default class DoctorController {
       doctorId,
       availabilityUuid,
     );
+  }
+  @Get(':id/avatar')
+  async getAvatar(@Param('id') id: number): Promise<string> {
+    return this.doctorService.getImageByUrl(id);
   }
 }

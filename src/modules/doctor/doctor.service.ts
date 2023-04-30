@@ -5,6 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { Repository } from 'typeorm';
 import { BACKWARD, FORWARD, NO_ROWS_AFFECTED } from 'shared/consts';
 import CreateDoctorDto from './dto/create-doctor.dto';
@@ -162,5 +164,12 @@ export default class DoctorService {
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+  async getImageByUrl(id: number) {
+    const doctor = await this.getDoctorByID(id);
+    const photoPath = doctor.photoUrl;
+    const photoFile = readFileSync(join('src', '..', photoPath));
+    const photoUrl = `data:image/png;base64,${photoFile.toString('base64')}`;
+    return photoUrl;
   }
 }
