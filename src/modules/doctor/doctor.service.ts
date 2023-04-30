@@ -165,7 +165,8 @@ export default class DoctorService {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-  async getImageByUrl(id: number) {
+
+  async getImageByUrl(id: number): Promise<string> {
     const doctor = await this.getDoctorByID(id);
     const photoPath = doctor.photoUrl;
     const photoFile = readFileSync(join('src', '..', photoPath));
