@@ -12,8 +12,10 @@ export interface Availability {
 @Entity()
 export default class Doctor {
   @PrimaryGeneratedColumn()
-  @OneToMany(() => Note, (note) => note.doctorId)
   id: number;
+
+  @OneToMany(() => Note, (note) => note.doctor)
+  notes: Note[];
 
   @ApiProperty({ example: 'John' })
   @Column({

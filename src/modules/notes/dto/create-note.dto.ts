@@ -5,26 +5,26 @@ import { Type } from 'class-transformer';
 
 export default class CreateNoteDto {
   @ApiProperty({
-    description: 'Doctor first name',
-    example: 'John',
+    description: 'Doctor Id',
+    example: '1',
   })
   @IsNumber()
   @IsNotEmpty()
   @Type(() => Number)
-  doctorId: number;
+  doctor: number;
 
   @ApiProperty({
-    description: 'Doctor first name',
-    example: 'John',
+    description: 'Patient Id',
+    example: '1',
   })
   @IsNumber()
   @IsNotEmpty()
   @Type(() => Number)
-  patientId: number;
+  patient: number;
 
   @ApiProperty({
-    description: 'Doctor first name',
-    example: 'John',
+    description: 'Text of the note',
+    example: 'Patient has pain',
   })
   @IsString()
   @IsNotEmpty()

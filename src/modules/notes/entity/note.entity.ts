@@ -20,11 +20,11 @@ export default class Note {
 
   @ApiProperty({ example: '231' })
   @ManyToOne(() => Doctor, (doctor) => doctor.id)
-  doctorId: number;
+  doctor: number;
 
   @ApiProperty({ example: '765' })
   @ManyToOne(() => Patient, (patient) => patient.id)
-  patientId: number;
+  patient: number;
 
   @ApiProperty({ example: 'Patient have big dick back pain disorder' })
   @Column({

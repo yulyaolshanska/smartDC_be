@@ -6,8 +6,10 @@ import { IsString } from 'class-validator';
 @Entity()
 export default class Patient {
   @PrimaryGeneratedColumn()
-  @OneToMany(() => Note, (note) => note.patientId)
   id: number;
+
+  @OneToMany(() => Note, (note) => note.doctor)
+  notes: Note[];
 
   @ApiProperty({ example: 'John' })
   @Column({

@@ -73,7 +73,7 @@ export default class NotesService {
         .where('notes.note like :searchString', {
           searchString: `%${query.searchString}%`,
         })
-        .leftJoin('notes.doctorId', 'doctor')
+        .leftJoin('notes.doctor', 'doctor')
         .leftJoinAndSelect('notes.file', 'file')
         .orderBy(`notes.${sortBy}`, sortOrder)
         .skip(Number(query.skipAmount))
