@@ -52,6 +52,7 @@ export default class NotesService {
           .into(Note)
           .values({
             ...createNoteDto,
+            file: null,
           })
           .execute();
       }

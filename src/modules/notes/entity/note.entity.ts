@@ -10,12 +10,13 @@ import {
   ManyToOne,
   OneToOne,
   JoinColumn,
+  PrimaryColumn,
 } from 'typeorm';
 import File from './file.entity';
 
 @Entity()
 export default class Note {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({})
   id: number;
 
   @ApiProperty({ example: '231' })
@@ -34,7 +35,11 @@ export default class Note {
   note: string;
 
   @ApiProperty({ example: '???' })
-  @OneToOne(() => File, (file) => file.id, { nullable: true })
+  @OneToOne(() => File, (file) => file.id, {
+    createForeignKeyConstraints: false,
+    nullable: true,
+    onUpdate: 'SET NULL',
+  })
   @JoinColumn()
   file?: File | null;
 

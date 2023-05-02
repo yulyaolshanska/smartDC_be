@@ -3,6 +3,7 @@ import {
   Entity,
   OneToOne,
   PrimaryGeneratedColumn,
+  PrimaryColumn,
   JoinColumn,
 } from 'typeorm';
 import Note from './note.entity';
@@ -18,13 +19,16 @@ export default class File {
   @Column()
   originalName: string;
 
-  @Column({})
+  @Column()
   size: number;
 
   @Column()
   mimetype: string;
 
-  @OneToOne(() => Note, (note) => note.id)
+  @OneToOne(() => Note, (note) => note.id, {
+    nullable: true,
+    createForeignKeyConstraints: false,
+  })
   @JoinColumn()
   note?: Note;
 }
