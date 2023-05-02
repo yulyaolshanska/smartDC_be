@@ -9,7 +9,7 @@ import {
   Post,
   UseInterceptors,
   UploadedFile,
-  Put,
+  Put
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import JwtPatchGuard from 'modules/auth/utils/PatchGuard';
@@ -86,5 +86,11 @@ export default class DoctorController {
       doctorId,
       availabilityUuid,
     );
+  }
+
+  @Get('/specialization/:specialization')
+  async findDoctorsWithSpecialization(
+    @Param('specialization') specialization: number): Promise<Doctor[]> {
+    return this.doctorService.findBySpecialization(specialization);
   }
 }
