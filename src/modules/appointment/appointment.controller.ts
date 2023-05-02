@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import JwtPatchGuard from 'modules/auth/utils/PatchGuard';
 import Patient from 'modules/patient/entity/patient.entity';
-import CreateAppointmentDto from './dto/create-appintment.dto';
+import CreateAppointmentDto from './dto/create-appointment.dto';
 import AppointmentService from './appointment.service';
 import Appointment from './entity/appointment.entity';
 

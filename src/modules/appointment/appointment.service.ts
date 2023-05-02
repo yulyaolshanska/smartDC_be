@@ -5,7 +5,7 @@ import DoctorService from 'modules/doctor/doctor.service';
 import PatientService from 'modules/patient/patient.service';
 import Patient from 'modules/patient/entity/patient.entity';
 import Appointment from './entity/appointment.entity';
-import CreateAppointmentDto from './dto/create-appintment.dto';
+import CreateAppointmentDto from './dto/create-appointment.dto';
 
 @Injectable()
 export default class AppointmentService {
@@ -17,19 +17,18 @@ export default class AppointmentService {
   ) {}
 
   async createAppointment(
-    createAppointmentDto: CreateAppointmentDto,
+    appointment: CreateAppointmentDto,
   ): Promise<Appointment> {
     try {
-      const { localDoctorId, remoteDoctorId, patientId, ...rest } =
-        createAppointmentDto;
+      const { localDoctorId, remoteDoctorId, patientId, ...rest } = appointment;
 
+      const patient = await this.patientService.getPatientById(patientId);
       const localDoctor = await this.doctorService.getDoctorByID(localDoctorId);
       const remoteDoctor = await this.doctorService.getDoctorByID(
         remoteDoctorId,
       );
-      const patient = await this.patientService.getPatientById(patientId);
 
-      const appointment = {
+      const newAppointment = {
         localDoctor,
         remoteDoctor,
         patient,
@@ -40,27 +39,30 @@ export default class AppointmentService {
         .createQueryBuilder()
         .insert()
         .into(Appointment)
-        .values(appointment)
+        .values(newAppointment)
         .execute()
         .then((result) => {
           const { generatedMaps } = result;
           const [generatedMap] = generatedMaps;
           const { id } = generatedMap;
 
-          return { ...appointment, id };
+          return { ...newAppointment, id };
         });
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
+  // TODO: can be used for getting appointments for today, week and month
   async getAppointmentsByDoctorId(id: number): Promise<Appointment[]> {
     try {
+      const doctor = await this.doctorService.getDoctorByID(id);
+
       const queryBuilder: SelectQueryBuilder<Appointment> =
         this.appointmentRepository.createQueryBuilder('appointment');
       queryBuilder.where(
         'appointment.localDoctorId = :doctorId OR appointment.remoteDoctorId = :doctorId',
-        { doctorId: id },
+        { doctorId: doctor.id },
       );
       queryBuilder.leftJoinAndSelect('appointment.localDoctor', 'localDoctor');
       queryBuilder.leftJoinAndSelect(
@@ -84,12 +86,15 @@ export default class AppointmentService {
     }
   }
 
+  // TODO: can be used for getting appointments for today, week and month
   async getAppointmentsByPatientId(id: number): Promise<Appointment[]> {
     try {
+      const patient = await this.patientService.getPatientById(id);
+
       const queryBuilder: SelectQueryBuilder<Appointment> =
         this.appointmentRepository.createQueryBuilder('appointment');
       queryBuilder.where('appointment.patientId = :patientId', {
-        patientId: id,
+        patientId: patient.id,
       });
       queryBuilder.leftJoinAndSelect('appointment.localDoctor', 'localDoctor');
       queryBuilder.leftJoinAndSelect(
@@ -113,11 +118,9 @@ export default class AppointmentService {
     }
   }
 
-  async getPatientsByDoctorIdAppointments(
-    doctorId: number,
-  ): Promise<Patient[]> {
+  async getPatientsByDoctorIdAppointments(id: number): Promise<Patient[]> {
     try {
-      const doctor = await this.doctorService.getDoctorByID(doctorId);
+      const doctor = await this.doctorService.getDoctorByID(id);
 
       const appointments = await this.appointmentRepository
         .createQueryBuilder('appointment')
