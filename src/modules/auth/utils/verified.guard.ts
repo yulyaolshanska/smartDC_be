@@ -41,7 +41,6 @@ export class VerifyGuard implements CanActivate {
       req.user = user;
       return Boolean(user.isVerified);
     } catch (e) {
-      console.log(e);
       throw new HttpException(
         'No access, need email to be confirmed',
         HttpStatus.FORBIDDEN,
