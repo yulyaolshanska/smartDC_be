@@ -16,9 +16,9 @@ export default class AppointmentController {
   @ApiResponse({ status: 201, type: Appointment })
   @Post()
   async createAppointment(
-    @Body() createAppointmentDto: CreateAppointmentDto,
+    @Body() appointment: CreateAppointmentDto,
   ): Promise<Appointment> {
-    return this.appointmentService.createAppointment(createAppointmentDto);
+    return this.appointmentService.createAppointment(appointment);
   }
 
   @ApiOperation({ summary: "Find doctor's appointments" })
