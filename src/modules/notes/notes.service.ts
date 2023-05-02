@@ -60,13 +60,15 @@ export default class NotesService {
     }
   }
 
-  async findAll(query: Query): Promise<{ notes: Note[]; count: number }> {
+  async findAll(
+    query: Query,
+  ): Promise<{ notes: Note[]; count: number; countWithoutAnyParams: number }> {
     try {
       const qb = this.notesRepository.createQueryBuilder('notes');
       const sortOrder = query.sortOrder === 'desc' ? 'DESC' : 'ASC';
       let sortBy: string;
       if (query.sortBy === 'Date') sortBy = 'createdAt';
-      if (query.sortBy === 'Doctor') sortBy = 'doctorId';
+      if (query.sortBy === 'Doctor') sortBy = 'doctor';
 
       const [notes, count] = await qb
         .select(['notes', 'doctor.firstName', 'doctor.lastName'])
@@ -80,7 +82,11 @@ export default class NotesService {
         .take(Number(query.limit))
         .getManyAndCount();
 
-      return { notes, count };
+      const countWithoutAnyParams = await this.notesRepository
+        .createQueryBuilder('notes')
+        .getCount();
+
+      return { notes, count, countWithoutAnyParams };
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
