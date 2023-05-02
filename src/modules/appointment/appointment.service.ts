@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import DoctorService from 'modules/doctor/doctor.service';
 import PatientService from 'modules/patient/patient.service';
 import Appointment from './entity/appointment.entity';
@@ -18,20 +18,58 @@ export default class AppointmentService {
   async createAppointment(
     createAppointmentDto: CreateAppointmentDto,
   ): Promise<Appointment> {
-    const { localDoctorId, remoteDoctorId, patientId, ...rest } =
+    try {
+      const { localDoctorId, remoteDoctorId, patientId, ...rest } =
       createAppointmentDto;
 
-    const localDoctor = await this.doctorService.getDoctorByID(localDoctorId);
-    const remoteDoctor = await this.doctorService.getDoctorByID(remoteDoctorId);
-    const patient = await this.patientService.getPatientById(patientId);
+      const localDoctor = await this.doctorService.getDoctorByID(localDoctorId);
+      const remoteDoctor = await this.doctorService.getDoctorByID(remoteDoctorId);
+      const patient = await this.patientService.getPatientById(patientId);
 
-    const appointment = this.appointmentRepository.create({
-      localDoctor,
-      remoteDoctor,
-      patient,
-      ...rest,
-    });
+      const appointment = {
+        localDoctor,
+        remoteDoctor,
+        patient,
+        ...rest,
+      };
 
-    return this.appointmentRepository.save(appointment);
+      return await this.appointmentRepository
+        .createQueryBuilder()
+        .insert()
+        .into(Appointment)
+        .values(appointment)
+        .execute()
+        .then(result => {
+          const { generatedMaps } = result;
+          const [ generatedMap ] = generatedMaps;
+          const { id } = generatedMap;
+
+          return { ...appointment, id };
+        });
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async getAppointmentsByDoctorId(id: number): Promise<Appointment[]> {
+    try {
+      const queryBuilder: SelectQueryBuilder<Appointment> = this.appointmentRepository.createQueryBuilder('appointment');
+      queryBuilder.where('appointment.localDoctorId = :doctorId OR appointment.remoteDoctorId = :doctorId', { doctorId: id });
+      queryBuilder.leftJoinAndSelect('appointment.localDoctor', 'localDoctor');
+      queryBuilder.leftJoinAndSelect('appointment.remoteDoctor', 'remoteDoctor');
+      queryBuilder.leftJoinAndSelect('appointment.patient', 'patient');
+      queryBuilder.select([
+        'appointment.id', 
+        'appointment.startTime', 
+        'appointment.endTime', 
+        'appointment.zoomLink', 
+        'localDoctor.id', 
+        'remoteDoctor.id', 
+        'patient.id']);
+  
+      return await queryBuilder.getMany();
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }

@@ -14,23 +14,23 @@ export default class Appointment {
   id: number;
 
   @Column()
-  startTime: Date;
+  startTime: string;
 
   @Column()
-  endTime: Date;
+  endTime: string;
 
   @Column()
   zoomLink: string;
 
   @ManyToOne(() => Doctor, { eager: true })
-  @JoinColumn({ name: 'local_doctor_id' })
+  @JoinColumn({ name: 'localDoctorId' })
   localDoctor: Doctor;
 
   @ManyToOne(() => Doctor, { eager: true })
-  @JoinColumn({ name: 'remote_doctor_id' })
+  @JoinColumn({ name: 'remoteDoctorId' })
   remoteDoctor: Doctor;
 
   @ManyToOne(() => Patient)
-  @JoinColumn({ name: 'patient_id' })
+  @JoinColumn({ name: 'patientId' })
   patient: Patient;
 }
