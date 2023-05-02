@@ -9,14 +9,13 @@ import {
   Post,
   UseInterceptors,
   UploadedFile,
-  Put,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import JwtPatchGuard from 'modules/auth/utils/PatchGuard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs-extra';
 import DoctorService from './doctor.service';
-import Doctor, { Availability } from './entity/doctor.entity';
+import Doctor from './entity/doctor.entity';
 import CreateDoctorDto from './dto/create-doctor.dto';
 
 @UseGuards(JwtPatchGuard)
@@ -64,28 +63,6 @@ export default class DoctorController {
 
     const doctor = await this.doctorService.updateDoctorPhotoUrl(id, filePath);
     return doctor;
-  }
-
-  @Put('/:id/availability')
-  addAvailability(
-    @Param('id') doctorId: number,
-    @Body() availabilities: Omit<Availability, 'doctorId'>[],
-  ): Promise<Availability[]> {
-    return this.doctorService.updateDoctorAvailability(
-      doctorId,
-      availabilities,
-    );
-  }
-
-  @Delete('/:id/availability/:uuid')
-  deleteAvailability(
-    @Param('id') doctorId: number,
-    @Param('uuid') availabilityUuid: string,
-  ): Promise<void> {
-    return this.doctorService.deleteDoctorAvailability(
-      doctorId,
-      availabilityUuid,
-    );
   }
 
   @Get('/specialization/:specialization')

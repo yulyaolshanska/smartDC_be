@@ -6,9 +6,9 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { BACKWARD, FORWARD, NO_ROWS_AFFECTED } from 'shared/consts';
+import { NO_ROWS_AFFECTED } from 'shared/consts';
 import CreateDoctorDto from './dto/create-doctor.dto';
-import Doctor, { Availability } from './entity/doctor.entity';
+import Doctor from './entity/doctor.entity';
 
 @Injectable()
 export default class DoctorService {
@@ -119,57 +119,12 @@ export default class DoctorService {
     }
   }
 
-  async updateDoctorAvailability(
-    doctorId: number,
-    availabilities: Availability[],
-  ): Promise<Availability[]> {
-    try {
-      const doctor = await this.doctorRepository.findOneOrFail({
-        where: { id: doctorId },
-      });
-      doctor.availabilities = availabilities;
-
-      await this.doctorRepository.save(doctor);
-
-      return availabilities;
-    } catch (err) {
-      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  async deleteDoctorAvailability(
-    doctorId: number,
-    availabilityUuid: string,
-  ): Promise<void> {
-    try {
-      const doctor = await this.doctorRepository.findOneOrFail({
-        where: { id: doctorId },
-      });
-
-      const index = doctor.availabilities.findIndex(
-        (availability) => availability.uuid === availabilityUuid,
-      );
-
-      if (index === BACKWARD) {
-        throw new NotFoundException(
-          `Availability with uuid ${availabilityUuid} not found`,
-        );
-      }
-
-      doctor.availabilities.splice(index, FORWARD);
-
-      await this.doctorRepository.save(doctor);
-    } catch (err) {
-      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
   async findBySpecialization(specialization: number): Promise<Doctor[]> {
     try {
       return await this.doctorRepository
-      .createQueryBuilder('doctor')
-      .where('doctor.specialization = :specialization', { specialization })
-      .getMany();
+        .createQueryBuilder('doctor')
+        .where('doctor.specialization = :specialization', { specialization })
+        .getMany();
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }

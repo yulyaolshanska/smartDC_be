@@ -7,6 +7,8 @@ import Patient from 'modules/patient/entity/patient.entity';
 import Doctor from 'modules/doctor/entity/doctor.entity';
 import Appointment from 'modules/appointment/entity/appointment.entity';
 import AppointmentModule from 'modules/appointment/appointment.module';
+import Availability from 'modules/availability/entity/availability.entity';
+import AvailabilityModule from 'modules/availability/availability.module';
 import AuthModule from './modules/auth/auth.module';
 import DoctorModule from './modules/doctor/doctor.module';
 
@@ -22,7 +24,7 @@ import DoctorModule from './modules/doctor/doctor.module';
         username: configService.get('DB_USER'),
         password: configService.get('DB_PASS'),
         database: configService.get('DB_NAME'),
-        entities: [Doctor, Patient, Appointment],
+        entities: [Doctor, Patient, Appointment, Availability],
         synchronize: true,
       }),
       inject: [ConfigService],
@@ -31,6 +33,7 @@ import DoctorModule from './modules/doctor/doctor.module';
     AuthModule,
     PatientModule,
     AppointmentModule,
+    AvailabilityModule,
   ],
   providers: [
     {
