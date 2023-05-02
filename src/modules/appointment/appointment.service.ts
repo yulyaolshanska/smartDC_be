@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import DoctorService from 'modules/doctor/doctor.service';
 import PatientService from 'modules/patient/patient.service';
+import Patient from 'modules/patient/entity/patient.entity';
 import Appointment from './entity/appointment.entity';
 import CreateAppointmentDto from './dto/create-appintment.dto';
 
@@ -107,6 +108,31 @@ export default class AppointmentService {
       ]);
 
       return await queryBuilder.getMany();
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async getPatientsByDoctorIdAppointments(
+    doctorId: number,
+  ): Promise<Patient[]> {
+    try {
+      const doctor = await this.doctorService.getDoctorByID(doctorId);
+
+      const appointments = await this.appointmentRepository
+        .createQueryBuilder('appointment')
+        .leftJoinAndSelect('appointment.patient', 'patient')
+        .where(
+          'appointment.localDoctorId = :id OR appointment.remoteDoctorId = :id',
+          { id: doctor.id },
+        )
+        .getMany();
+
+      const patients: Patient[] = appointments.map(
+        (appointment) => appointment.patient,
+      );
+
+      return patients;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
