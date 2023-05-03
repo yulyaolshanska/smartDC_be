@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import DoctorService from 'modules/doctor/doctor.service';
 import PatientService from 'modules/patient/patient.service';
-import Patient from 'modules/patient/entity/patient.entity';
 import Appointment from './entity/appointment.entity';
 import CreateAppointmentDto from './dto/create-appointment.dto';
 
@@ -21,22 +20,24 @@ export default class AppointmentService {
   ): Promise<Appointment> {
     try {
       const { localDoctorId, remoteDoctorId, patientId, ...rest } = appointment;
-  
+
       const [patient, localDoctor, remoteDoctor] = await Promise.all([
         this.patientService.getPatientById(patientId),
         this.doctorService.getDoctorByID(localDoctorId),
         this.doctorService.getDoctorByID(remoteDoctorId),
       ]);
-  
+
       const newAppointment = this.appointmentRepository.create({
         localDoctor,
         remoteDoctor,
         patient,
         ...rest,
       });
-  
-      const savedAppointment = await this.appointmentRepository.save(newAppointment);
-  
+
+      const savedAppointment = await this.appointmentRepository.save(
+        newAppointment,
+      );
+
       return { ...savedAppointment, id: savedAppointment.id };
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -103,29 +104,6 @@ export default class AppointmentService {
       ]);
 
       return await queryBuilder.getMany();
-    } catch (err) {
-      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  async getPatientsByDoctorIdAppointments(id: number): Promise<Patient[]> {
-    try {
-      const doctor = await this.doctorService.getDoctorByID(id);
-
-      const appointments = await this.appointmentRepository
-        .createQueryBuilder('appointment')
-        .leftJoinAndSelect('appointment.patient', 'patient')
-        .where(
-          'appointment.localDoctorId = :id OR appointment.remoteDoctorId = :id',
-          { id: doctor.id },
-        )
-        .getMany();
-
-      const patients: Patient[] = appointments.map(
-        (appointment) => appointment.patient,
-      );
-
-      return patients;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
