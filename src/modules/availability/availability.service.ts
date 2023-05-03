@@ -115,4 +115,35 @@ export default class AvailabilityService {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  async findBySpecialization(specialization: string): Promise<Availability[]> {
+    try {
+      if (!specialization) {
+        throw new HttpException(
+          'A valid specialization is required',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      const availabilities = await this.availabilityRepository
+        .createQueryBuilder('availability')
+        .select([
+          'availability',
+          'doctor.id',
+          'doctor.specialization',
+          'doctor.role',
+        ])
+        .innerJoin('availability.doctor', 'doctor')
+        .getMany();
+
+      const filteredAvailabilities = availabilities.filter(
+        (availability) =>
+          availability.doctor.role === Role.Remote &&
+          availability.doctor.specialization === Number(specialization),
+      );
+
+      return filteredAvailabilities;
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }

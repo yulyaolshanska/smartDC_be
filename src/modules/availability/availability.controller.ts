@@ -55,4 +55,11 @@ export default class AvailabilityController {
       specialization,
     );
   }
+
+  @Get('/specialization/:specialization')
+  async findDoctorsWithSpecialization(
+    @Param('specialization') specialization: string,
+  ): Promise<Availability[]> {
+    return this.availabilityService.findBySpecialization(specialization);
+  }
 }

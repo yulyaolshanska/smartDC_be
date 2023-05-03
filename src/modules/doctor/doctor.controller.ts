@@ -64,11 +64,4 @@ export default class DoctorController {
     const doctor = await this.doctorService.updateDoctorPhotoUrl(id, filePath);
     return doctor;
   }
-
-  @Get('/specialization/:specialization')
-  async findDoctorsWithSpecialization(
-    @Param('specialization') specialization: number,
-  ): Promise<Doctor[]> {
-    return this.doctorService.findBySpecialization(specialization);
-  }
 }

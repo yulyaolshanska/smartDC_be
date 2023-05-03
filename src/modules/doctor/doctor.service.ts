@@ -118,15 +118,4 @@ export default class DoctorService {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-
-  async findBySpecialization(specialization: number): Promise<Doctor[]> {
-    try {
-      return await this.doctorRepository
-        .createQueryBuilder('doctor')
-        .where('doctor.specialization = :specialization', { specialization })
-        .getMany();
-    } catch (err) {
-      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
 }
