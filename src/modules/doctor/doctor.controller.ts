@@ -92,6 +92,6 @@ export default class DoctorController {
 
   @Get(':id/avatar')
   async getAvatar(@Param('id') id: number): Promise<string> {
-    return this.doctorService.getImageByUrl(id);
+    return `${id}/avatar.jpg`;
   }
 }
