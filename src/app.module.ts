@@ -5,11 +5,11 @@ import { APP_PIPE } from '@nestjs/core';
 import PatientModule from 'modules/patient/patient.module';
 import Patient from 'modules/patient/entity/patient.entity';
 import Doctor from 'modules/doctor/entity/doctor.entity';
-import AuthModule from './modules/auth/auth.module';
-import DoctorModule from './modules/doctor/doctor.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import * as path from 'path';
+import DoctorModule from './modules/doctor/doctor.module';
+import AuthModule from './modules/auth/auth.module';
 
 @Module({
   imports: [
