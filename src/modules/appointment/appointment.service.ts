@@ -21,33 +21,23 @@ export default class AppointmentService {
   ): Promise<Appointment> {
     try {
       const { localDoctorId, remoteDoctorId, patientId, ...rest } = appointment;
-
-      const patient = await this.patientService.getPatientById(patientId);
-      const localDoctor = await this.doctorService.getDoctorByID(localDoctorId);
-      const remoteDoctor = await this.doctorService.getDoctorByID(
-        remoteDoctorId,
-      );
-
-      const newAppointment = {
+  
+      const [patient, localDoctor, remoteDoctor] = await Promise.all([
+        this.patientService.getPatientById(patientId),
+        this.doctorService.getDoctorByID(localDoctorId),
+        this.doctorService.getDoctorByID(remoteDoctorId),
+      ]);
+  
+      const newAppointment = this.appointmentRepository.create({
         localDoctor,
         remoteDoctor,
         patient,
         ...rest,
-      };
-
-      return await this.appointmentRepository
-        .createQueryBuilder()
-        .insert()
-        .into(Appointment)
-        .values(newAppointment)
-        .execute()
-        .then((result) => {
-          const { generatedMaps } = result;
-          const [generatedMap] = generatedMaps;
-          const { id } = generatedMap;
-
-          return { ...newAppointment, id };
-        });
+      });
+  
+      const savedAppointment = await this.appointmentRepository.save(newAppointment);
+  
+      return { ...savedAppointment, id: savedAppointment.id };
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
