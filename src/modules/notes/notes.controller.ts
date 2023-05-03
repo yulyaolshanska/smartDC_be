@@ -33,6 +33,7 @@ import { fileStorage } from './storage';
 
 const MAX_FILE_SIZE_BYTES = 1024 * 1024 * 5; // eslint-disable-line no-magic-numbers
 @Controller('notes')
+@UseGuards(JwtAuthGuard)
 @ApiTags('Notes')
 export default class NotesController {
   constructor(private notesService: NotesService) {}
@@ -42,7 +43,6 @@ export default class NotesController {
   @ApiOperation({ summary: 'Getting All Notes' })
   @ApiResponse({ status: 200, type: [Note] })
   @Get('/all')
-  @UseGuards(JwtAuthGuard)
   getAllNotes(
     @Query() query: ExpressQuery,
   ): Promise<{ notes: Note[]; count: number }> {
@@ -76,7 +76,6 @@ export default class NotesController {
       storage: fileStorage,
     }),
   )
-  @UseGuards(JwtAuthGuard)
   createNote(
     @Body() createNoteDto: CreateNoteDto,
     @UploadedFile(
@@ -96,7 +95,6 @@ export default class NotesController {
   @ApiOperation({ summary: 'Download a file' })
   @ApiResponse({ status: 200, type: [Note] })
   @Get('/file/:filename')
-  @UseGuards(JwtAuthGuard)
   async downloadFile(
     @Param('filename') filename: string,
     @Res() res: Response,

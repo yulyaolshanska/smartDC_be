@@ -7,6 +7,7 @@ import * as fs from 'fs';
 import Note from './entity/note.entity';
 import CreateNoteDto from './dto/create-note.dto';
 import File from './entity/file.entity';
+import { DATE, DESC, DOCTOR } from '@shared/consts';
 
 @Injectable()
 export default class NotesService {
@@ -66,10 +67,10 @@ export default class NotesService {
   ): Promise<{ notes: Note[]; count: number; countWithoutAnyParams: number }> {
     try {
       const qb = this.notesRepository.createQueryBuilder('notes');
-      const sortOrder = query.sortOrder === 'desc' ? 'DESC' : 'ASC';
+      const sortOrder = query.sortOrder === DESC ? 'DESC' : 'ASC';
       let sortBy: string;
-      if (query.sortBy === 'Date') sortBy = 'createdAt';
-      if (query.sortBy === 'Doctor') sortBy = 'doctor';
+      if (query.sortBy === DATE) sortBy = 'createdAt';
+      if (query.sortBy === DOCTOR) sortBy = 'doctor';
 
       const [notes, count] = await qb
         .select(['notes', 'doctor.firstName', 'doctor.lastName'])
