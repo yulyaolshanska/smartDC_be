@@ -20,9 +20,17 @@ export default class AvailabilityService {
 
   async getAvailabilities(doctorId: number): Promise<Availability[]> {
     try {
-      const availabilities = await this.availabilityRepository.find({
-        where: { doctor: { id: doctorId } },
-      });
+      const availabilities = await this.availabilityRepository
+        .createQueryBuilder('availability')
+        .select([
+          'availability.title',
+          'availability.uuid',
+          'availability.start',
+          'availability.end',
+        ])
+        .leftJoin('availability.doctor', 'doctor')
+        .where('doctor.id = :id', { id: doctorId })
+        .getMany();
       return availabilities;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
