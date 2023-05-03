@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NO_ROWS_AFFECTED } from '@shared/consts';
 import DoctorService from 'modules/doctor/doctor.service';
+import { Role } from '@shared/enums';
 import Availability from './entity/availability.entity';
 
 @Injectable()
@@ -76,14 +77,20 @@ export default class AvailabilityService {
     }
   }
 
-  async findDoctorsByAvailability(
+  async findDoctorsByAvailabilityAndSpeciality(
     start: string,
     end: string,
+    specialization?: string,
   ): Promise<Availability[]> {
     try {
-      const availability = await this.availabilityRepository
+      const availabilities = await this.availabilityRepository
         .createQueryBuilder('availability')
-        .select(['availability', 'doctor.id'])
+        .select([
+          'availability',
+          'doctor.id',
+          'doctor.specialization',
+          'doctor.role',
+        ])
         .innerJoin('availability.doctor', 'doctor')
         .andWhere(
           '(availability.start >= :start AND availability.start < :end) OR (availability.end > :start AND availability.end <= :end)',
@@ -92,7 +99,18 @@ export default class AvailabilityService {
         .setParameter('end', end)
         .getMany();
 
-      return availability;
+      let filteredAvailabilities = availabilities.filter(
+        (availability) => availability.doctor.role === Role.Remote,
+      );
+
+      if (specialization) {
+        filteredAvailabilities = filteredAvailabilities.filter(
+          (availability) =>
+            availability.doctor.specialization === Number(specialization),
+        );
+      }
+
+      return filteredAvailabilities;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }

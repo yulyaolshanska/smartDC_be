@@ -44,10 +44,15 @@ export default class AvailabilityController {
   }
 
   @Get()
-  async findDoctorsByAvailability(
+  async findDoctorsByAvailabilityandSpeciality(
     @Query('start') start: string,
     @Query('end') end: string,
+    @Query('specialization') specialization?: string,
   ): Promise<Availability[]> {
-    return this.availabilityService.findDoctorsByAvailability(start, end);
+    return this.availabilityService.findDoctorsByAvailabilityAndSpeciality(
+      start,
+      end,
+      specialization,
+    );
   }
 }
