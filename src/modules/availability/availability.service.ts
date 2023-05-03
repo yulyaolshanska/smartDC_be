@@ -78,8 +78,8 @@ export default class AvailabilityService {
   }
 
   async findDoctorsByAvailabilityAndSpeciality(
-    start: string,
-    end: string,
+    startDatetime: string,
+    endDatetime: string,
     specialization?: string,
   ): Promise<Availability[]> {
     try {
@@ -95,8 +95,8 @@ export default class AvailabilityService {
         .andWhere(
           '(availability.start >= :start AND availability.start < :end) OR (availability.end > :start AND availability.end <= :end)',
         )
-        .setParameter('start', start)
-        .setParameter('end', end)
+        .setParameter('start', startDatetime)
+        .setParameter('end', endDatetime)
         .getMany();
 
       let filteredAvailabilities = availabilities.filter(

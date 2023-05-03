@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import Availability from '../../availability/entity/availability.entity';
+import Availability from 'modules/availability/entity/availability.entity';
 
 @Entity()
 export default class Doctor {
