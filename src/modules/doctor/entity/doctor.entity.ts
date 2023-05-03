@@ -2,13 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import Availability from '../../availability/entity/availability.entity';
 
-export interface IAvailability {
-  uuid: string;
-  title: string;
-  start: Date;
-  end: Date;
-}
-
 @Entity()
 export default class Doctor {
   @PrimaryGeneratedColumn()
@@ -124,5 +117,5 @@ export default class Doctor {
   gender: string;
 
   @ManyToOne(() => Availability, (availability) => availability.doctor)
-  availability: IAvailability[];
+  availability: Availability[];
 }
