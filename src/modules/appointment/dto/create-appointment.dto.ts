@@ -8,7 +8,7 @@ export default class CreateAppointmentDto {
   })
   @IsNotEmpty()
   @IsDateString()
-  startTime: string;
+  startTime: Date;
 
   @ApiProperty({
     description: 'Appointment end time',
@@ -16,7 +16,7 @@ export default class CreateAppointmentDto {
   })
   @IsNotEmpty()
   @IsDateString()
-  endTime: string;
+  endTime: Date;
 
   @ApiProperty({
     description: 'Zoom link',

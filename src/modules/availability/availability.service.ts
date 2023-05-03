@@ -67,4 +67,26 @@ export default class AvailabilityService {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  async findDoctorsByAvailability(
+    start: string,
+    end: string,
+  ): Promise<Availability[]> {
+    try {
+      const availability = await this.availabilityRepository
+        .createQueryBuilder('availability')
+        .select(['availability', 'doctor.id'])
+        .innerJoin('availability.doctor', 'doctor')
+        .andWhere(
+          '(availability.start >= :start AND availability.start < :end) OR (availability.end > :start AND availability.end <= :end)',
+        )
+        .setParameter('start', start)
+        .setParameter('end', end)
+        .getMany();
+
+      return availability;
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }

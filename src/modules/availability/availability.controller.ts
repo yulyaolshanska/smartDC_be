@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import JwtPatchGuard from 'modules/auth/utils/PatchGuard';
@@ -40,5 +41,13 @@ export default class AvailabilityController {
       doctorId,
       availabilityUuid,
     );
+  }
+
+  @Get()
+  async findDoctorsByAvailability(
+    @Query('start') start: string,
+    @Query('end') end: string,
+  ): Promise<Availability[]> {
+    return this.availabilityService.findDoctorsByAvailability(start, end);
   }
 }

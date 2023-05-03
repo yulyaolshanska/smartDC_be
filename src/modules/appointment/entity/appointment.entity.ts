@@ -14,10 +14,10 @@ export default class Appointment {
   id: number;
 
   @Column()
-  startTime: string;
+  startTime: Date;
 
   @Column()
-  endTime: string;
+  endTime: Date;
 
   @Column()
   zoomLink: string;
