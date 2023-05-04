@@ -1,28 +1,33 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Query } from 'express-serve-static-core';
 import { Response } from 'express';
 import * as fs from 'fs';
+import { DATE, DESC, DOCTOR } from '@shared/consts';
 import Note from './entity/note.entity';
 import CreateNoteDto from './dto/create-note.dto';
 import File from './entity/file.entity';
-import { DATE, DESC, DOCTOR } from '@shared/consts';
 
 @Injectable()
 export default class NotesService {
   constructor(
     @InjectRepository(Note) private notesRepository: Repository<Note>,
     @InjectRepository(File) private filesRepository: Repository<File>,
+    private dataSource: DataSource,
   ) {}
 
   async create(
     createNoteDto: CreateNoteDto,
     file: Express.Multer.File,
   ): Promise<void> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
     try {
       if (file) {
-        const newNote = await this.notesRepository
+        const newNote = await queryRunner.manager
           .createQueryBuilder()
           .insert()
           .into(Note)
@@ -30,7 +35,8 @@ export default class NotesService {
             ...createNoteDto,
           })
           .execute();
-        const newFile = await this.filesRepository
+
+        const newFile = await queryRunner.manager
           .createQueryBuilder()
           .insert()
           .into(File)
@@ -43,11 +49,11 @@ export default class NotesService {
           })
           .execute();
 
-        await this.notesRepository.update(newNote.generatedMaps[0].id, {
+        await queryRunner.manager.update(Note, newNote.generatedMaps[0].id, {
           file: newFile.generatedMaps[0].id,
         });
       } else {
-        const newNote = await this.notesRepository
+        const newNote = await queryRunner.manager
           .createQueryBuilder()
           .insert()
           .into(Note)
@@ -57,8 +63,13 @@ export default class NotesService {
           })
           .execute();
       }
-    } catch (err) {
-      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new HttpException(`${error}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    } finally {
+      await queryRunner.release();
     }
   }
 
