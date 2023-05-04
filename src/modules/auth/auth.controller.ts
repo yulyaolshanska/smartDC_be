@@ -67,7 +67,6 @@ class AuthController {
   @ApiOperation({ summary: 'Account activation' })
   @ApiResponse({ status: 201, type: Doctor })
   @Get('/activation/:link')
-  @Redirect('https://nestjs.com') // TODO change value
   async activation(@Param('link') link: string): Promise<void> {
     return this.authService.activation(link);
   }

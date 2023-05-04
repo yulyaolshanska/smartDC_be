@@ -70,12 +70,16 @@ export default class AuthService {
         ...doctorDto,
         password: hash,
       },
-      `${this.configService.get('API_URL')}/auth/activation/${activationLink}`,
+      `${this.configService.get(
+        'CLIENT_URL',
+      )}/auth/activation/${activationLink}`,
     );
 
     await this.mailService.sendActivationMail(
       doctorDto.email,
-      `${this.configService.get('API_URL')}/auth/activation/${activationLink}`,
+      `${this.configService.get(
+        'CLIENT_URL',
+      )}/auth/activation/${activationLink}`,
     );
     return this.generateToken(newDoctor);
   }
@@ -106,7 +110,7 @@ export default class AuthService {
 
   async activation(link: string): Promise<void> {
     const activationLink = `${this.configService.get(
-      'API_URL',
+      'CLIENT_URL',
     )}/auth/activation/${link}`;
     try {
       const doctor = await this.doctorRepository
