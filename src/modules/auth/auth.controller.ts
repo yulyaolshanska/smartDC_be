@@ -92,7 +92,7 @@ class AuthController {
   @Patch('/resetPassword')
   async resetPassword(
     @Body() resetPasswordDto: ResetPasswordDto,
-  ): Promise<string> {
+  ): Promise<void> {
     return this.authService.resetPassword(resetPasswordDto);
   }
 
