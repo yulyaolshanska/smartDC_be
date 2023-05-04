@@ -1,12 +1,4 @@
-import Doctor from 'modules/doctor/entity/doctor.entity';
-import Patient from 'modules/patient/entity/patient.entity';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export default class Appointment {
@@ -22,15 +14,12 @@ export default class Appointment {
   @Column()
   zoomLink: string;
 
-  @ManyToOne(() => Doctor, { eager: true })
-  @JoinColumn({ name: 'localDoctorId' })
-  localDoctor: Doctor;
+  @Column()
+  localDoctorId: number;
 
-  @ManyToOne(() => Doctor, { eager: true })
-  @JoinColumn({ name: 'remoteDoctorId' })
-  remoteDoctor: Doctor;
+  @Column()
+  remoteDoctorId: number;
 
-  @ManyToOne(() => Patient)
-  @JoinColumn({ name: 'patientId' })
-  patient: Patient;
+  @Column()
+  patientId: number;
 }
