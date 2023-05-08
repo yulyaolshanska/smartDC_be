@@ -4,6 +4,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import DoctorService from 'modules/doctor/doctor.service';
 import PatientService from 'modules/patient/patient.service';
 import Patient from 'modules/patient/entity/patient.entity';
+import { THIRTY } from '@shared/consts';
 import Appointment from './entity/appointment.entity';
 import CreateAppointmentDto from './dto/create-appointment.dto';
 
@@ -112,7 +113,7 @@ export default class AppointmentService {
 
   async getPatientsByDoctorIdAppointments(
     id: number,
-    limit: number,
+    limit: number = THIRTY,
   ): Promise<Patient[]> {
     try {
       const doctor = await this.doctorService.getDoctorByID(id);

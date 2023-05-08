@@ -84,7 +84,7 @@ export default class AvailabilityService {
     limit?: number,
   ): Promise<Availability[]> {
     try {
-      const query = this.availabilityRepository
+      const availabilities = await this.availabilityRepository
         .createQueryBuilder('availability')
         .select([
           'availability',
@@ -97,21 +97,20 @@ export default class AvailabilityService {
           '(availability.start >= :start AND availability.start < :end) OR (availability.end > :start AND availability.end <= :end)',
         )
         .setParameter('start', startDatetime)
-        .setParameter('end', endDatetime);
-
-      const availabilities = await query.getMany();
+        .setParameter('end', endDatetime)
+        .getMany();
 
       const filteredAvailabilities = availabilities.filter(
         (availability) =>
           availability.doctor.role === Role.Remote &&
-          availability.doctor.specialization === Number(specialization),
+          (specialization
+            ? availability.doctor.specialization === Number(specialization)
+            : true),
       );
 
-      if (limit) {
-        filteredAvailabilities.slice(SLICE_START, limit);
-      }
-
-      return filteredAvailabilities;
+      return limit
+        ? filteredAvailabilities.slice(SLICE_START, limit)
+        : filteredAvailabilities;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
