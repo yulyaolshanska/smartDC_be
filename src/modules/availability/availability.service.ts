@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { NO_ROWS_AFFECTED } from '@shared/consts';
+import { NO_ROWS_AFFECTED, SLICE_START } from '@shared/consts';
 import DoctorService from 'modules/doctor/doctor.service';
 import { Role } from '@shared/enums';
 import Availability from './entity/availability.entity';
@@ -81,9 +81,10 @@ export default class AvailabilityService {
     startDatetime: string,
     endDatetime: string,
     specialization?: string,
+    limit?: number,
   ): Promise<Availability[]> {
     try {
-      const availabilities = await this.availabilityRepository
+      const query = this.availabilityRepository
         .createQueryBuilder('availability')
         .select([
           'availability',
@@ -96,25 +97,25 @@ export default class AvailabilityService {
           '(availability.start >= :start AND availability.start < :end) OR (availability.end > :start AND availability.end <= :end)',
         )
         .setParameter('start', startDatetime)
-        .setParameter('end', endDatetime)
-        .getMany();
+        .setParameter('end', endDatetime);
 
-      let filteredAvailabilities = availabilities.filter(
-        (availability) => availability.doctor.role === Role.Remote,
+      const availabilities = await query.getMany();
+  
+      const filteredAvailabilities = availabilities.filter(
+        (availability) =>
+          availability.doctor.role === Role.Remote &&
+          availability.doctor.specialization === Number(specialization),
       );
 
-      if (specialization) {
-        filteredAvailabilities = filteredAvailabilities.filter(
-          (availability) =>
-            availability.doctor.specialization === Number(specialization),
-        );
+      if (limit) {
+        filteredAvailabilities.slice(SLICE_START, limit);
       }
-
+  
       return filteredAvailabilities;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-  }
+  }   
 
   async findBySpecialization(specialization: string): Promise<Availability[]> {
     try {
