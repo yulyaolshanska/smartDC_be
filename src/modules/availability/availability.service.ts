@@ -100,7 +100,7 @@ export default class AvailabilityService {
         .setParameter('end', endDatetime);
 
       const availabilities = await query.getMany();
-  
+
       const filteredAvailabilities = availabilities.filter(
         (availability) =>
           availability.doctor.role === Role.Remote &&
@@ -110,12 +110,12 @@ export default class AvailabilityService {
       if (limit) {
         filteredAvailabilities.slice(SLICE_START, limit);
       }
-  
+
       return filteredAvailabilities;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-  }   
+  }
 
   async findBySpecialization(specialization: string): Promise<Availability[]> {
     try {
