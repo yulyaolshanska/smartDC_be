@@ -1,8 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import DoctorService from 'modules/doctor/doctor.service';
 import PatientService from 'modules/patient/patient.service';
+import Patient from 'modules/patient/entity/patient.entity';
 import Appointment from './entity/appointment.entity';
 import CreateAppointmentDto from './dto/create-appointment.dto';
 
@@ -21,22 +22,20 @@ export default class AppointmentService {
     try {
       const { localDoctorId, remoteDoctorId, patientId, ...rest } = appointment;
 
-      await Promise.all([
+      const [patient, localDoctor, remoteDoctor] = await Promise.all([
         this.patientService.getPatientById(patientId),
         this.doctorService.getDoctorByID(localDoctorId),
         this.doctorService.getDoctorByID(remoteDoctorId),
       ]);
 
       const newAppointment = this.appointmentRepository.create({
-        localDoctorId,
-        remoteDoctorId,
-        patientId,
+        localDoctor,
+        remoteDoctor,
+        patient,
         ...rest,
       });
 
-      const savedAppointment = await this.appointmentRepository.save(
-        newAppointment,
-      );
+      const savedAppointment = await this.appointmentRepository.save(newAppointment);
 
       return { ...savedAppointment, id: savedAppointment.id };
     } catch (err) {
@@ -47,23 +46,31 @@ export default class AppointmentService {
   // TODO: can be used for getting appointments for today, week and month
   async getAppointmentsByDoctorId(id: number): Promise<Appointment[]> {
     try {
-      const queryBuilder =
+      const doctor = await this.doctorService.getDoctorByID(id);
+
+      const queryBuilder: SelectQueryBuilder<Appointment> =
         this.appointmentRepository.createQueryBuilder('appointment');
       queryBuilder.where(
         'appointment.localDoctorId = :doctorId OR appointment.remoteDoctorId = :doctorId',
-        { doctorId: id },
+        { doctorId: doctor.id },
       );
+      queryBuilder.leftJoinAndSelect('appointment.localDoctor', 'localDoctor');
+      queryBuilder.leftJoinAndSelect(
+        'appointment.remoteDoctor',
+        'remoteDoctor',
+      );
+      queryBuilder.leftJoinAndSelect('appointment.patient', 'patient');
       queryBuilder.select([
         'appointment.id',
         'appointment.startTime',
         'appointment.endTime',
         'appointment.zoomLink',
-        'appointment.localDoctorId',
-        'appointment.remoteDoctorId',
-        'appointment.patientId',
+        'localDoctor.id',
+        'remoteDoctor.id',
+        'patient.id',
       ]);
-      const appointments = await queryBuilder.getMany();
-      return appointments;
+
+      return await queryBuilder.getMany();
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -72,22 +79,57 @@ export default class AppointmentService {
   // TODO: can be used for getting appointments for today, week and month
   async getAppointmentsByPatientId(id: number): Promise<Appointment[]> {
     try {
-      const queryBuilder =
+      const patient = await this.patientService.getPatientById(id);
+
+      const queryBuilder: SelectQueryBuilder<Appointment> =
         this.appointmentRepository.createQueryBuilder('appointment');
       queryBuilder.where('appointment.patientId = :patientId', {
-        patientId: id,
+        patientId: patient.id,
       });
+      queryBuilder.leftJoinAndSelect('appointment.localDoctor', 'localDoctor');
+      queryBuilder.leftJoinAndSelect(
+        'appointment.remoteDoctor',
+        'remoteDoctor',
+      );
+      queryBuilder.leftJoinAndSelect('appointment.patient', 'patient');
       queryBuilder.select([
         'appointment.id',
         'appointment.startTime',
         'appointment.endTime',
         'appointment.zoomLink',
-        'appointment.localDoctorId',
-        'appointment.remoteDoctorId',
-        'appointment.patientId',
+        'localDoctor.id',
+        'remoteDoctor.id',
+        'patient.id',
       ]);
-      const appointments = await queryBuilder.getMany();
-      return appointments;
+
+      return await queryBuilder.getMany();
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async getPatientsByDoctorIdAppointments(id: number): Promise<Patient[]> {
+    try {
+      const doctor = await this.doctorService.getDoctorByID(id);
+
+      const appointments = await this.appointmentRepository
+        .createQueryBuilder('appointment')
+        .leftJoinAndSelect('appointment.patient', 'patient')
+        .where(
+          'appointment.localDoctorId = :id OR appointment.remoteDoctorId = :id',
+          { id: doctor.id },
+        )
+        .getMany();
+
+      const patients: Patient[] = appointments.reduce((uniquePatients: Patient[], appointment) => {
+        const existingPatient = uniquePatients.find(patient => patient.id === appointment.patient.id);
+        if (!existingPatient) {
+          uniquePatients.push(appointment.patient);
+        }
+        return uniquePatients;
+      }, []);
+        
+      return patients;        
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }

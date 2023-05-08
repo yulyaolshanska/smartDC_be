@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import JwtPatchGuard from 'modules/auth/utils/PatchGuard';
+import Patient from 'modules/patient/entity/patient.entity';
 import CreateAppointmentDto from './dto/create-appointment.dto';
 import AppointmentService from './appointment.service';
 import Appointment from './entity/appointment.entity';
@@ -36,5 +37,14 @@ export default class AppointmentController {
     @Param('id') id: number,
   ): Promise<Appointment[]> {
     return this.appointmentService.getAppointmentsByPatientId(id);
+  }
+
+  @ApiOperation({ summary: "Find doctor patient's who have appointments" })
+  @ApiResponse({ status: 200, type: [Appointment] })
+  @Get('/doctor/:id/patients')
+  async getAppointmentsWithPatients(
+    @Param('id') id: number
+  ): Promise<Patient[]> {
+    return this.appointmentService.getPatientsByDoctorIdAppointments(id);
   }
 }
