@@ -35,7 +35,9 @@ export default class AppointmentService {
         ...rest,
       });
 
-      const savedAppointment = await this.appointmentRepository.save(newAppointment);
+      const savedAppointment = await this.appointmentRepository.save(
+        newAppointment,
+      );
 
       return { ...savedAppointment, id: savedAppointment.id };
     } catch (err) {
@@ -121,15 +123,20 @@ export default class AppointmentService {
         )
         .getMany();
 
-      const patients: Patient[] = appointments.reduce((uniquePatients: Patient[], appointment) => {
-        const existingPatient = uniquePatients.find(patient => patient.id === appointment.patient.id);
-        if (!existingPatient) {
-          uniquePatients.push(appointment.patient);
-        }
-        return uniquePatients;
-      }, []);
-        
-      return patients;        
+      const patients: Patient[] = appointments.reduce(
+        (uniquePatients: Patient[], appointment) => {
+          const existingPatient = uniquePatients.find(
+            (patient) => patient.id === appointment.patient.id,
+          );
+          if (!existingPatient) {
+            uniquePatients.push(appointment.patient);
+          }
+          return uniquePatients;
+        },
+        [],
+      );
+
+      return patients;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }

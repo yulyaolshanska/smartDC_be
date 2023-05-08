@@ -43,7 +43,7 @@ export default class AppointmentController {
   @ApiResponse({ status: 200, type: [Appointment] })
   @Get('/doctor/:id/patients')
   async getAppointmentsWithPatients(
-    @Param('id') id: number
+    @Param('id') id: number,
   ): Promise<Patient[]> {
     return this.appointmentService.getPatientsByDoctorIdAppointments(id);
   }

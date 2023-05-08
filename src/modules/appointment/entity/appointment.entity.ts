@@ -1,6 +1,12 @@
 import Doctor from 'modules/doctor/entity/doctor.entity';
 import Patient from 'modules/patient/entity/patient.entity';
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export default class Appointment {
