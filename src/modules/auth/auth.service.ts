@@ -70,12 +70,16 @@ export default class AuthService {
         ...doctorDto,
         password: hash,
       },
-      `${this.configService.get('API_URL')}/auth/activation/${activationLink}`,
+      `${this.configService.get(
+        'CLIENT_URL',
+      )}/auth/activation/${activationLink}`,
     );
 
     await this.mailService.sendActivationMail(
       doctorDto.email,
-      `${this.configService.get('API_URL')}/auth/activation/${activationLink}`,
+      `${this.configService.get(
+        'CLIENT_URL',
+      )}/auth/activation/${activationLink}`,
     );
     return this.generateToken(newDoctor);
   }
@@ -106,7 +110,7 @@ export default class AuthService {
 
   async activation(link: string): Promise<void> {
     const activationLink = `${this.configService.get(
-      'API_URL',
+      'CLIENT_URL',
     )}/auth/activation/${link}`;
     try {
       const doctor = await this.doctorRepository
@@ -337,17 +341,7 @@ export default class AuthService {
     )}/reset-pass/${encodedToken}`;
 
     try {
-      await this.transporter.sendMail({
-        from: this.configService.get('SMTP_USER'),
-        to: doctor.email,
-        subject: `Account activation${this.configService.get('API_URL')}`,
-        html: `
-                <div>
-                <h1>Hello ${doctor.firstName}</h1>
-                <p>Please use this <a href="${forgotLink}">link</a> to reset your password.</p>
-                </div>
-          `,
-      });
+      await this.mailService.sendChangePasswordMail(doctor.email, forgotLink);
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -372,10 +366,9 @@ export default class AuthService {
     }
   }
 
-  async resetPassword(payload: ResetPasswordDto): Promise<string> {
+  async resetPassword(payload: ResetPasswordDto): Promise<void> {
     try {
       const { password, token } = payload;
-      const result = 'password updated';
 
       const decodedToken = base64url.decode(token);
 
@@ -390,7 +383,6 @@ export default class AuthService {
 
       doctor.password = newPassword;
       await this.updatePasswordByEmail(doctor.email, doctor.password);
-      return result;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }

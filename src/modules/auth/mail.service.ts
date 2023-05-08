@@ -42,4 +42,25 @@ export default class MailService {
       );
     }
   }
+
+  async sendChangePasswordMail(to: string, link: string): Promise<void> {
+    try {
+      await this.transporter.sendMail({
+        from: this.configService.get('SMTP_USER'),
+        to,
+        subject: `Reset password${this.configService.get('API_URL')}`,
+        html: `
+                <div>
+                <h1>"For reset password press the link"</h1>
+                <a href="${link}">${link}</a>
+                </div>
+          `,
+      });
+    } catch (error) {
+      throw new HttpException(
+        'Can not send email',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }
