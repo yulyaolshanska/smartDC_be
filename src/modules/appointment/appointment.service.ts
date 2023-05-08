@@ -21,29 +21,29 @@ export default class AppointmentService {
   ): Promise<Appointment> {
     try {
       const { localDoctorId, remoteDoctorId, patientId, ...rest } = appointment;
-
-      const [patient, localDoctor, remoteDoctor] = await Promise.all([
+  
+      await Promise.all([
         this.patientService.getPatientById(patientId),
         this.doctorService.getDoctorByID(localDoctorId),
         this.doctorService.getDoctorByID(remoteDoctorId),
       ]);
-
+  
       const newAppointment = this.appointmentRepository.create({
-        localDoctor,
-        remoteDoctor,
-        patient,
+        localDoctor: { id: localDoctorId },
+        remoteDoctor: { id: remoteDoctorId },
+        patient: { id: patientId },
         ...rest,
       });
-
+  
       const savedAppointment = await this.appointmentRepository.save(
         newAppointment,
       );
-
+  
       return { ...savedAppointment, id: savedAppointment.id };
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-  }
+  }  
 
   // TODO: can be used for getting appointments for today, week and month
   async getAppointmentsByDoctorId(id: number): Promise<Appointment[]> {
