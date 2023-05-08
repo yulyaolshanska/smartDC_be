@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import JwtPatchGuard from 'modules/auth/utils/PatchGuard';
 import Patient from 'modules/patient/entity/patient.entity';
@@ -44,7 +44,8 @@ export default class AppointmentController {
   @Get('/doctor/:id/patients')
   async getAppointmentsWithPatients(
     @Param('id') id: number,
+    @Query('limit') limit?: number,
   ): Promise<Patient[]> {
-    return this.appointmentService.getPatientsByDoctorIdAppointments(id);
+    return this.appointmentService.getPatientsByDoctorIdAppointments(id, limit);
   }
 }

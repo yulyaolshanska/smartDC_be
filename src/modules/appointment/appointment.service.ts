@@ -110,7 +110,7 @@ export default class AppointmentService {
     }
   }
 
-  async getPatientsByDoctorIdAppointments(id: number): Promise<Patient[]> {
+  async getPatientsByDoctorIdAppointments(id: number, limit: number): Promise<Patient[]> {
     try {
       const doctor = await this.doctorService.getDoctorByID(id);
 
@@ -121,6 +121,7 @@ export default class AppointmentService {
           'appointment.localDoctorId = :id OR appointment.remoteDoctorId = :id',
           { id: doctor.id },
         )
+        .take(limit)
         .getMany();
 
       const patients: Patient[] = appointments.reduce(
