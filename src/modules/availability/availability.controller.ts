@@ -48,11 +48,13 @@ export default class AvailabilityController {
     @Query('start') start: string,
     @Query('end') end: string,
     @Query('specialization') specialization?: string,
+    @Query('limit') limit?: number,
   ): Promise<Availability[]> {
     return this.availabilityService.findDoctorsByAvailabilityAndSpeciality(
       start,
       end,
       specialization,
+      limit,
     );
   }
 

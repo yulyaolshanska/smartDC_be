@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import Appointment from 'modules/appointment/entity/appointment.entity';
 import Patient from './entity/patient.entity';
 import CreatePatientDto from './dto/create-patient.dto';
 
@@ -58,30 +57,6 @@ export default class PatientService {
       return await this.patientRepository.findOneOrFail({
         where: { id: patientId },
       });
-    } catch (err) {
-      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  async getPatientsByDoctorIdAppointments(id: number): Promise<Patient[]> {
-    try {
-      const patients = await this.patientRepository
-        .createQueryBuilder('patient')
-        .innerJoin(
-          (subQuery) =>
-            subQuery
-              .select('appointment.patientId')
-              .from(Appointment, 'appointment')
-              .where(
-                'appointment.localDoctorId = :id OR appointment.remoteDoctorId = :id',
-                { id },
-              ),
-          'appts',
-          'appts.patientId = patient.id',
-        )
-        .getMany();
-
-      return patients;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
