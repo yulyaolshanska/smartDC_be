@@ -108,7 +108,7 @@ export default class AppointmentService {
         'appointment.zoomLink',
         'localDoctor.id',
         'remoteDoctor.id',
-        'patient.id',
+        'patient',
       ]);
 
       return await queryBuilder.getMany();
