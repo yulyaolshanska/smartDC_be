@@ -4,7 +4,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import DoctorService from 'modules/doctor/doctor.service';
 import PatientService from 'modules/patient/patient.service';
 import Patient from 'modules/patient/entity/patient.entity';
-import { MILLIS_PER_DAY, THIRTY, ZERO } from '@shared/consts';
+import { MILLIS_PER_DAY, TEN, THIRTY, ZERO } from '@shared/consts';
 import Appointment from './entity/appointment.entity';
 import CreateAppointmentDto from './dto/create-appointment.dto';
 
@@ -80,7 +80,8 @@ export default class AppointmentService {
 
   async getAppointmentsByDoctorIdToday(
     id: number,
-    limit: number,
+    limit = TEN,
+    all = false,
   ): Promise<Appointment[]> {
     try {
       const doctor = await this.doctorService.getDoctorByID(id);
@@ -113,7 +114,7 @@ export default class AppointmentService {
         'patient',
       ]);
 
-      if (limit) {
+      if (!all) {
         queryBuilder.limit(limit);
       }
 
