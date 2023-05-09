@@ -4,7 +4,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import DoctorService from 'modules/doctor/doctor.service';
 import PatientService from 'modules/patient/patient.service';
 import Patient from 'modules/patient/entity/patient.entity';
-import { THIRTY } from '@shared/consts';
+import { MILLIS_PER_DAY, THIRTY, ZERO } from '@shared/consts';
 import Appointment from './entity/appointment.entity';
 import CreateAppointmentDto from './dto/create-appointment.dto';
 
@@ -56,6 +56,44 @@ export default class AppointmentService {
       queryBuilder.where(
         'appointment.localDoctorId = :doctorId OR appointment.remoteDoctorId = :doctorId',
         { doctorId: doctor.id },
+      );
+      queryBuilder.leftJoinAndSelect('appointment.localDoctor', 'localDoctor');
+      queryBuilder.leftJoinAndSelect(
+        'appointment.remoteDoctor',
+        'remoteDoctor',
+      );
+      queryBuilder.leftJoinAndSelect('appointment.patient', 'patient');
+      queryBuilder.select([
+        'appointment.id',
+        'appointment.startTime',
+        'appointment.endTime',
+        'appointment.zoomLink',
+        'localDoctor.id',
+        'remoteDoctor.id',
+        'patient.id',
+      ]);
+
+      return await queryBuilder.getMany();
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async getAppointmentsByDoctorIdToday(id: number): Promise<Appointment[]> {
+    try {
+      const doctor = await this.doctorService.getDoctorByID(id);
+      const today = new Date();
+      today.setHours(ZERO, ZERO, ZERO, ZERO);
+
+      const queryBuilder: SelectQueryBuilder<Appointment> =
+        this.appointmentRepository.createQueryBuilder('appointment');
+      queryBuilder.where(
+        '(appointment.localDoctorId = :doctorId OR appointment.remoteDoctorId = :doctorId) AND appointment.startTime >= :today AND appointment.startTime < :tomorrow',
+        {
+          doctorId: doctor.id,
+          today,
+          tomorrow: new Date(today.getTime() + MILLIS_PER_DAY),
+        },
       );
       queryBuilder.leftJoinAndSelect('appointment.localDoctor', 'localDoctor');
       queryBuilder.leftJoinAndSelect(

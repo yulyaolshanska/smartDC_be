@@ -38,6 +38,15 @@ export default class AppointmentController {
     return this.appointmentService.getAppointmentsByDoctorId(id);
   }
 
+  @ApiOperation({ summary: "Find doctor's today appointments" })
+  @ApiResponse({ status: 200, type: [Appointment] })
+  @Get('/doctor/:id/today')
+  async getAppointmentsByDoctorIdToday(
+    @Param('id') id: number,
+  ): Promise<Appointment[]> {
+    return this.appointmentService.getAppointmentsByDoctorIdToday(id);
+  }
+
   @ApiOperation({ summary: "Find patient's appointments" })
   @ApiResponse({ status: 200, type: [Appointment] })
   @Get('/patient/:id')
