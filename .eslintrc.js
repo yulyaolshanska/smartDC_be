@@ -20,6 +20,7 @@ module.exports = {
   },
   ignorePatterns: ['.eslintrc.js'],
   rules: {
+    'import/prefer-default-export': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
     'class-methods-use-this': 'off',
     'import/no-cycle': 'off',
