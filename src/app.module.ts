@@ -12,7 +12,11 @@ import AvailabilityModule from 'modules/availability/availability.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import * as path from 'path';
+import Note from 'modules/notes/entity/note.entity';
+import NotesModule from 'modules/notes/notes.module';
+import File from 'modules/notes/entity/file.entity';
 import DoctorModule from './modules/doctor/doctor.module';
+import AuthModule from './modules/auth/auth.module';
 import AuthModule from './modules/auth/auth.module';
 
 @Module({
@@ -31,7 +35,7 @@ import AuthModule from './modules/auth/auth.module';
         username: configService.get('DB_USER'),
         password: configService.get('DB_PASS'),
         database: configService.get('DB_NAME'),
-        entities: [Doctor, Patient, Appointment, Availability],
+        entities: [Doctor, Patient, Appointment, Availability, Note, File],
         synchronize: true,
       }),
       inject: [ConfigService],
@@ -39,6 +43,7 @@ import AuthModule from './modules/auth/auth.module';
     DoctorModule,
     AuthModule,
     PatientModule,
+    NotesModule,
     AppointmentModule,
     AvailabilityModule,
   ],
