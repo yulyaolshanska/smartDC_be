@@ -4,7 +4,12 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import DoctorService from 'modules/doctor/doctor.service';
 import PatientService from 'modules/patient/patient.service';
 import Patient from 'modules/patient/entity/patient.entity';
-import { THIRTY } from '@shared/consts';
+import {
+  FIRST_DAY_OF_MONTH,
+  LAST_DAY_OF_MONTH,
+  ONE,
+  THIRTY,
+} from '@shared/consts';
 import Appointment from './entity/appointment.entity';
 import CreateAppointmentDto from './dto/create-appointment.dto';
 
@@ -56,6 +61,48 @@ export default class AppointmentService {
       queryBuilder.where(
         'appointment.localDoctorId = :doctorId OR appointment.remoteDoctorId = :doctorId',
         { doctorId: doctor.id },
+      );
+      queryBuilder.leftJoinAndSelect('appointment.localDoctor', 'localDoctor');
+      queryBuilder.leftJoinAndSelect(
+        'appointment.remoteDoctor',
+        'remoteDoctor',
+      );
+      queryBuilder.leftJoinAndSelect('appointment.patient', 'patient');
+      queryBuilder.select([
+        'appointment.id',
+        'appointment.startTime',
+        'appointment.endTime',
+        'appointment.zoomLink',
+        'localDoctor.id',
+        'remoteDoctor.id',
+        'patient.id',
+      ]);
+
+      return await queryBuilder.getMany();
+    } catch (err) {
+      throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async getAppointmentsByDoctorIdAndMonth(
+    id: number,
+    year: number,
+    month: number,
+  ): Promise<Appointment[]> {
+    try {
+      const doctor = await this.doctorService.getDoctorByID(id);
+
+      const startDate = new Date(year, month - ONE, FIRST_DAY_OF_MONTH);
+      const endDate = new Date(year, month, LAST_DAY_OF_MONTH);
+      const queryBuilder: SelectQueryBuilder<Appointment> =
+        this.appointmentRepository.createQueryBuilder('appointment');
+      queryBuilder.where(
+        '(appointment.localDoctorId = :doctorId OR appointment.remoteDoctorId = :doctorId) AND appointment.startTime >= :startDate AND appointment.startTime <= :endDate',
+        {
+          doctorId: doctor.id,
+          startDate,
+          endDate,
+        },
       );
       queryBuilder.leftJoinAndSelect('appointment.localDoctor', 'localDoctor');
       queryBuilder.leftJoinAndSelect(
