@@ -18,3 +18,11 @@ export const GOOGLE_URL =
   'https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token';
 
 export const GOOGLE_TOCKEN_PATH = 'https://oauth2.googleapis.com/token';
+
+export const NOTE_MIN_LENGTH = 10;
+
+export const DATE = 'Date';
+
+export const DOCTOR = 'Doctor';
+
+export const DESC = 'desc';

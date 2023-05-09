@@ -1,11 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import Note from 'modules/notes/entity/note.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { IsString } from 'class-validator';
 
 @Entity()
 export default class Patient {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @OneToMany(() => Note, (note) => note.doctor)
+  notes: Note[];
 
   @ApiProperty({ example: 'John' })
   @Column({
