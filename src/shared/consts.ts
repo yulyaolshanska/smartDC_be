@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 export const NO_ROWS_AFFECTED = 0;
 export const SUCCESS_STATUS_CODE = 200;
 export const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z]).{10,}$/;
@@ -6,7 +5,7 @@ export const HASH_NUMBER = 5;
 export const NAME_MIN_LENGTH = 3;
 export const SLICE_START = 0;
 
-export const MILLIS_PER_DAY = 24 * 60 * 60 * 1000;
+export const MILLIS_PER_DAY = 86400000;
 export const ZERO = 0;
 
 export const CITY_REGEX = /^[A-Za-z]+(?:[ '-][A-Za-z]+)*$/;
