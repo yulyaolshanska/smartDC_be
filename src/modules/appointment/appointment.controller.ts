@@ -40,11 +40,12 @@ export default class AppointmentController {
 
   @ApiOperation({ summary: "Find doctor's today appointments" })
   @ApiResponse({ status: 200, type: [Appointment] })
-  @Get('/doctor/:id/today')
+  @Get('/doctor/:id/today/:limit')
   async getAppointmentsByDoctorIdToday(
     @Param('id') id: number,
+    @Param('limit') limit: number,
   ): Promise<Appointment[]> {
-    return this.appointmentService.getAppointmentsByDoctorIdToday(id);
+    return this.appointmentService.getAppointmentsByDoctorIdToday(id, limit);
   }
 
   @ApiOperation({ summary: "Find patient's appointments" })

@@ -46,7 +46,6 @@ export default class AppointmentService {
     }
   }
 
-  // TODO: can be used for getting appointments for today, week and month
   async getAppointmentsByDoctorId(id: number): Promise<Appointment[]> {
     try {
       const doctor = await this.doctorService.getDoctorByID(id);
@@ -79,7 +78,10 @@ export default class AppointmentService {
     }
   }
 
-  async getAppointmentsByDoctorIdToday(id: number): Promise<Appointment[]> {
+  async getAppointmentsByDoctorIdToday(
+    id: number,
+    limit: number,
+  ): Promise<Appointment[]> {
     try {
       const doctor = await this.doctorService.getDoctorByID(id);
       const today = new Date();
@@ -111,13 +113,16 @@ export default class AppointmentService {
         'patient',
       ]);
 
+      if (limit) {
+        queryBuilder.limit(limit);
+      }
+
       return await queryBuilder.getMany();
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  // TODO: can be used for getting appointments for today, week and month
   async getAppointmentsByPatientId(id: number): Promise<Appointment[]> {
     try {
       const patient = await this.patientService.getPatientById(id);
