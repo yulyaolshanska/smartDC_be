@@ -17,7 +17,6 @@ import NotesModule from 'modules/notes/notes.module';
 import File from 'modules/notes/entity/file.entity';
 import DoctorModule from './modules/doctor/doctor.module';
 import AuthModule from './modules/auth/auth.module';
-import AuthModule from './modules/auth/auth.module';
 
 @Module({
   imports: [

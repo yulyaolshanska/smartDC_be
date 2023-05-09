@@ -5,11 +5,19 @@ export const HASH_NUMBER = 5;
 export const NAME_MIN_LENGTH = 3;
 export const SLICE_START = 0;
 
+export const DAYS_PER_WEEK = 7;
+export const HOURS_PER_DAY = 24;
+export const MINUTES_PER_HOUR = 60;
+export const SECONDS_PER_MINUTE = 60;
+export const MILLIS_PER_SECOND = 1000;
+
 export const CITY_REGEX = /^[A-Za-z]+(?:[ '-][A-Za-z]+)*$/;
 export const ADDRESS_REGEX = /^[A-Za-z0-9\s,'-.]+$/;
 export const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 export const TIME_ZONE_REGEX = /\(\w{3}[+-]\d{1,2}\)\s\w+\/\w+/;
 
+export const ZERO = 0;
+export const ONE = 1;
 export const SEVEN = 7;
 export const THIRTY = 30;
 
