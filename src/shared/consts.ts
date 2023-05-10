@@ -8,6 +8,11 @@ export const SLICE_START = 0;
 export const FIRST_DAY_OF_MONTH = 1;
 export const LAST_DAY_OF_MONTH = 0;
 export const MILLIS_PER_DAY = 86400000;
+export const DAYS_PER_WEEK = 7;
+export const HOURS_PER_DAY = 24;
+export const MINUTES_PER_HOUR = 60;
+export const SECONDS_PER_MINUTE = 60;
+export const MILLIS_PER_SECOND = 1000;
 
 export const CITY_REGEX = /^[A-Za-z]+(?:[ '-][A-Za-z]+)*$/;
 export const ADDRESS_REGEX = /^[A-Za-z0-9\s,'-.]+$/;

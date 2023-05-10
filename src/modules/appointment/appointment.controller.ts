@@ -78,6 +78,20 @@ export default class AppointmentController {
     return this.appointmentService.getAppointmentsByPatientId(id);
   }
 
+  @ApiOperation({ summary: "Find patient's appointments for week" })
+  @Get('/patient/:id/week/:year/:week')
+  async getAppointmentsByPatientIdAndWeek(
+    @Param('id') id: number,
+    @Param('year') year: number,
+    @Param('week') week: number,
+  ): Promise<Appointment[]> {
+    return this.appointmentService.getAppointmentsByPatientIdAndWeek(
+      id,
+      year,
+      week,
+    );
+  }
+
   @ApiOperation({ summary: "Find doctor patient's who have appointments" })
   @ApiResponse({ status: 200, type: [Appointment] })
   @Get('/doctor/:id/patients')
