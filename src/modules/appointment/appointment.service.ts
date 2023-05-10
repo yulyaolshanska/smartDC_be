@@ -328,6 +328,11 @@ export default class AppointmentService {
       const appointments = await this.appointmentRepository
         .createQueryBuilder('appointment')
         .leftJoinAndSelect('appointment.patient', 'patient')
+        .leftJoinAndSelect(
+          'patient.notes',
+          'notes',
+          'notes.createdAt = (SELECT MAX(n.createdAt) FROM note n WHERE n.patientId = patient.id)',
+        )
         .where(
           'appointment.localDoctorId = :id OR appointment.remoteDoctorId = :id',
           { id: doctor.id },
