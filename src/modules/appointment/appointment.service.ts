@@ -74,7 +74,11 @@ export default class AppointmentService {
         'remoteDoctor',
       );
       queryBuilder.leftJoinAndSelect('appointment.patient', 'patient');
-      queryBuilder.leftJoinAndSelect('patient.notes', 'notes');
+      queryBuilder.leftJoinAndSelect(
+        'patient.notes',
+        'notes',
+        'notes.createdAt = (SELECT MAX(n.createdAt) FROM note n WHERE n.patientId = patient.id)',
+      );
       queryBuilder.select([
         'appointment',
         'localDoctor.id',
@@ -88,18 +92,6 @@ export default class AppointmentService {
       ]);
 
       const appointments: Appointment[] = await queryBuilder.getMany();
-
-      for (let i = ZERO; i < appointments.length; i += ONE) {
-        const { patient, ...appointment } = appointments[i];
-        const lastNote = patient.notes.shift();
-        appointments[i] = {
-          ...appointment,
-          patient: {
-            ...patient,
-            notes: lastNote ? [lastNote] : [],
-          },
-        };
-      }
 
       return appointments;
     } catch (err) {
@@ -133,7 +125,11 @@ export default class AppointmentService {
         'remoteDoctor',
       );
       queryBuilder.leftJoinAndSelect('appointment.patient', 'patient');
-      queryBuilder.leftJoinAndSelect('patient.notes', 'notes');
+      queryBuilder.leftJoinAndSelect(
+        'patient.notes',
+        'notes',
+        'notes.createdAt = (SELECT MAX(n.createdAt) FROM note n WHERE n.patientId = patient.id)',
+      );
       queryBuilder.select([
         'appointment',
         'localDoctor.id',
@@ -151,18 +147,6 @@ export default class AppointmentService {
       }
 
       const appointments: Appointment[] = await queryBuilder.getMany();
-
-      for (let i = ZERO; i < appointments.length; i += ONE) {
-        const { patient, ...appointment } = appointments[i];
-        const lastNote = patient.notes.shift();
-        appointments[i] = {
-          ...appointment,
-          patient: {
-            ...patient,
-            notes: lastNote ? [lastNote] : [],
-          },
-        };
-      }
 
       return appointments;
     } catch (err) {
@@ -196,7 +180,11 @@ export default class AppointmentService {
         'remoteDoctor',
       );
       queryBuilder.leftJoinAndSelect('appointment.patient', 'patient');
-      queryBuilder.leftJoinAndSelect('patient.notes', 'notes');
+      queryBuilder.leftJoinAndSelect(
+        'patient.notes',
+        'notes',
+        'notes.createdAt = (SELECT MAX(n.createdAt) FROM note n WHERE n.patientId = patient.id)',
+      );
       queryBuilder.select([
         'appointment',
         'localDoctor.id',
@@ -210,18 +198,6 @@ export default class AppointmentService {
       ]);
 
       const appointments: Appointment[] = await queryBuilder.getMany();
-
-      for (let i = ZERO; i < appointments.length; i += ONE) {
-        const { patient, ...appointment } = appointments[i];
-        const lastNote = patient.notes.shift();
-        appointments[i] = {
-          ...appointment,
-          patient: {
-            ...patient,
-            notes: lastNote ? [lastNote] : [],
-          },
-        };
-      }
 
       return appointments;
     } catch (err) {

@@ -15,6 +15,11 @@ export default class PatientService {
     try {
       return await this.patientRepository
         .createQueryBuilder('patient')
+        .leftJoinAndSelect(
+          'patient.notes',
+          'notes',
+          'notes.createdAt = (SELECT MAX(n.createdAt) FROM note n WHERE n.patientId = patient.id)',
+        )
         .getMany();
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
