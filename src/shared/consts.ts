@@ -5,6 +5,9 @@ export const HASH_NUMBER = 5;
 export const NAME_MIN_LENGTH = 3;
 export const SLICE_START = 0;
 
+export const FIRST_DAY_OF_MONTH = 1;
+export const LAST_DAY_OF_MONTH = 0;
+export const MILLIS_PER_DAY = 86400000;
 export const DAYS_PER_WEEK = 7;
 export const HOURS_PER_DAY = 24;
 export const MINUTES_PER_HOUR = 60;
@@ -16,10 +19,11 @@ export const ADDRESS_REGEX = /^[A-Za-z0-9\s,'-.]+$/;
 export const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 export const TIME_ZONE_REGEX = /\(\w{3}[+-]\d{1,2}\)\s\w+\/\w+/;
 
-export const ZERO = 0;
-export const ONE = 1;
 export const SEVEN = 7;
+export const ONE = 1;
+export const TEN = 10;
 export const THIRTY = 30;
+export const ZERO = 0;
 
 export const BACKWARD = -1;
 export const FORWARD = 1;
