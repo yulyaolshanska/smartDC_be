@@ -59,9 +59,17 @@ export default class PatientService {
 
   async getPatientById(patientId: number): Promise<Patient> {
     try {
-      return await this.patientRepository.findOneOrFail({
-        where: { id: patientId },
-      });
+      const queryResult = await this.patientRepository
+        .createQueryBuilder('patient')
+        .leftJoinAndSelect(
+          'patient.notes',
+          'note',
+          'note.createdAt = (SELECT MAX(n.createdAt) FROM note n WHERE n.patientId = patient.id)',
+        )
+        .where('patient.id = :patientId', { patientId })
+        .getOneOrFail();
+
+      return queryResult;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
