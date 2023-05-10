@@ -10,6 +10,7 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import JwtPatchGuard from 'modules/auth/utils/PatchGuard';
 import Patient from 'modules/patient/entity/patient.entity';
+import { TEN } from '@shared/consts';
 import CreateAppointmentDto from './dto/create-appointment.dto';
 import AppointmentService from './appointment.service';
 import Appointment from './entity/appointment.entity';
@@ -36,6 +37,21 @@ export default class AppointmentController {
     @Param('id') id: number,
   ): Promise<Appointment[]> {
     return this.appointmentService.getAppointmentsByDoctorId(id);
+  }
+
+  @ApiOperation({ summary: "Find doctor's today appointments" })
+  @ApiResponse({ status: 200, type: [Appointment] })
+  @Get('/doctor/:id/today/:all?')
+  async getAppointmentsByDoctorIdToday(
+    @Param('id') id: number,
+    @Query('limit') limit = TEN,
+    @Param('all') all = false,
+  ): Promise<Appointment[]> {
+    return this.appointmentService.getAppointmentsByDoctorIdToday(
+      id,
+      limit,
+      all,
+    );
   }
 
   @ApiOperation({ summary: "Find patient's appointments" })
