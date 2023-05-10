@@ -87,18 +87,19 @@ export default class AppointmentService {
         'notes',
       ]);
 
-      let appointments: Appointment[] = await queryBuilder.getMany();
+      const appointments: Appointment[] = await queryBuilder.getMany();
 
-      appointments = appointments.map(({ patient, ...appointment }) => {
+      for (let i = ZERO; i < appointments.length; i += ONE) {
+        const { patient, ...appointment } = appointments[i];
         const lastNote = patient.notes.shift();
-        return {
+        appointments[i] = {
           ...appointment,
           patient: {
             ...patient,
             notes: lastNote ? [lastNote] : [],
           },
         };
-      });
+      }
 
       return appointments;
     } catch (err) {
@@ -149,18 +150,19 @@ export default class AppointmentService {
         queryBuilder.limit(limit);
       }
 
-      let appointments: Appointment[] = await queryBuilder.getMany();
+      const appointments: Appointment[] = await queryBuilder.getMany();
 
-      appointments = appointments.map(({ patient, ...appointment }) => {
+      for (let i = ZERO; i < appointments.length; i += ONE) {
+        const { patient, ...appointment } = appointments[i];
         const lastNote = patient.notes.shift();
-        return {
+        appointments[i] = {
           ...appointment,
           patient: {
             ...patient,
             notes: lastNote ? [lastNote] : [],
           },
         };
-      });
+      }
 
       return appointments;
     } catch (err) {
@@ -207,18 +209,19 @@ export default class AppointmentService {
         'notes',
       ]);
 
-      let appointments: Appointment[] = await queryBuilder.getMany();
+      const appointments: Appointment[] = await queryBuilder.getMany();
 
-      appointments = appointments.map(({ patient, ...appointment }) => {
+      for (let i = ZERO; i < appointments.length; i += ONE) {
+        const { patient, ...appointment } = appointments[i];
         const lastNote = patient.notes.shift();
-        return {
+        appointments[i] = {
           ...appointment,
           patient: {
             ...patient,
             notes: lastNote ? [lastNote] : [],
           },
         };
-      });
+      }
 
       return appointments;
     } catch (err) {
