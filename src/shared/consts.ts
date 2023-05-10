@@ -7,6 +7,7 @@ export const SLICE_START = 0;
 
 export const FIRST_DAY_OF_MONTH = 1;
 export const LAST_DAY_OF_MONTH = 0;
+export const MILLIS_PER_DAY = 86400000;
 
 export const CITY_REGEX = /^[A-Za-z]+(?:[ '-][A-Za-z]+)*$/;
 export const ADDRESS_REGEX = /^[A-Za-z0-9\s,'-.]+$/;
@@ -15,7 +16,9 @@ export const TIME_ZONE_REGEX = /\(\w{3}[+-]\d{1,2}\)\s\w+\/\w+/;
 
 export const SEVEN = 7;
 export const ONE = 1;
+export const TEN = 10;
 export const THIRTY = 30;
+export const ZERO = 0;
 
 export const BACKWARD = -1;
 export const FORWARD = 1;
