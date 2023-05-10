@@ -4,7 +4,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import DoctorService from 'modules/doctor/doctor.service';
 import PatientService from 'modules/patient/patient.service';
 import Patient from 'modules/patient/entity/patient.entity';
-import { 
+import {
   MILLIS_PER_DAY,
   FIRST_DAY_OF_MONTH,
   LAST_DAY_OF_MONTH,
@@ -15,7 +15,7 @@ import {
   ONE,
   TEN,
   THIRTY,
-  ZERO
+  ZERO,
 } from '@shared/consts';
 import Appointment from './entity/appointment.entity';
 import CreateAppointmentDto from './dto/create-appointment.dto';
@@ -116,21 +116,37 @@ export default class AppointmentService {
         'remoteDoctor',
       );
       queryBuilder.leftJoinAndSelect('appointment.patient', 'patient');
+      queryBuilder.leftJoinAndSelect('patient.notes', 'notes');
       queryBuilder.select([
-        'appointment.id',
-        'appointment.startTime',
-        'appointment.endTime',
-        'appointment.zoomLink',
+        'appointment',
         'localDoctor.id',
+        'localDoctor.firstName',
+        'localDoctor.lastName',
         'remoteDoctor.id',
+        'remoteDoctor.firstName',
+        'remoteDoctor.lastName',
         'patient',
+        'notes',
       ]);
 
       if (!all) {
         queryBuilder.limit(limit);
       }
 
-      return await queryBuilder.getMany();
+      let appointments: Appointment[] = await queryBuilder.getMany();
+
+      appointments = appointments.map(({ patient, ...appointment }) => {
+        const lastNote = patient.notes.shift();
+        return {
+          ...appointment,
+          patient: {
+            ...patient,
+            notes: lastNote ? [lastNote] : [],
+          },
+        };
+      });
+
+      return appointments;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
