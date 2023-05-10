@@ -103,7 +103,7 @@ export default class AppointmentService {
     id: number,
     limit = TEN,
     all = false,
-  ): Promise<Appointment[]> {
+  ): Promise<{ appointments: Appointment[]; count: number }> {
     try {
       const doctor = await this.doctorService.getDoctorByID(id);
       const today = new Date();
@@ -146,9 +146,9 @@ export default class AppointmentService {
         queryBuilder.limit(limit);
       }
 
-      const appointments: Appointment[] = await queryBuilder.getMany();
+      const [appointments, count] = await queryBuilder.getManyAndCount();
 
-      return appointments;
+      return { appointments, count };
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
