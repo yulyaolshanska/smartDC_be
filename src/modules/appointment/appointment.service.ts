@@ -74,17 +74,33 @@ export default class AppointmentService {
         'remoteDoctor',
       );
       queryBuilder.leftJoinAndSelect('appointment.patient', 'patient');
+      queryBuilder.leftJoinAndSelect('patient.notes', 'notes');
       queryBuilder.select([
-        'appointment.id',
-        'appointment.startTime',
-        'appointment.endTime',
-        'appointment.zoomLink',
+        'appointment',
         'localDoctor.id',
+        'localDoctor.firstName',
+        'localDoctor.lastName',
         'remoteDoctor.id',
-        'patient.id',
+        'remoteDoctor.firstName',
+        'remoteDoctor.lastName',
+        'patient',
+        'notes',
       ]);
 
-      return await queryBuilder.getMany();
+      let appointments: Appointment[] = await queryBuilder.getMany();
+
+      appointments = appointments.map(({ patient, ...appointment }) => {
+        const lastNote = patient.notes.shift();
+        return {
+          ...appointment,
+          patient: {
+            ...patient,
+            notes: lastNote ? [lastNote] : [],
+          },
+        };
+      });
+
+      return appointments;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -178,17 +194,33 @@ export default class AppointmentService {
         'remoteDoctor',
       );
       queryBuilder.leftJoinAndSelect('appointment.patient', 'patient');
+      queryBuilder.leftJoinAndSelect('patient.notes', 'notes');
       queryBuilder.select([
-        'appointment.id',
-        'appointment.startTime',
-        'appointment.endTime',
-        'appointment.zoomLink',
+        'appointment',
         'localDoctor.id',
+        'localDoctor.firstName',
+        'localDoctor.lastName',
         'remoteDoctor.id',
-        'patient.id',
+        'remoteDoctor.firstName',
+        'remoteDoctor.lastName',
+        'patient',
+        'notes',
       ]);
 
-      return await queryBuilder.getMany();
+      let appointments: Appointment[] = await queryBuilder.getMany();
+
+      appointments = appointments.map(({ patient, ...appointment }) => {
+        const lastNote = patient.notes.shift();
+        return {
+          ...appointment,
+          patient: {
+            ...patient,
+            notes: lastNote ? [lastNote] : [],
+          },
+        };
+      });
+
+      return appointments;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
