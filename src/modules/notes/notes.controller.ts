@@ -42,11 +42,12 @@ export default class NotesController {
 
   @ApiOperation({ summary: 'Getting All Notes' })
   @ApiResponse({ status: 200, type: [Note] })
-  @Get('/all')
+  @Get('/all/:patientId')
   getAllNotes(
     @Query() query: ExpressQuery,
+    @Param('patientId') patientId: number,
   ): Promise<{ notes: Note[]; count: number }> {
-    return this.notesService.findAll(query);
+    return this.notesService.findAll(query, patientId);
   }
 
   // create a note

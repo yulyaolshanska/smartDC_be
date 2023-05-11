@@ -4,7 +4,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import DoctorService from 'modules/doctor/doctor.service';
 import PatientService from 'modules/patient/patient.service';
 import Patient from 'modules/patient/entity/patient.entity';
-import { 
+import {
   MILLIS_PER_DAY,
   FIRST_DAY_OF_MONTH,
   LAST_DAY_OF_MONTH,
@@ -15,7 +15,7 @@ import {
   ONE,
   TEN,
   THIRTY,
-  ZERO
+  ZERO,
 } from '@shared/consts';
 import Appointment from './entity/appointment.entity';
 import CreateAppointmentDto from './dto/create-appointment.dto';
@@ -99,6 +99,9 @@ export default class AppointmentService {
       const doctor = await this.doctorService.getDoctorByID(id);
       const today = new Date();
       today.setHours(ZERO, ZERO, ZERO, ZERO);
+      console.log(id);
+      console.log(limit);
+      console.log(all);
 
       const queryBuilder: SelectQueryBuilder<Appointment> =
         this.appointmentRepository.createQueryBuilder('appointment');
