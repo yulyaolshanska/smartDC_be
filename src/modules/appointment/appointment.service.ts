@@ -99,9 +99,6 @@ export default class AppointmentService {
       const doctor = await this.doctorService.getDoctorByID(id);
       const today = new Date();
       today.setHours(ZERO, ZERO, ZERO, ZERO);
-      console.log(id);
-      console.log(limit);
-      console.log(all);
 
       const queryBuilder: SelectQueryBuilder<Appointment> =
         this.appointmentRepository.createQueryBuilder('appointment');

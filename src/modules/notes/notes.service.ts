@@ -100,7 +100,7 @@ export default class NotesService {
         .skip(Number(query.skipAmount))
         .take(Number(query.limit))
         .getManyAndCount();
-      console.log(notes);
+
       const countWithoutAnyParams = await this.notesRepository
         .createQueryBuilder('notes')
         .where('notes.patientId = :patientId', {
