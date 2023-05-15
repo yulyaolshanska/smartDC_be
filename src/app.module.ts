@@ -11,6 +11,7 @@ import Availability from 'modules/availability/entity/availability.entity';
 import AvailabilityModule from 'modules/availability/availability.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { ZoomModule } from 'modules/zoom/zoom.module';
 import * as path from 'path';
 import DoctorModule from './modules/doctor/doctor.module';
 import AuthModule from './modules/auth/auth.module';
@@ -41,6 +42,7 @@ import AuthModule from './modules/auth/auth.module';
     PatientModule,
     AppointmentModule,
     AvailabilityModule,
+    ZoomModule,
   ],
   providers: [
     {
