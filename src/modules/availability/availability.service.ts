@@ -91,6 +91,10 @@ export default class AvailabilityService {
           'doctor.id',
           'doctor.specialization',
           'doctor.role',
+          'doctor.firstName',
+          'doctor.lastName',
+          'doctor.country',
+          'doctor.city',
         ])
         .innerJoin('availability.doctor', 'doctor')
         .andWhere(

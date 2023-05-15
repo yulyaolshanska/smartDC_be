@@ -46,7 +46,7 @@ export default class AppointmentController {
     @Param('id') id: number,
     @Query('limit') limit = TEN,
     @Param('all') all = false,
-  ): Promise<Appointment[]> {
+  ): Promise<{ appointments: Appointment[]; count: number }> {
     return this.appointmentService.getAppointmentsByDoctorIdToday(
       id,
       limit,

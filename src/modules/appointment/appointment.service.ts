@@ -4,7 +4,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import DoctorService from 'modules/doctor/doctor.service';
 import PatientService from 'modules/patient/patient.service';
 import Patient from 'modules/patient/entity/patient.entity';
-import { 
+import {
   MILLIS_PER_DAY,
   FIRST_DAY_OF_MONTH,
   LAST_DAY_OF_MONTH,
@@ -15,7 +15,7 @@ import {
   ONE,
   TEN,
   THIRTY,
-  ZERO
+  ZERO,
 } from '@shared/consts';
 import Appointment from './entity/appointment.entity';
 import CreateAppointmentDto from './dto/create-appointment.dto';
@@ -74,17 +74,26 @@ export default class AppointmentService {
         'remoteDoctor',
       );
       queryBuilder.leftJoinAndSelect('appointment.patient', 'patient');
+      queryBuilder.leftJoinAndSelect(
+        'patient.notes',
+        'notes',
+        'notes.createdAt = (SELECT MAX(n.createdAt) FROM note n WHERE n.patientId = patient.id)',
+      );
       queryBuilder.select([
-        'appointment.id',
-        'appointment.startTime',
-        'appointment.endTime',
-        'appointment.zoomLink',
+        'appointment',
         'localDoctor.id',
+        'localDoctor.firstName',
+        'localDoctor.lastName',
         'remoteDoctor.id',
-        'patient.id',
+        'remoteDoctor.firstName',
+        'remoteDoctor.lastName',
+        'patient',
+        'notes',
       ]);
 
-      return await queryBuilder.getMany();
+      const appointments: Appointment[] = await queryBuilder.getMany();
+
+      return appointments;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -94,7 +103,7 @@ export default class AppointmentService {
     id: number,
     limit = TEN,
     all = false,
-  ): Promise<Appointment[]> {
+  ): Promise<{ appointments: Appointment[]; count: number }> {
     try {
       const doctor = await this.doctorService.getDoctorByID(id);
       const today = new Date();
@@ -116,21 +125,30 @@ export default class AppointmentService {
         'remoteDoctor',
       );
       queryBuilder.leftJoinAndSelect('appointment.patient', 'patient');
+      queryBuilder.leftJoinAndSelect(
+        'patient.notes',
+        'notes',
+        'notes.createdAt = (SELECT MAX(n.createdAt) FROM note n WHERE n.patientId = patient.id)',
+      );
       queryBuilder.select([
-        'appointment.id',
-        'appointment.startTime',
-        'appointment.endTime',
-        'appointment.zoomLink',
+        'appointment',
         'localDoctor.id',
+        'localDoctor.firstName',
+        'localDoctor.lastName',
         'remoteDoctor.id',
+        'remoteDoctor.firstName',
+        'remoteDoctor.lastName',
         'patient',
+        'notes',
       ]);
 
       if (!all) {
         queryBuilder.limit(limit);
       }
 
-      return await queryBuilder.getMany();
+      const [appointments, count] = await queryBuilder.getManyAndCount();
+
+      return { appointments, count };
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -162,17 +180,26 @@ export default class AppointmentService {
         'remoteDoctor',
       );
       queryBuilder.leftJoinAndSelect('appointment.patient', 'patient');
+      queryBuilder.leftJoinAndSelect(
+        'patient.notes',
+        'notes',
+        'notes.createdAt = (SELECT MAX(n.createdAt) FROM note n WHERE n.patientId = patient.id)',
+      );
       queryBuilder.select([
-        'appointment.id',
-        'appointment.startTime',
-        'appointment.endTime',
-        'appointment.zoomLink',
+        'appointment',
         'localDoctor.id',
+        'localDoctor.firstName',
+        'localDoctor.lastName',
         'remoteDoctor.id',
-        'patient.id',
+        'remoteDoctor.firstName',
+        'remoteDoctor.lastName',
+        'patient',
+        'notes',
       ]);
 
-      return await queryBuilder.getMany();
+      const appointments: Appointment[] = await queryBuilder.getMany();
+
+      return appointments;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -277,6 +304,11 @@ export default class AppointmentService {
       const appointments = await this.appointmentRepository
         .createQueryBuilder('appointment')
         .leftJoinAndSelect('appointment.patient', 'patient')
+        .leftJoinAndSelect(
+          'patient.notes',
+          'notes',
+          'notes.createdAt = (SELECT MAX(n.createdAt) FROM note n WHERE n.patientId = patient.id)',
+        )
         .where(
           'appointment.localDoctorId = :id OR appointment.remoteDoctorId = :id',
           { id: doctor.id },

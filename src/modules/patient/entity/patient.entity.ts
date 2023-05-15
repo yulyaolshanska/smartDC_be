@@ -8,7 +8,7 @@ export default class Patient {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToMany(() => Note, (note) => note.doctor)
+  @OneToMany(() => Note, (note) => note.patient)
   notes: Note[];
 
   @ApiProperty({ example: 'John' })
