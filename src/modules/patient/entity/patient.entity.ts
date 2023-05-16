@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import Note from 'modules/notes/entity/note.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { IsString } from 'class-validator';
+import CreateNoteDto from 'modules/notes/dto/create-note.dto';
 
 @Entity()
 export default class Patient {
@@ -9,6 +10,7 @@ export default class Patient {
   id: number;
 
   @OneToMany(() => Note, (note) => note.patient)
+  @ApiProperty({ type: CreateNoteDto })
   notes: Note[];
 
   @ApiProperty({ example: 'John' })
