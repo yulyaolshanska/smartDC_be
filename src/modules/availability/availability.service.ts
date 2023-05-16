@@ -95,6 +95,7 @@ export default class AvailabilityService {
           'doctor.lastName',
           'doctor.country',
           'doctor.city',
+          'doctor.photoUrl',
         ])
         .innerJoin('availability.doctor', 'doctor')
         .andWhere(
