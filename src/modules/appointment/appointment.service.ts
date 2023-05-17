@@ -220,14 +220,24 @@ export default class AppointmentService {
         'remoteDoctor',
       );
       queryBuilder.leftJoinAndSelect('appointment.patient', 'patient');
+      queryBuilder.leftJoinAndSelect(
+        'patient.notes',
+        'notes',
+        'notes.createdAt = (SELECT MAX(n.createdAt) FROM note n WHERE n.patientId = patient.id)',
+      );
       queryBuilder.select([
         'appointment.id',
         'appointment.startTime',
         'appointment.endTime',
         'appointment.zoomLink',
         'localDoctor.id',
+        'localDoctor.firstName',
+        'localDoctor.lastName',
         'remoteDoctor.id',
-        'patient.id',
+        'remoteDoctor.firstName',
+        'remoteDoctor.lastName',
+        'patient',
+        'notes',
       ]);
 
       return await queryBuilder.getMany();
@@ -278,14 +288,24 @@ export default class AppointmentService {
         'remoteDoctor',
       );
       queryBuilder.leftJoinAndSelect('appointment.patient', 'patient');
+      queryBuilder.leftJoinAndSelect(
+        'patient.notes',
+        'notes',
+        'notes.createdAt = (SELECT MAX(n.createdAt) FROM note n WHERE n.patientId = patient.id)',
+      );
       queryBuilder.select([
         'appointment.id',
         'appointment.startTime',
         'appointment.endTime',
         'appointment.zoomLink',
         'localDoctor.id',
+        'localDoctor.firstName',
+        'localDoctor.lastName',
         'remoteDoctor.id',
-        'patient.id',
+        'remoteDoctor.firstName',
+        'remoteDoctor.lastName',
+        'patient',
+        'notes',
       ]);
 
       return await queryBuilder.getMany();

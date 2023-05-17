@@ -9,14 +9,18 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import JwtPatchGuard from 'modules/auth/utils/PatchGuard';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import Availability from './entity/availability.entity';
 import AvailabilityService from './availability.service';
 
 @UseGuards(JwtPatchGuard)
+@ApiTags('Availability')
 @Controller('availability')
 export default class AvailabilityController {
   constructor(private availabilityService: AvailabilityService) {}
 
+  @ApiOperation({ summary: 'Getting all doctor availabilities' })
+  @ApiResponse({ status: 200, type: [Availability] })
   @Get('/:id')
   async getAvailabilitiesForDoctor(
     @Param('id') id: number,
@@ -24,6 +28,8 @@ export default class AvailabilityController {
     return this.availabilityService.getAvailabilities(id);
   }
 
+  @ApiOperation({ summary: 'Create doctor availability' })
+  @ApiResponse({ status: 200, type: Availability })
   @Post('/:id')
   async createAvailability(
     @Param('id') doctorId: number,
@@ -32,6 +38,8 @@ export default class AvailabilityController {
     return this.availabilityService.createAvailability(doctorId, availability);
   }
 
+  @ApiOperation({ summary: 'Delete doctor availability' })
+  @ApiResponse({ status: 204 })
   @Delete('/:id/:uuid')
   async deleteAvailability(
     @Param('id') doctorId: number,
@@ -43,6 +51,10 @@ export default class AvailabilityController {
     );
   }
 
+  @ApiOperation({
+    summary: 'Find available doctors by datetime and speciality',
+  })
+  @ApiResponse({ status: 200, type: [Availability] })
   @Get()
   async findDoctorsByAvailabilityandSpeciality(
     @Query('start') start: string,
@@ -58,6 +70,8 @@ export default class AvailabilityController {
     );
   }
 
+  @ApiOperation({ summary: 'Find available doctors by speciality' })
+  @ApiResponse({ status: 200, type: [Availability] })
   @Get('/specialization/:specialization')
   async findDoctorsWithSpecialization(
     @Param('specialization') specialization: string,

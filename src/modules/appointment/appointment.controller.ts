@@ -79,6 +79,7 @@ export default class AppointmentController {
   }
 
   @ApiOperation({ summary: "Find patient's appointments for week" })
+  @ApiResponse({ status: 200, type: [Appointment] })
   @Get('/patient/:id/week/:year/:week')
   async getAppointmentsByPatientIdAndWeek(
     @Param('id') id: number,
