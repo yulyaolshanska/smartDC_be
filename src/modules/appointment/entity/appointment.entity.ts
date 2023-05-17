@@ -9,7 +9,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import PatientWithNotes from '../../patient/dto/patient-with-notes.dto';
+import PatientWithNotes from 'modules/patient/dto/patient-with-notes.dto';
 
 @Entity()
 export default class Appointment {

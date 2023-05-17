@@ -139,7 +139,7 @@ export default class CreateDoctorDto {
 
   @ApiProperty({
     description: "Doctor's photo",
-    example: '?????',
+    example: '',
   })
   photoUrl: string;
 }
