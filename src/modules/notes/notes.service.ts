@@ -75,10 +75,13 @@ export default class NotesService {
 
   async findAll(
     query: Query,
+    patientId: number,
   ): Promise<{ notes: Note[]; count: number; countWithoutAnyParams: number }> {
     try {
       const qb = this.notesRepository.createQueryBuilder('notes');
+
       const sortOrder = query.sortOrder === DESC ? 'DESC' : 'ASC';
+
       let sortBy: string;
       if (query.sortBy === DATE) sortBy = 'createdAt';
       if (query.sortBy === DOCTOR) sortBy = 'doctor';
@@ -87,6 +90,9 @@ export default class NotesService {
         .select(['notes', 'doctor.firstName', 'doctor.lastName'])
         .where('notes.note like :searchString', {
           searchString: `%${query.searchString}%`,
+        })
+        .andWhere('notes.patientId = :patientId', {
+          patientId,
         })
         .leftJoin('notes.doctor', 'doctor')
         .leftJoinAndSelect('notes.file', 'file')
@@ -97,6 +103,9 @@ export default class NotesService {
 
       const countWithoutAnyParams = await this.notesRepository
         .createQueryBuilder('notes')
+        .where('notes.patientId = :patientId', {
+          patientId,
+        })
         .getCount();
 
       return { notes, count, countWithoutAnyParams };
