@@ -7,7 +7,7 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 export default class Availability {
   @PrimaryGeneratedColumn('uuid')
   @ApiProperty({ example: 'c3864420-2d55-4483-b861-4970e3b7ea40' })
-  uiid: string;
+  uuid: string;
 
   @Column()
   @ApiProperty({ example: 'Working hours' })
