@@ -92,4 +92,34 @@ export default class AppointmentService {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  async startAppointments() {
+    const currentDate = new Date();
+    try {
+      const nextAppointment = await this.appointmentRepository
+        .createQueryBuilder('appointment')
+        .where('appointment.startTime > :currentDate', { currentDate })
+        .orderBy('appointment.startTime', 'ASC')
+        .getOne();
+      if (nextAppointment) {
+        return nextAppointment;
+      }
+    } catch (error) {
+      throw new HttpException(`${error}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async deleteAppointments() {
+    try {
+      const currentDate = new Date();
+      const appointmentsToDelete = await this.appointmentRepository
+        .createQueryBuilder('appointment')
+        .where('appointment.endTime < :currentDate', { currentDate })
+        .getMany();
+
+      await this.appointmentRepository.remove(appointmentsToDelete);
+    } catch (error) {
+      throw new HttpException(`${error}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }
