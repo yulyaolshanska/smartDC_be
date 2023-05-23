@@ -7,6 +7,7 @@ import { Server, ServerOptions } from 'socket.io';
 
 export class SocketIOAdapter extends IoAdapter {
   private readonly logger = new Logger(SocketIOAdapter.name);
+
   constructor(
     private app: INestApplicationContext,
     private configService: ConfigService,
@@ -48,7 +49,7 @@ const createTokenMiddleware =
   (socket: SocketWithAuth, next) => {
     // for Postman testing support, fallback to token header
     const token =
-      socket.handshake.auth.token || socket.handshake.headers['token'];
+      socket.handshake.auth.token || socket.handshake.headers.token;
 
     logger.debug(`Validating auth token before connection: ${token}`);
 

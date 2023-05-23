@@ -1,10 +1,10 @@
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import AppModule from './app.module';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import * as socketio from 'socket.io';
 import { SocketIOAdapter } from 'socket-io-adapter';
+import AppModule from './app.module';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);

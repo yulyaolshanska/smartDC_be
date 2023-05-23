@@ -14,10 +14,10 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ZoomModule } from 'modules/zoom/zoom.module';
 import * as path from 'path';
-import DoctorModule from './modules/doctor/doctor.module';
-import AuthModule from './modules/auth/auth.module';
 import { AppointmentGateway } from 'modules/appointment/appointment.gateway';
 import AppointmentService from 'modules/appointment/appointment.service';
+import DoctorModule from './modules/doctor/doctor.module';
+import AuthModule from './modules/auth/auth.module';
 
 @Module({
   imports: [
