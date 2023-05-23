@@ -42,6 +42,8 @@ class AuthController {
     return this.authService.registration(doctorDto);
   }
 
+  @ApiOperation({ summary: 'Get doctor with new activation link' })
+  @ApiResponse({ status: 201, type: Doctor })
   @Patch('/reactivation/:id')
   updateOne(@Param('id') id: number): Promise<Doctor> {
     return this.authService.sendActivationLink(id);
