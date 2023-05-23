@@ -9,6 +9,7 @@ import {
   Matches,
   IsEnum,
   IsISO31661Alpha2,
+  IsOptional,
 } from 'class-validator';
 import {
   NAME_MIN_LENGTH,
@@ -58,7 +59,8 @@ export default class CreatePatientDto {
     example: 'Male',
   })
   @IsEnum(Gender)
-  gender: Gender;
+  @IsOptional()
+  gender?: Gender;
 
   @ApiProperty({
     description: "Patient's birthday",
@@ -67,7 +69,8 @@ export default class CreatePatientDto {
   @Matches(DATE_REGEX, {
     message: 'Invalid date type',
   })
-  birthDate: string;
+  @IsOptional()
+  birthDate?: string;
 
   @ApiProperty({
     description: "Patient's country",
@@ -75,7 +78,8 @@ export default class CreatePatientDto {
   })
   @IsISO31661Alpha2()
   @IsString()
-  country: string;
+  @IsOptional()
+  country?: string;
 
   @ApiProperty({
     description: "Patient's city",
@@ -85,7 +89,8 @@ export default class CreatePatientDto {
     message: 'Invalid city name',
   })
   @IsString()
-  city: string;
+  @IsOptional()
+  city?: string;
 
   @ApiProperty({
     description: "Patient's address",
@@ -95,7 +100,8 @@ export default class CreatePatientDto {
     message: 'Invalid address',
   })
   @IsString()
-  address: string;
+  @IsOptional()
+  address?: string;
 
   @ApiProperty({
     description: "Patient's time zone",
@@ -105,12 +111,14 @@ export default class CreatePatientDto {
     message: 'Invalid time zone format',
   })
   @IsString()
-  timeZone: string;
+  @IsOptional()
+  timeZone?: string;
 
   @ApiProperty({
     description: "Patient's overview",
     example: 'Some issue',
   })
   @IsString()
-  overview: string;
+  @IsOptional()
+  overview?: string;
 }
