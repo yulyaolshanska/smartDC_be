@@ -42,6 +42,11 @@ class AuthController {
     return this.authService.registration(doctorDto);
   }
 
+  @Patch('/reactivation/:id')
+  updateOne(@Param('id') id: number): Promise<Doctor> {
+    return this.authService.sendActivationLink(id);
+  }
+
   @ApiOperation({ summary: 'Google Login' })
   @ApiResponse({ status: 201, type: Doctor })
   @Get('/google/redirect')

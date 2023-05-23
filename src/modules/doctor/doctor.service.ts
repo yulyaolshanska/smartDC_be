@@ -90,7 +90,7 @@ export default class DoctorService {
 
   async updateDoctor(
     doctorId: number,
-    doctorDto: Partial<CreateDoctorDto>,
+    doctorDto: Partial<Doctor>,
   ): Promise<Doctor> {
     try {
       const doctor = await this.doctorRepository.findOneOrFail({
