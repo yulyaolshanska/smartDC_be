@@ -1,4 +1,5 @@
 import { Logger } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -9,12 +10,14 @@ import {
 import { Namespace } from 'socket.io';
 import { SocketWithAuth } from './types';
 
+import AppointmentService from './appointment.service';
+
 @WebSocketGateway({ namespace: 'appointment', cors: true })
 export class AppointmentGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   private readonly logger = new Logger(AppointmentGateway.name);
-  constructor() {}
+  constructor(private appointmentService: AppointmentService) {}
 
   @WebSocketServer() io: Namespace;
 
@@ -22,22 +25,40 @@ export class AppointmentGateway
     this.logger.log('WebSocket init');
   }
 
-  handleConnection(client: SocketWithAuth) {
+  async handleConnection(client: SocketWithAuth) {
     const sockets = this.io.sockets;
 
-    this.logger.debug(
-      `Socket connected with userID: ${client.doctorId}, firstName: ${client.firstName}, and lastName: "${client.lastName}"`,
-    );
-
     this.logger.log(`Client with id ${client.id} connected`);
-    this.logger.debug(`Number of connected sockets ${sockets.size}`);
-
-    this.io.emit('hello', `hello from ${client.id}`);
   }
   handleDisconnect(client: SocketWithAuth) {
     const sockets = this.io.sockets;
 
     this.logger.log(`Client with id ${client.id} disconnected`);
     this.logger.debug(`Number of connected sockets ${sockets.size}`);
+  }
+
+  @Cron('*/5 * * * * *')
+  async joinNextAppointment() {
+    const sockets = this.io.sockets;
+    const nextAppointment = await this.appointmentService.startAppointments();
+
+    const localDoctor = [...sockets.values()].find(
+      (obj: SocketWithAuth) => obj.doctorId == nextAppointment.localDoctorId,
+    );
+
+    const remoteDoctor = [...sockets.values()].find(
+      (obj: SocketWithAuth) => obj.doctorId == nextAppointment.remoteDoctorId,
+    );
+
+    this.appointmentService.deleteAppointments();
+
+    console.log(localDoctor.id);
+    console.log(remoteDoctor.id);
+    console.log(nextAppointment);
+
+    if (nextAppointment) {
+      this.io.emit('appointment_update', nextAppointment);
+      return nextAppointment;
+    }
   }
 }

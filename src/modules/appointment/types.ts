@@ -2,7 +2,7 @@ import { Request } from 'express';
 import { Socket } from 'socket.io';
 
 type AuthPayload = {
-  doctorId: string;
+  doctorId: number;
   firstName: string;
   lastName: string;
 };

@@ -95,6 +95,7 @@ export default class AppointmentService {
 
   async startAppointments() {
     const currentDate = new Date();
+    let diffTime: number;
     try {
       const nextAppointment = await this.appointmentRepository
         .createQueryBuilder('appointment')
@@ -102,6 +103,11 @@ export default class AppointmentService {
         .orderBy('appointment.startTime', 'ASC')
         .getOne();
       if (nextAppointment) {
+        diffTime = Number(nextAppointment.startTime) - Number(currentDate);
+      }
+
+      if (nextAppointment) {
+        console.log(nextAppointment);
         return nextAppointment;
       }
     } catch (error) {
