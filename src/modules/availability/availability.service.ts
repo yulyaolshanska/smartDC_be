@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { NO_ROWS_AFFECTED } from '@shared/consts';
+import { NO_ROWS_AFFECTED, SLICE_START } from '@shared/consts';
 import DoctorService from 'modules/doctor/doctor.service';
 import { Role } from '@shared/enums';
 import Availability from './entity/availability.entity';
@@ -81,6 +81,7 @@ export default class AvailabilityService {
     startDatetime: string,
     endDatetime: string,
     specialization?: string,
+    limit?: number,
   ): Promise<Availability[]> {
     try {
       const availabilities = await this.availabilityRepository
@@ -90,6 +91,11 @@ export default class AvailabilityService {
           'doctor.id',
           'doctor.specialization',
           'doctor.role',
+          'doctor.firstName',
+          'doctor.lastName',
+          'doctor.country',
+          'doctor.city',
+          'doctor.photoUrl',
         ])
         .innerJoin('availability.doctor', 'doctor')
         .andWhere(
@@ -99,18 +105,17 @@ export default class AvailabilityService {
         .setParameter('end', endDatetime)
         .getMany();
 
-      let filteredAvailabilities = availabilities.filter(
-        (availability) => availability.doctor.role === Role.Remote,
+      const filteredAvailabilities = availabilities.filter(
+        (availability) =>
+          availability.doctor.role === Role.Remote &&
+          (specialization
+            ? availability.doctor.specialization === Number(specialization)
+            : true),
       );
 
-      if (specialization) {
-        filteredAvailabilities = filteredAvailabilities.filter(
-          (availability) =>
-            availability.doctor.specialization === Number(specialization),
-        );
-      }
-
-      return filteredAvailabilities;
+      return limit
+        ? filteredAvailabilities.slice(SLICE_START, limit)
+        : filteredAvailabilities;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
