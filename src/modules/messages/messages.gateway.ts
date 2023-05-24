@@ -26,15 +26,15 @@ export default class MessagesGateway {
   @SubscribeMessage('joinRoom')
   async joinRoom(
     @MessageBody() roomId: string,
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() doctor: Socket,
   ): Promise<void> {
-    client.join(roomId);
+    doctor.join(roomId);
   }
 
   @SubscribeMessage('createMessage')
   async createMessage(
     @MessageBody() createMessageDto: CreateMessageDto,
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() doctor: Socket,
   ): Promise<Message> {
     const message = await this.messagesService.createMessage(createMessageDto);
     this.server.emit('message', message);
@@ -44,10 +44,10 @@ export default class MessagesGateway {
   @SubscribeMessage('typing')
   async handleTypingEvent(
     @MessageBody('isTyping') isTyping: boolean,
-    @MessageBody('user') userId: number,
-    @ConnectedSocket() client: Socket,
+    @MessageBody('user') doctorId: number,
+    @ConnectedSocket() doctor: Socket,
   ): Promise<void> {
-    const user = await this.messagesService.getUserById(userId);
-    client.broadcast.emit('typing', { user, isTyping });
+    const user = await this.messagesService.getUserById(doctorId);
+    doctor.broadcast.emit('typing', { user, isTyping });
   }
 }

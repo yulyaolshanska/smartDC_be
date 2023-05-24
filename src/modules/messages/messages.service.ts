@@ -30,9 +30,9 @@ export default class MessagesService {
     }
   }
 
-  async getUserById(clientId: number): Promise<Doctor | null> {
+  async getUserById(doctorId: number): Promise<Doctor | null> {
     try {
-      const doctor = await this.doctorService.getDoctorByID(clientId);
+      const doctor = await this.doctorService.getDoctorByID(doctorId);
       return doctor;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
