@@ -122,7 +122,7 @@ export default class AuthService {
         })
         .execute();
 
-      if (!doctor) {
+      if (!doctor.affected) {
         throw new HttpException(
           'Wrong activation link',
           HttpStatus.BAD_REQUEST,
