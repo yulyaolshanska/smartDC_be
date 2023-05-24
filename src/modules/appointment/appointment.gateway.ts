@@ -27,13 +27,12 @@ export class AppointmentGateway
   }
 
   async handleConnection(client: SocketWithAuth) {
-    const {sockets} = this.io;
-
+    const { sockets } = this.io;
     this.logger.log(`Client with id ${client.id} connected`);
   }
 
   handleDisconnect(client: SocketWithAuth) {
-    const {sockets} = this.io;
+    const { sockets } = this.io;
 
     this.logger.log(`Client with id ${client.id} disconnected`);
     this.logger.debug(`Number of connected sockets ${sockets.size}`);
@@ -41,26 +40,32 @@ export class AppointmentGateway
 
   @Cron('*/5 * * * * *')
   async joinNextAppointment() {
-    const {sockets} = this.io;
+    const { sockets } = this.io;
     const nextAppointment = await this.appointmentService.startAppointments();
 
-    const localDoctor = [...sockets.values()].find(
-      (obj: SocketWithAuth) => obj.doctorId == nextAppointment.localDoctorId,
-    );
-
-    const remoteDoctor = [...sockets.values()].find(
-      (obj: SocketWithAuth) => obj.doctorId == nextAppointment.remoteDoctorId,
-    );
-
-    this.appointmentService.deleteAppointments();
-
-    console.log(localDoctor.id);
-    console.log(remoteDoctor.id);
-    console.log(nextAppointment);
-
     if (nextAppointment) {
-      this.io.emit('appointment_update', nextAppointment);
-      return nextAppointment;
+      const localDoctor = [...sockets.values()].find(
+        (obj: SocketWithAuth) => obj.doctorId == nextAppointment.localDoctorId,
+      );
+
+      const remoteDoctor = [...sockets.values()].find(
+        (obj: SocketWithAuth) => obj.doctorId == nextAppointment.remoteDoctorId,
+      );
+
+      const remoteDoctorSocketId = remoteDoctor?.id;
+      const localDoctorSocketId = localDoctor?.id;
+
+      this.appointmentService.deleteAppointments();
+      if (remoteDoctorSocketId) {
+        this.io
+          .to(remoteDoctorSocketId)
+          .emit('appointment_update', nextAppointment);
+      }
+      if (localDoctorSocketId) {
+        this.io
+          .to(localDoctorSocketId)
+          .emit('appointment_update', nextAppointment);
+      }
     }
   }
 }
