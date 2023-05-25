@@ -84,6 +84,7 @@ export default class AppointmentController {
     this.appointmentService.deleteAppointments();
     return 'Starting appointments';
   }
+
   @ApiOperation({ summary: "Find patient's appointments for week" })
   @ApiResponse({ status: 200, type: [Appointment] })
   @Get('/patient/:id/week/:year/:week')

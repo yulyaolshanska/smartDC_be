@@ -19,6 +19,7 @@ import {
 } from '@shared/consts';
 import Appointment from './entity/appointment.entity';
 import CreateAppointmentDto from './dto/create-appointment.dto';
+import * as moment from 'moment';
 
 @Injectable()
 export default class AppointmentService {
@@ -207,21 +208,61 @@ export default class AppointmentService {
 
   async startAppointments() {
     const currentDate = new Date();
+    const formattedCurrentTime = new Date(
+      moment(new Date()).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
+    );
     let diffTime: number;
     try {
-      const nextAppointment = await this.appointmentRepository
-        .createQueryBuilder('appointment')
-        .where('appointment.startTime > :currentDate', { currentDate })
+      const queryBuilder: SelectQueryBuilder<Appointment> =
+        this.appointmentRepository.createQueryBuilder('appointment');
+      queryBuilder.where(
+        'appointment.startTime > :formattedCurrentTime OR  appointment.endTime > :formattedCurrentTime',
+        {
+          formattedCurrentTime,
+        },
+      );
+      queryBuilder.leftJoinAndSelect('appointment.localDoctor', 'localDoctor');
+      queryBuilder.leftJoinAndSelect(
+        'appointment.remoteDoctor',
+        'remoteDoctor',
+      );
+      queryBuilder.leftJoinAndSelect('appointment.patient', 'patient');
+      queryBuilder.select([
+        'appointment',
+        'localDoctor.id',
+        'localDoctor.firstName',
+        'localDoctor.lastName',
+        'remoteDoctor.id',
+        'remoteDoctor.firstName',
+        'remoteDoctor.lastName',
+        'patient',
+      ]);
+
+      const nextAppointment: Appointment = await queryBuilder
         .orderBy('appointment.startTime', 'ASC')
         .getOne();
-      if (nextAppointment) {
-        diffTime = Number(nextAppointment.startTime) - Number(currentDate);
-      }
 
       if (nextAppointment) {
         console.log(nextAppointment);
         return nextAppointment;
       }
+      //
+      // const nextAppointment = await this.appointmentRepository
+      //   .createQueryBuilder('appointment')
+      //   .where('appointment.startTime > :formattedCurrentTime', {
+      //     formattedCurrentTime,
+      //   })
+      //   .orderBy('appointment.startTime', 'ASC')
+      //   .getOne();
+
+      // if (nextAppointment) {
+      //   diffTime = Number(nextAppointment.startTime) - Number(currentDate);
+      // }
+
+      // if (nextAppointment) {
+      //   console.log(nextAppointment);
+      //   return nextAppointment;
+      // }
     } catch (error) {
       throw new HttpException(`${error}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -240,6 +281,7 @@ export default class AppointmentService {
       throw new HttpException(`${error}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
   async getAppointmentsByPatientId(id: number): Promise<Appointment[]> {
     try {
       const patient = await this.patientService.getPatientById(id);

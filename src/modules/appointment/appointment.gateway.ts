@@ -38,18 +38,19 @@ export class AppointmentGateway
     this.logger.debug(`Number of connected sockets ${sockets.size}`);
   }
 
-  @Cron('*/5 * * * * *')
+  @Cron('*/15 * * * * *')
   async joinNextAppointment() {
     const { sockets } = this.io;
     const nextAppointment = await this.appointmentService.startAppointments();
 
     if (nextAppointment) {
       const localDoctor = [...sockets.values()].find(
-        (obj: SocketWithAuth) => obj.doctorId == nextAppointment.localDoctorId,
+        (obj: SocketWithAuth) => obj.doctorId == nextAppointment.localDoctor.id,
       );
 
       const remoteDoctor = [...sockets.values()].find(
-        (obj: SocketWithAuth) => obj.doctorId == nextAppointment.remoteDoctorId,
+        (obj: SocketWithAuth) =>
+          obj.doctorId == nextAppointment.remoteDoctor.id,
       );
 
       const remoteDoctorSocketId = remoteDoctor?.id;
