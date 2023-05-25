@@ -37,11 +37,4 @@ export default class AppointmentController {
   ): Promise<Appointment[]> {
     return this.appointmentService.getAppointmentsByPatientId(id);
   }
-
-  @Get('start')
-  startAndDeleteAppointments() {
-    this.appointmentService.startAppointments();
-    this.appointmentService.deleteAppointments();
-    return 'Starting appointments';
-  }
 }

@@ -26,12 +26,11 @@ export class AppointmentGateway
     this.logger.log('WebSocket init');
   }
 
-  async handleConnection(client: SocketWithAuth) {
-    const { sockets } = this.io;
+  async handleConnection(client: SocketWithAuth): Promise<void> {
     this.logger.log(`Client with id ${client.id} connected`);
   }
 
-  handleDisconnect(client: SocketWithAuth) {
+  async handleDisconnect(client: SocketWithAuth): Promise<void> {
     const { sockets } = this.io;
 
     this.logger.log(`Client with id ${client.id} disconnected`);
@@ -39,7 +38,7 @@ export class AppointmentGateway
   }
 
   @Cron('*/5 * * * * *')
-  async joinNextAppointment() {
+  async joinNextAppointment(): Promise<void> {
     const { sockets } = this.io;
     const nextAppointment = await this.appointmentService.startAppointments();
 
@@ -53,18 +52,24 @@ export class AppointmentGateway
       );
 
       const remoteDoctorSocketId = remoteDoctor?.id;
+
       const localDoctorSocketId = localDoctor?.id;
+
+      const roomName = this.appointmentService.getRoomName(
+        nextAppointment.id,
+        nextAppointment.startTime,
+      );
 
       this.appointmentService.deleteAppointments();
       if (remoteDoctorSocketId) {
         this.io
           .to(remoteDoctorSocketId)
-          .emit('appointment_update', nextAppointment);
+          .emit('appointment_update', { nextAppointment, roomName });
       }
       if (localDoctorSocketId) {
         this.io
           .to(localDoctorSocketId)
-          .emit('appointment_update', nextAppointment);
+          .emit('appointment_update', { nextAppointment, roomName });
       }
     }
   }
