@@ -23,6 +23,7 @@ export default class MailService {
   }
 
   async sendActivationMail(to: string, link: string): Promise<void> {
+
     try {
       await this.transporter.sendMail({
         from: this.configService.get('SMTP_USER'),
@@ -30,8 +31,8 @@ export default class MailService {
         subject: `Account activation${this.configService.get('API_URL')}`,
         html: `
                 <div>
-                <h1>"For activation press the link"</h1>
-                <a href="${link}">${link}</a>
+                <h3>For verification of your account please press the link below</h3>
+                <a href="${link}">Verification link</a>
                 </div>
           `,
       });
