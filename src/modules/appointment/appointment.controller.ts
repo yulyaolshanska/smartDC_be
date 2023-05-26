@@ -78,6 +78,13 @@ export default class AppointmentController {
     return this.appointmentService.getAppointmentsByPatientId(id);
   }
 
+  @Get('start')
+  startAndDeleteAppointments() {
+    this.appointmentService.startAppointments();
+    this.appointmentService.deleteAppointments();
+    return 'Starting appointments';
+  }
+
   @ApiOperation({ summary: "Find patient's appointments for week" })
   @ApiResponse({ status: 200, type: [Appointment] })
   @Get('/patient/:id/week/:year/:week')

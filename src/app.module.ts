@@ -1,4 +1,5 @@
 import { Module, ValidationPipe } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
@@ -11,7 +12,10 @@ import Availability from 'modules/availability/entity/availability.entity';
 import AvailabilityModule from 'modules/availability/availability.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import * as path from 'path';
+import { ZoomModule } from 'modules/zoom/zoom.module';
+// import * as path from 'path';
+// import { AppointmentGateway } from 'modules/appointment/appointment.gateway';
+// import AppointmentService from 'modules/appointment/appointment.service';
 import Note from 'modules/notes/entity/note.entity';
 import NotesModule from 'modules/notes/notes.module';
 import File from 'modules/notes/entity/file.entity';
@@ -20,6 +24,7 @@ import AuthModule from './modules/auth/auth.module';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({ isGlobal: true }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
@@ -45,6 +50,7 @@ import AuthModule from './modules/auth/auth.module';
     NotesModule,
     AppointmentModule,
     AvailabilityModule,
+    ZoomModule,
   ],
   providers: [
     {
