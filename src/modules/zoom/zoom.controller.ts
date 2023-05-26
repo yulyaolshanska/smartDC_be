@@ -11,10 +11,4 @@ export class ZoomController {
   getSignature(@Body() credentials: any): Promise<any> {
     return this.zoomService.handleSignature(credentials);
   }
-
-  @ApiOperation({ summary: 'Get signature' })
-  @Post('/qwerty')
-  zoomOauth(): Promise<any> {
-    return this.zoomService.handleZoomOauth();
-  }
 }

@@ -19,6 +19,7 @@ async function bootstrap(): Promise<void> {
   const config = new DocumentBuilder()
     .setTitle('Web Wizards api')
     .setDescription('')
+    .addBearerAuth()
     .setVersion('1.0')
     .addTag('app')
     .build();

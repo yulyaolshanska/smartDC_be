@@ -40,20 +40,22 @@ export class AppointmentGateway
   @Cron('*/5 * * * * *')
   async joinNextAppointment(): Promise<void> {
     const { sockets } = this.io;
-    const nextAppointment = await this.appointmentService.startAppointments();
+    const nextAppointment =
+      (await this.appointmentService.startAppointments()) as any;
+    console.log(nextAppointment);
 
     if (nextAppointment) {
-      const localDoctor = [...sockets.values()].find(
+      const localDoctorSocket = [...sockets.values()].find(
         (obj: SocketWithAuth) => obj.doctorId == nextAppointment.localDoctorId,
       );
 
-      const remoteDoctor = [...sockets.values()].find(
+      const remoteDoctorSocket = [...sockets.values()].find(
         (obj: SocketWithAuth) => obj.doctorId == nextAppointment.remoteDoctorId,
       );
 
-      const remoteDoctorSocketId = remoteDoctor?.id;
+      const remoteDoctorSocketId = remoteDoctorSocket?.id;
 
-      const localDoctorSocketId = localDoctor?.id;
+      const localDoctorSocketId = localDoctorSocket?.id;
 
       const roomName = this.appointmentService.getRoomName(
         nextAppointment.id,

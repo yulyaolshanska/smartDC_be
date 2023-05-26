@@ -23,6 +23,7 @@ module.exports = {
     'import/prefer-default-export': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
     'class-methods-use-this': 'off',
+    'import/no-cycle': 'off',
     '@typescript-eslint/class-methods-use-this': 'off',
     '@typescript-eslint/naming-convention': 'off',
     '@typescript-eslint/interface-name-prefix': 'off',
