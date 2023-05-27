@@ -6,10 +6,24 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { NO_ROWS_AFFECTED, SLICE_START } from '@shared/consts';
+import {
+  FIFTEEN,
+  FIVE_NINE,
+  NO_ROWS_AFFECTED,
+  ONE,
+  SLICE_START,
+  TWENTY_THREE,
+  ZERO,
+} from '@shared/consts';
 import DoctorService from 'modules/doctor/doctor.service';
 import { Role } from '@shared/enums';
 import Availability from './entity/availability.entity';
+
+export interface Notification {
+  message: string;
+  action: string;
+  actionUrl: string;
+}
 
 @Injectable()
 export default class AvailabilityService {
@@ -150,5 +164,72 @@ export default class AvailabilityService {
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  async getNotifications(doctorId: number): Promise<Notification[]> {
+    const doctor = await this.doctorService.getDoctorByID(doctorId);
+
+    if (doctor.role !== Role.Remote) {
+      throw new HttpException(
+        'Only remote doctors are eligible for notifications',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const nextMonthAvailability = await this.getNextMonthAvailability(doctorId);
+    const notifications: Notification[] = [];
+
+    if (!nextMonthAvailability || nextMonthAvailability.length === ZERO) {
+      const notification = {
+        message: 'Fill up your schedule to be able to conduct meetings',
+        action: 'Go to Availability',
+        actionUrl: '/availability',
+      };
+
+      notifications.push(notification);
+    } else if (nextMonthAvailability.length <= FIFTEEN) {
+      const notification = {
+        message: 'Manage your schedule for the upcoming month',
+        action: 'Go to Availability',
+        actionUrl: '/availability',
+      };
+
+      notifications.push(notification);
+    }
+
+    return notifications;
+  }
+
+  private async getNextMonthAvailability(
+    doctorId: number,
+  ): Promise<Availability[]> {
+    const currentDate = new Date();
+    const nextMonthDate = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + ONE,
+    );
+
+    const nextMonthStartDate = new Date(
+      nextMonthDate.getFullYear(),
+      nextMonthDate.getMonth(),
+      ONE,
+    );
+    const nextMonthEndDate = new Date(
+      nextMonthDate.getFullYear(),
+      nextMonthDate.getMonth() + ONE,
+      ZERO,
+      TWENTY_THREE,
+      FIVE_NINE,
+      FIVE_NINE,
+    );
+
+    const availabilities = await this.availabilityRepository
+      .createQueryBuilder('availability')
+      .where('availability.doctor = :doctorId', { doctorId })
+      .andWhere('availability.start >= :start', { start: nextMonthStartDate })
+      .andWhere('availability.end <= :end', { end: nextMonthEndDate })
+      .getMany();
+
+    return availabilities;
   }
 }
