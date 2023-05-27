@@ -47,6 +47,7 @@ export default class PatientController {
   @ApiResponse({ status: 200, type: Patient })
   @Get('/:id')
   getOne(@Param('id') id: number): Promise<Patient> {
+    console.log(123);
     return this.patientService.getPatientById(id);
   }
 }

@@ -8,6 +8,7 @@ const KJUR = require('jsrsasign');
 @Injectable()
 export class ZoomService {
   constructor(private configService: ConfigService) {}
+
   async handleSignature(credentials): Promise<string> {
     const iat = Math.round(new Date().getTime() / 1000) - 30;
     const exp = iat + 60 * 60 * 2;
