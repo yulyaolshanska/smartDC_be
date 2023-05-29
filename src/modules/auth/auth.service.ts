@@ -122,7 +122,7 @@ export default class AuthService {
         })
         .execute();
 
-      if (!doctor) {
+      if (!doctor.affected) {
         throw new HttpException(
           'Wrong activation link',
           HttpStatus.BAD_REQUEST,
@@ -303,7 +303,7 @@ export default class AuthService {
   }
 
   private separateDoctorInfo(doctor: Doctor): UserInfo {
-    const { password, activationLink, ...userInfo } = doctor;
+    const { password, ...userInfo } = doctor;
 
     return userInfo;
   }
@@ -401,6 +401,33 @@ export default class AuthService {
       throw new HttpException(
         'Error while checking email',
         HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async sendActivationLink(id: number): Promise<Doctor> {
+    try {
+      const doctor = await this.doctorService.getDoctorByID(id);
+      const activationLink = uuid.v4();
+
+      const updatedDoctor = await this.doctorService.updateDoctor(doctor.id, {
+        activationLink: `${this.configService.get(
+          'CLIENT_URL',
+        )}/auth/activation/${activationLink}`,
+      });
+
+      await this.mailService.sendActivationMail(
+        doctor.email,
+        `${this.configService.get(
+          'CLIENT_URL',
+        )}/auth/activation/${activationLink}`,
+      );
+
+      return await this.doctorRepository.save(updatedDoctor);
+    } catch (err) {
+      throw new HttpException(
+        'User with this email does not exist',
+        HttpStatus.CONFLICT,
       );
     }
   }
