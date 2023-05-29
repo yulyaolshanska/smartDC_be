@@ -17,6 +17,7 @@ import {
   THIRTY,
   ZERO,
 } from '@shared/consts';
+import * as moment from 'moment';
 import Appointment from './entity/appointment.entity';
 import CreateAppointmentDto from './dto/create-appointment.dto';
 
@@ -202,6 +203,82 @@ export default class AppointmentService {
       return appointments;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async startAppointments() {
+    const currentDate = new Date();
+    const formattedCurrentTime = new Date(
+      moment(new Date()).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
+    );
+    let diffTime: number;
+    try {
+      const queryBuilder: SelectQueryBuilder<Appointment> =
+        this.appointmentRepository.createQueryBuilder('appointment');
+      queryBuilder.where(
+        'appointment.startTime > :formattedCurrentTime OR  appointment.endTime > :formattedCurrentTime',
+        {
+          formattedCurrentTime,
+        },
+      );
+      queryBuilder.leftJoinAndSelect('appointment.localDoctor', 'localDoctor');
+      queryBuilder.leftJoinAndSelect(
+        'appointment.remoteDoctor',
+        'remoteDoctor',
+      );
+      queryBuilder.leftJoinAndSelect('appointment.patient', 'patient');
+      queryBuilder.select([
+        'appointment',
+        'localDoctor.id',
+        'localDoctor.firstName',
+        'localDoctor.lastName',
+        'remoteDoctor.id',
+        'remoteDoctor.firstName',
+        'remoteDoctor.lastName',
+        'patient',
+      ]);
+
+      const nextAppointment: Appointment = await queryBuilder
+        .orderBy('appointment.startTime', 'ASC')
+        .getOne();
+
+      if (nextAppointment) {
+        console.log(nextAppointment);
+        return nextAppointment;
+      }
+      //
+      // const nextAppointment = await this.appointmentRepository
+      //   .createQueryBuilder('appointment')
+      //   .where('appointment.startTime > :formattedCurrentTime', {
+      //     formattedCurrentTime,
+      //   })
+      //   .orderBy('appointment.startTime', 'ASC')
+      //   .getOne();
+
+      // if (nextAppointment) {
+      //   diffTime = Number(nextAppointment.startTime) - Number(currentDate);
+      // }
+
+      // if (nextAppointment) {
+      //   console.log(nextAppointment);
+      //   return nextAppointment;
+      // }
+    } catch (error) {
+      throw new HttpException(`${error}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async deleteAppointments() {
+    try {
+      const currentDate = new Date();
+      const appointmentsToDelete = await this.appointmentRepository
+        .createQueryBuilder('appointment')
+        .where('appointment.endTime < :currentDate', { currentDate })
+        .getMany();
+
+      await this.appointmentRepository.remove(appointmentsToDelete);
+    } catch (error) {
+      throw new HttpException(`${error}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
