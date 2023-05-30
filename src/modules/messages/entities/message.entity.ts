@@ -19,6 +19,12 @@ export default class Message {
   })
   text: string;
 
+  @Column({ type: 'json', nullable: true })
+  file: string[];
+
+  @Column({ type: 'json', nullable: true })
+  fileName: string[];
+
   @ManyToOne(() => Doctor, (doctor) => doctor.messages)
   @JoinTable()
   user: Doctor;
