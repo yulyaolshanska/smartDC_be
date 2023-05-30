@@ -6,10 +6,12 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Controller } from '@nestjs/common';
+import { Body, Controller } from '@nestjs/common';
+import * as fs from 'fs-extra';
 import MessagesService from './messages.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import Message from './entities/message.entity';
+import { UploadFileDto } from './dto/upload-file.dto';
 
 @WebSocketGateway({
   cors: {
@@ -33,10 +35,33 @@ export default class MessagesGateway {
 
   @SubscribeMessage('createMessage')
   async createMessage(
-    @MessageBody() createMessageDto: CreateMessageDto,
+    @Body() createMessageDto: CreateMessageDto,
+    @Body() uploadFileDto: UploadFileDto,
     @ConnectedSocket() doctor: Socket,
   ): Promise<Message> {
-    const message = await this.messagesService.createMessage(createMessageDto);
+    const filePaths: string[] = [];
+
+    if (uploadFileDto.files) {
+      uploadFileDto.files.forEach((file) => {
+        const buffer = Buffer.from(file.file, 'base64');
+        const filePath = `uploads/${file.fileName}`;
+        try {
+          fs.writeFileSync(filePath, buffer);
+        } catch (err) {
+          throw new Error('Error writing file');
+        }
+        filePaths.push(filePath);
+      });
+    }
+
+    const fileNames = uploadFileDto.files.map((item) => item.fileName) ?? [];
+
+    const message = await this.messagesService.createMessage({
+      ...createMessageDto,
+      file: filePaths,
+      fileName: fileNames,
+    });
+
     this.server.emit('message', message);
     return message;
   }
