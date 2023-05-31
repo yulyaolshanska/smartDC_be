@@ -11,6 +11,7 @@ import { Namespace } from 'socket.io';
 import { SocketWithAuth } from './types';
 
 import AppointmentService from './appointment.service';
+import Appointment from './entity/appointment.entity';
 
 @WebSocketGateway({ namespace: 'appointment', cors: true })
 export class AppointmentGateway
@@ -38,25 +39,25 @@ export class AppointmentGateway
   }
 
   @Cron('*/15 * * * * *')
-  async joinNextAppointment() {
+  async joinNextAppointment(): Promise<void> {
     const { sockets } = this.io;
     const nextAppointment =
-      (await this.appointmentService.startAppointments()) as any;
-    console.log(nextAppointment);
+      (await this.appointmentService.startAppointments()) as Appointment;
 
     if (nextAppointment) {
       const localDoctor = [...sockets.values()].find(
-        (obj: SocketWithAuth) => obj.doctorId == nextAppointment.localDoctor.id,
+        (obj: SocketWithAuth) =>
+          obj.doctorId === nextAppointment.localDoctor.id,
       );
 
       const remoteDoctor = [...sockets.values()].find(
         (obj: SocketWithAuth) =>
-          obj.doctorId == nextAppointment.remoteDoctor.id,
+          obj.doctorId === nextAppointment.remoteDoctor.id,
       );
-
-      const remoteDoctorSocketId = remoteDoctorSocket?.id;
-
-      const localDoctorSocketId = localDoctorSocket?.id;
+      // @ts-ignore
+      const remoteDoctorSocketId = remoteDoctor?.id;
+      // @ts-ignore
+      const localDoctorSocketId = localDoctor?.id;
 
       const roomName = this.appointmentService.getRoomName(
         nextAppointment.id,

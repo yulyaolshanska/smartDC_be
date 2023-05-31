@@ -3,7 +3,6 @@ import {
   Entity,
   OneToOne,
   PrimaryGeneratedColumn,
-  PrimaryColumn,
   JoinColumn,
 } from 'typeorm';
 import Note from './note.entity';

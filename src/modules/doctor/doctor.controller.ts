@@ -11,8 +11,6 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 import JwtPatchGuard from 'modules/auth/utils/PatchGuard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs-extra';

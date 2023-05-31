@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import axios from 'axios';
-import base64url from 'base64url';
+import { ZoomCredentials } from './types';
 
 const KJUR = require('jsrsasign');
 
@@ -9,7 +8,7 @@ const KJUR = require('jsrsasign');
 export class ZoomService {
   constructor(private configService: ConfigService) {}
 
-  async handleSignature(credentials): Promise<string> {
+  async handleSignature(credentials: ZoomCredentials): Promise<string> {
     const iat = Math.round(new Date().getTime() / 1000) - 30;
     const exp = iat + 60 * 60 * 2;
 

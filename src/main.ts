@@ -1,8 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { IoAdapter } from '@nestjs/platform-socket.io';
-import * as socketio from 'socket.io';
 import { SocketIOAdapter } from 'socket-io-adapter';
 import AppModule from './app.module';
 

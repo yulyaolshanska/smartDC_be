@@ -208,14 +208,11 @@ export default class AppointmentService {
     }
   }
 
-<<<<<<< HEAD
-=======
-  async startAppointments() {
-    const currentDate = new Date();
+  async startAppointments(): Promise<Appointment> {
     const formattedCurrentTime = new Date(
       moment(new Date()).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
     );
-    let diffTime: number;
+
     try {
       const queryBuilder: SelectQueryBuilder<Appointment> =
         this.appointmentRepository.createQueryBuilder('appointment');
@@ -247,7 +244,6 @@ export default class AppointmentService {
         .getOne();
 
       if (nextAppointment) {
-        console.log(nextAppointment);
         return nextAppointment;
       }
       //
@@ -272,7 +268,7 @@ export default class AppointmentService {
     }
   }
 
-  async deleteAppointments() {
+  async deleteAppointments(): Promise<void> {
     try {
       const currentDate = new Date();
       const appointmentsToDelete = await this.appointmentRepository
@@ -286,7 +282,6 @@ export default class AppointmentService {
     }
   }
 
->>>>>>> 6d2b897122a99a76e7774f5015770a9f8f227b27
   async getAppointmentsByPatientId(id: number): Promise<Appointment[]> {
     try {
       const patient = await this.patientService.getPatientById(id);
@@ -434,44 +429,6 @@ export default class AppointmentService {
       return patients;
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
-<<<<<<< HEAD
-    }
-  }
-
-  async startAppointments() {
-    const currentDate = new Date();
-    let diffTime: number;
-    try {
-      const nextAppointment = await this.appointmentRepository
-        .createQueryBuilder('appointment')
-        .where('appointment.startTime > :currentDate', { currentDate })
-        .orderBy('appointment.startTime', 'ASC')
-        .getOne();
-      if (nextAppointment) {
-        diffTime = Number(nextAppointment.startTime) - Number(currentDate);
-      }
-
-      if (nextAppointment) {
-        return nextAppointment;
-      }
-    } catch (error) {
-      throw new HttpException(`${error}`, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  async deleteAppointments(): Promise<void> {
-    try {
-      const currentDate = new Date();
-      const appointmentsToDelete = await this.appointmentRepository
-        .createQueryBuilder('appointment')
-        .where('appointment.endTime < :currentDate', { currentDate })
-        .getMany();
-
-      await this.appointmentRepository.remove(appointmentsToDelete);
-    } catch (error) {
-      throw new HttpException(`${error}`, HttpStatus.INTERNAL_SERVER_ERROR);
-=======
->>>>>>> 6d2b897122a99a76e7774f5015770a9f8f227b27
     }
   }
 
