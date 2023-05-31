@@ -40,3 +40,5 @@ export const DATE = 'Date';
 export const DOCTOR = 'Doctor';
 
 export const DESC = 'desc';
+
+export const DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ss.SSS[Z]';

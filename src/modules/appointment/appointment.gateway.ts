@@ -38,12 +38,12 @@ export class AppointmentGateway
     this.logger.debug(`Number of connected sockets ${sockets.size}`);
   }
 
-  @Cron('*/15 * * * * *')
+  @Cron('*/5 * * * * *')
   async joinNextAppointment(): Promise<void> {
     const { sockets } = this.io;
     const nextAppointment =
       (await this.appointmentService.startAppointments()) as Appointment;
-
+    console.log(nextAppointment);
     if (nextAppointment) {
       const localDoctor = [...sockets.values()].find(
         (obj: SocketWithAuth) =>
@@ -54,9 +54,7 @@ export class AppointmentGateway
         (obj: SocketWithAuth) =>
           obj.doctorId === nextAppointment.remoteDoctor.id,
       );
-      // @ts-ignore
       const remoteDoctorSocketId = remoteDoctor?.id;
-      // @ts-ignore
       const localDoctorSocketId = localDoctor?.id;
 
       const roomName = this.appointmentService.getRoomName(
@@ -64,7 +62,6 @@ export class AppointmentGateway
         nextAppointment.startTime,
       );
 
-      this.appointmentService.deleteAppointments();
       if (remoteDoctorSocketId) {
         this.io
           .to(remoteDoctorSocketId)
