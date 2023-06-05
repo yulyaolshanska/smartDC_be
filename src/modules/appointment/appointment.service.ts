@@ -16,9 +16,13 @@ import {
   TEN,
   THIRTY,
   ZERO,
+  DATE_FORMAT,
 } from '@shared/consts';
+import * as moment from 'moment';
 import Appointment from './entity/appointment.entity';
 import CreateAppointmentDto from './dto/create-appointment.dto';
+
+const KJUR = require('jsrsasign');
 
 @Injectable()
 export default class AppointmentService {
@@ -205,6 +209,64 @@ export default class AppointmentService {
     }
   }
 
+  async startAppointments(): Promise<Appointment> {
+    this.deleteAppointments();
+    const formattedCurrentTime = new Date(
+      moment(new Date()).format(DATE_FORMAT), //TODO
+    );
+
+    try {
+      const queryBuilder: SelectQueryBuilder<Appointment> =
+        this.appointmentRepository.createQueryBuilder('appointment');
+      queryBuilder.where(
+        'appointment.startTime > :formattedCurrentTime OR  appointment.endTime > :formattedCurrentTime',
+        {
+          formattedCurrentTime,
+        },
+      );
+      queryBuilder.leftJoinAndSelect('appointment.localDoctor', 'localDoctor');
+      queryBuilder.leftJoinAndSelect(
+        'appointment.remoteDoctor',
+        'remoteDoctor',
+      );
+      queryBuilder.leftJoinAndSelect('appointment.patient', 'patient');
+      queryBuilder.select([
+        'appointment',
+        'localDoctor.id',
+        'localDoctor.firstName',
+        'localDoctor.lastName',
+        'remoteDoctor.id',
+        'remoteDoctor.firstName',
+        'remoteDoctor.lastName',
+        'patient',
+      ]);
+
+      const nextAppointment: Appointment = await queryBuilder
+        .orderBy('appointment.startTime', 'ASC')
+        .getOne();
+
+      if (nextAppointment) {
+        return nextAppointment;
+      }
+    } catch (error) {
+      throw new HttpException(`${error}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async deleteAppointments(): Promise<void> {
+    try {
+      const currentDate = new Date();
+      const appointmentsToDelete = await this.appointmentRepository
+        .createQueryBuilder('appointment')
+        .where('appointment.endTime < :currentDate', { currentDate })
+        .getMany();
+
+      await this.appointmentRepository.remove(appointmentsToDelete);
+    } catch (error) {
+      throw new HttpException(`${error}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   async getAppointmentsByPatientId(id: number): Promise<Appointment[]> {
     try {
       const patient = await this.patientService.getPatientById(id);
@@ -353,5 +415,16 @@ export default class AppointmentService {
     } catch (err) {
       throw new HttpException(`${err}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  getRoomName(id: number, startTime: Date): string {
+    const oHeader = { alg: 'HS256', typ: 'JWT' };
+
+    return KJUR.jws.JWS.sign(
+      'HS256',
+      oHeader,
+      JSON.stringify(id),
+      JSON.stringify(startTime),
+    ).substring(0, 35); // TODO
   }
 }

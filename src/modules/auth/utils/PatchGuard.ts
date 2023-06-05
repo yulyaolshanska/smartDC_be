@@ -3,8 +3,6 @@ import {
   Injectable,
   CanActivate,
   UnauthorizedException,
-  HttpException,
-  HttpStatus,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Observable } from 'rxjs';

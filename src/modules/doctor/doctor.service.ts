@@ -5,8 +5,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 import { Repository } from 'typeorm';
 import { NO_ROWS_AFFECTED } from 'shared/consts';
 import CreateDoctorDto from './dto/create-doctor.dto';
@@ -90,7 +88,7 @@ export default class DoctorService {
 
   async updateDoctor(
     doctorId: number,
-    doctorDto: Partial<CreateDoctorDto>,
+    doctorDto: Partial<Doctor>,
   ): Promise<Doctor> {
     try {
       const doctor = await this.doctorRepository.findOneOrFail({

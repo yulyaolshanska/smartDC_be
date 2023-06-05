@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import Note from 'modules/notes/entity/note.entity';
 import Availability from 'modules/availability/entity/availability.entity';
+import Message from '../../messages/entities/message.entity';
 
 @Entity()
 export default class Doctor {
@@ -128,4 +129,7 @@ export default class Doctor {
 
   @ManyToOne(() => Availability, (availability) => availability.doctor)
   availability: Availability[];
+
+  @OneToMany(() => Message, (message) => message.user)
+  messages: Message[];
 }
