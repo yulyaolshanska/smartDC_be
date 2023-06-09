@@ -152,13 +152,13 @@ export default class AuthService {
     );
 
     res.clearCookie('accessToken');
-    res.cookie('accessToken', accessToken, {
-      ...this.accessTokenCookieOptions,
-    });
+    res.cookie('accessToken', accessToken);
 
     const existingDoctor = await this.doctorService.getDoctorByEmail(
       doctor.email,
     );
+    res.setHeader('Authorization', `Bearer ${accessToken}`);
+    console.log(accessToken);
 
     if (existingDoctor?.address) {
       res.redirect(`${this.configService.get(`CLIENT_URL`)}/dashboard`);
