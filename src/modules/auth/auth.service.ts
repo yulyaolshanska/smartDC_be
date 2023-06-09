@@ -152,7 +152,9 @@ export default class AuthService {
     );
 
     res.clearCookie('accessToken');
-    res.cookie('accessToken', accessToken);
+    res.cookie('accessToken', accessToken, {
+      ...this.accessTokenCookieOptions,
+    });
 
     const existingDoctor = await this.doctorService.getDoctorByEmail(
       doctor.email,
