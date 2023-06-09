@@ -22,8 +22,11 @@ export const TIME_ZONE_REGEX = /\(\w{3}[+-]\d{1,2}\)\s\w+\/\w+/;
 export const SEVEN = 7;
 export const ONE = 1;
 export const TEN = 10;
+export const FIFTEEN = 15;
 export const THIRTY = 30;
 export const ZERO = 0;
+export const FIVE_NINE = 59;
+export const TWENTY_THREE = 23;
 
 export const BACKWARD = -1;
 export const FORWARD = 1;

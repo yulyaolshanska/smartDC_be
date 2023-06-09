@@ -11,7 +11,7 @@ import {
 import JwtPatchGuard from 'modules/auth/utils/PatchGuard';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import Availability from './entity/availability.entity';
-import AvailabilityService from './availability.service';
+import AvailabilityService, { Notification } from './availability.service';
 
 @UseGuards(JwtPatchGuard)
 @ApiTags('Availability')
@@ -77,5 +77,21 @@ export default class AvailabilityController {
     @Param('specialization') specialization: string,
   ): Promise<Availability[]> {
     return this.availabilityService.findBySpecialization(specialization);
+  }
+
+  @ApiOperation({
+    summary:
+      'Check if doctor have availability for soon days and give notification',
+  })
+  @ApiResponse({ status: 200 })
+  @Get('/send-notifications/:id')
+  async sendNotifications(
+    @Param('id') doctorId: number,
+  ): Promise<Notification[]> {
+    const notifications = await this.availabilityService.getNotifications(
+      doctorId,
+    );
+
+    return notifications;
   }
 }
