@@ -15,6 +15,7 @@ async function bootstrap(): Promise<void> {
       'http://web-wizards-frontend.s3-website.eu-central-1.amazonaws.com',
       'http://localhost:4200',
       'http://localhost:5000',
+      'http://ec2-3-68-84-251.eu-central-1.compute.amazonaws.com',
     ],
 
     credentials: true,
