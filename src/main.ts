@@ -11,7 +11,7 @@ async function bootstrap(): Promise<void> {
   const configService = app.get(ConfigService);
 
   app.enableCors({
-    origin: '*',
+    origin: 'http://web-wizards-frontend.s3-website.eu-central-1.amazonaws.com',
   });
 
   app.useWebSocketAdapter(new SocketIOAdapter(app, configService));
