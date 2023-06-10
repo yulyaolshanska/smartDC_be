@@ -49,7 +49,7 @@ export default class AuthService {
   private readonly accessTokenCookieOptions: CookieOptions = {
     maxAge: this.configService.get('ACCESS_TOKEN_MAX_AGE'),
     httpOnly: false,
-    // domain: this.configService.get('ACCESS_TOKEN_DOMAIN'),
+    domain: this.configService.get('ACCESS_TOKEN_DOMAIN'),
     path: '/',
     sameSite: 'lax',
     secure: false,
@@ -152,7 +152,9 @@ export default class AuthService {
     );
 
     res.clearCookie('accessToken');
-    res.cookie('accessToken', accessToken);
+    res.cookie('accessToken', accessToken, {
+      ...this.accessTokenCookieOptions,
+    });
 
     const existingDoctor = await this.doctorService.getDoctorByEmail(
       doctor.email,
