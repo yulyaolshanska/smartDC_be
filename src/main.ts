@@ -17,8 +17,8 @@ async function bootstrap(): Promise<void> {
       'http://localhost:5000',
       'http://ec2-3-68-84-251.eu-central-1.compute.amazonaws.com',
     ],
-    allowedHeaders: ['Authorization'],
-    exposedHeaders: ['Authorization'],
+    allowedHeaders: ['Authorization', 'authorization'],
+    exposedHeaders: ['Authorization', 'authorization'],
     credentials: true,
   });
 
