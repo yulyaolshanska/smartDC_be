@@ -157,7 +157,6 @@ export default class AuthService {
     const existingDoctor = await this.doctorService.getDoctorByEmail(
       doctor.email,
     );
-
     if (existingDoctor?.address) {
       res.redirect(`${this.configService.get(`CLIENT_URL`)}/dashboard`);
     } else {
