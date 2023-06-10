@@ -17,7 +17,7 @@ export const MILLIS_PER_SECOND = 1000;
 export const CITY_REGEX = /^[A-Za-z]+(?:[ '-][A-Za-z]+)*$/;
 export const ADDRESS_REGEX = /^[A-Za-z0-9\s,'-.]+$/;
 export const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
-export const TIME_ZONE_REGEX = /\(\w{3}[+-]\d{1,2}\)\s\w+\/\w+/;
+export const TIME_ZONE_REGEX = /\(\w{3}[+-]\d{1,2}\)\s\w+\w+/;
 
 export const SEVEN = 7;
 export const ONE = 1;
