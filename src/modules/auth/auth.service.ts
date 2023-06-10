@@ -151,7 +151,6 @@ export default class AuthService {
       { expiresIn: '24h' },
     );
 
-    res.clearCookie('accessToken');
     res.cookie('accessToken', accessToken);
 
     const existingDoctor = await this.doctorService.getDoctorByEmail(
