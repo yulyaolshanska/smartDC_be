@@ -1,10 +1,11 @@
-# WebWizards
 
-<a alt="Nx logo" href="http://web-wizards-frontend.s3-website.eu-central-1.amazonaws.com/" target="_blank" rel="noreferrer"><img src="./src/assets/Frame.png" width="180"></a>
-
-## Backend Readme
+# Backend Readme
 
 This repository contains the backend code for a project written in NestJS. The backend is deployed to Amazon EC2 and uses Amazon RDS for the database.
+
+## About
+
+The website is a platform for doctors worldwide to register, provide online consultations, and efficiently manage their schedules. Doctors can easily view their appointments in user-friendly calendars, update their profiles, and set their preferred working hours. To ensure punctuality, doctors receive a notification 5 minutes prior to each scheduled Zoom meeting. The platform facilitates seamless communication between doctors and patients through Zoom calls and an online chat feature. It offers a secure and convenient way for patients to schedule appointments, share medical records, and receive personalized care from a diverse range of doctors. By leveraging technology, the website aims to enhance accessibility to healthcare and empower doctors with greater control over their practice.
 
 ## Prerequisites
 
