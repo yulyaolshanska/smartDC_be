@@ -1,5 +1,8 @@
+# WebWizards
 
-# Backend Readme
+<a alt="Nx logo" href="http://web-wizards-frontend.s3-website.eu-central-1.amazonaws.com/" target="_blank" rel="noreferrer"><img src="./src/assets/Frame.png" width="180"></a>
+
+## Backend Readme
 
 This repository contains the backend code for a project written in NestJS. The backend is deployed to Amazon EC2 and uses Amazon RDS for the database.
 
