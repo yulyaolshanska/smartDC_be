@@ -157,3 +157,25 @@ The backend uses Amazon RDS for the database. To set up the database:
 3. Create a new database instance with MySQL.
 
 4. Configure the database credentials and connection details in the `.env` file or set them as environment variables on your EC2 instance.
+
+## API Documentation
+
+The backend API is documented using Swagger. You can explore and interact with the API using the Swagger UI.
+
+To access the Swagger documentation, visit [Swagger UI](http://your-api-url/docs) or use the following endpoints:
+
+![image](https://github.com/ZenBit-Tech/WebWizards_be/assets/72575014/7410ba0d-78e2-4c10-819c-9efd47b33874)
+![image](https://github.com/ZenBit-Tech/WebWizards_be/assets/72575014/956c0534-8c66-4202-8342-bcc3432a8d74)
+![image](https://github.com/ZenBit-Tech/WebWizards_be/assets/72575014/2b41ab5d-daac-45fe-a12c-40e348382c79)
+![image](https://github.com/ZenBit-Tech/WebWizards_be/assets/72575014/40f7654a-ab59-4c9f-acd8-e02bb52d3cbc)
+![image](https://github.com/ZenBit-Tech/WebWizards_be/assets/72575014/1e9c23ff-9a4e-4edf-9b8b-fcddae0114a2)
+
+### Schemas
+
+![image](https://github.com/ZenBit-Tech/WebWizards_be/assets/72575014/a633854f-ca7d-4b32-9289-b038e7ed5113)
+![image](https://github.com/ZenBit-Tech/WebWizards_be/assets/72575014/c1f757f1-1493-489a-b5bb-ee0bd5a49014)
+![image](https://github.com/ZenBit-Tech/WebWizards_be/assets/72575014/6aeac931-4106-4608-9685-76ca747dc1fa)
+![image](https://github.com/ZenBit-Tech/WebWizards_be/assets/72575014/642fcad0-7eed-485b-9cce-c140728702c3)
+![image](https://github.com/ZenBit-Tech/WebWizards_be/assets/72575014/3b61a9ad-69e3-4fef-a3a3-9a758c3cb8be)
+![image](https://github.com/ZenBit-Tech/WebWizards_be/assets/72575014/f4cb73f8-2b35-4b05-8a34-61c0f1951db1)
+![image](https://github.com/ZenBit-Tech/WebWizards_be/assets/72575014/f1b956b4-5a1f-487c-9bd8-165262391975)
