@@ -1,73 +1,155 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# Backend Readme
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+This repository contains the backend code for a project written in NestJS. The backend is deployed to Amazon EC2 and uses Amazon RDS for the database.
 
-## Description
+## Prerequisites
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Before running the backend locally or deploying it to a server, ensure that you have the following prerequisites installed:
+
+- [Node.js](https://nodejs.org/) (version 18.16.0 or higher)
+- [Nest CLI](https://docs.nestjs.com/cli/overview) (version 9.4.2 or higher)
+- [Amazon Web Services (AWS) Account](https://aws.amazon.com/)
 
 ## Installation
 
-```bash
-$ npm install
-```
+1. Clone this repository:
 
-## Running the app
+   ```shell
+   git clone https://github.com/ZenBit-Tech/WebWizards_be.git
+   ```
 
-```bash
-# development
-$ npm run start
+2. Install the dependencies:
 
-# watch mode
-$ npm run start:dev
+   ```shell
+   cd backend
+   npm install
+   ```
 
-# production mode
-$ npm run start:prod
-```
+## Configuration
 
-## Test
+Before running or deploying the backend, you need to configure some settings.
 
-```bash
-# unit tests
-$ npm run test
+1. Create a `.env` file in the root directory of the project and add the following environment variables:
 
-# e2e tests
-$ npm run test:e2e
+   ```plaintext
+   # Database Configuration
+   DB_HOST=your-database-host
+   DB_PORT=your-database-port
+   DB_USERNAME=your-database-username
+   DB_PASSWORD=your-database-password
+   DB_NAME=your-database-name
 
-# test coverage
-$ npm run test:cov
-```
+   # SMTP Configuration
+   SMTP_HOST=your-smtp-host
+   SMTP_PORT=your-smtp-port
+   SMTP_USER=your-smtp-username
+   SMTP_PASSWORD=your-smtp-password
 
-## Support
+   # API URLs
+   API_URL=your-api-url
+   CLIENT_URL=your-client-url
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+   # JWT Configuration
+   PRIVATE_KEY=your-private-key
+   ACCESS_TOKEN_MAX_AGE=your-access-token-max-age
 
-## Stay in touch
+   # Google Authentication Configuration
+   GOOGLE_CLIENT_ID=your-google-client-id
+   GOOGLE_SECRET=your-google-secret
+   GOOGLE_REDIRECT_URL=your-google-redirect-url
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+   # Access Token Configuration
+   ACCESS_TOKEN_DOMAIN=your-access-token-domain
 
-## License
+   # Other Configuration
+   # Add any other required configuration variables here
+   ```
 
-Nest is [MIT licensed](LICENSE).
+2. Replace the placeholders in the `.env` file with your actual values.
+
+## Local Development
+
+To run the backend locally, follow these steps:
+
+1. Start the server:
+
+   ```shell
+   npm run start:dev
+   ```
+
+   The backend server should now be running on `http://localhost:5001`.
+
+2. Use a tool like [Postman](https://www.postman.com/) to test the API endpoints.
+
+
+## Deployment
+
+To deploy the backend to Amazon EC2 using PM2 and a start script, follow these steps:
+
+1. Set up an EC2 instance with your preferred operating system.
+
+2. Install Node.js on the EC2 instance.
+
+3. Clone the repository onto the EC2 instance.
+
+4. Install the dependencies:
+
+   ```shell
+   cd backend
+   npm install
+   ```
+
+5. Build the project:
+
+   ```shell
+   npm run build
+   ```
+
+   This will create a `dist` folder containing the compiled JavaScript files.
+
+6. Create a start script file named `start.sh` in the root directory of the project with the following contents:
+
+   ```shell
+   #!/bin/bash
+   npm run start:prod
+   ```
+
+7. Make the `start.sh` file executable:
+
+   ```shell
+   chmod +x start.sh
+   ```
+
+8. Configure the environment variables either by setting them in the environment or by modifying the `.env` file.
+
+9. Start the backend using PM2:
+
+   ```shell
+   pm2 start start.sh
+   ```
+
+   The backend should now be running using PM2.
+
+10. Optionally, you can set up PM2 to automatically start the backend on system boot:
+
+    ```shell
+    pm2 startup
+    pm2 save
+    ```
+
+    This will generate a command that you need to run. Execute the generated command to set up the startup script.
+
+11. Access your backend API using the appropriate URL or IP address of your EC2 instance.
+
+## Database Setup
+
+The backend uses Amazon RDS for the database. To set up the database:
+
+1. Log in to your AWS Management Console.
+
+2. Navigate to the Amazon RDS service.
+
+3. Create a new database instance with MySQL.
+
+4. Configure the database credentials and connection details in the `.env` file or set them as environment variables on your EC2 instance.
